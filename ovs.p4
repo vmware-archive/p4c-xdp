@@ -1,6 +1,5 @@
 /*
     OVS.p4 using tc-ebpf P4 architecture
-
 Requirements:
 - This should be an example which uses tc-ebpf P4 model to implement
   all the protocols supported by OVS.
@@ -270,11 +269,12 @@ control InPipe(inout ovs_packet headers,
     apply {
         //ovs_match_action.apply(headers, mcast_ctrl);
         // we can choose to use mcast engine or not
+        pass = false;
     }
 
 }
 
-control Deparser(packet_out packet, in headers hdr) {
+control Deparser(packet_out packet, in ovs_packet hdr) {
     apply {
         packet.emit(hdr.ethernet);
         packet.emit(hdr.vlan);

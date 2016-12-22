@@ -42,7 +42,9 @@ void KernelSamplesTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
         "        __u32 flags;\n"
         "        __u32 id;\n"
         "        __u32 pinning;\n"
-        "};\n");
+        "};\n"
+        "SEC(\"_ebpf_filter\") int ebpf_filter(struct __sk_buff *skb);\n"
+        );
 }
 
 void KernelSamplesTarget::emitTableLookup(Util::SourceCodeBuilder* builder, cstring tblName,
