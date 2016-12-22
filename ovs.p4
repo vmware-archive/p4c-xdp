@@ -196,80 +196,37 @@ parser TopParser(packet_in packet, /*inout bpf_sk_buff skbU, */ out ovs_packet h
     // more...
 }
 
-control InPipe(inout ovs_packet headers,
-               //in input_metadata md,
+control InPipe(inout ovs_packet hdr,
                out bool pass)
-               /*
-               in error parseError,
-               out McastControl ports // list of output ports)
-               */
 {
-    /* 'bitmap' shows which action should be executed, 
-       'md' is the corresponding action's metadata.
 
-    action ovs_dp_actions(bitmap, md[]) {
-        if (bitmap & DROP_MASK)
-            tc_drop.exec();
-        
-        if (bitmap & OUTPUT_MASK)
-            clone_redirect.exec(md[i++].port);
-            // or should we use redirect.exec()?
-
-        if (bitmap & TRUNC_MASK) // truncate the packet
-            change_tail.exec(md[i++].new_len, flags); 
-
-        if (bitmap & HASH_MASK)
-            get_hash.exec();
-
-        if (bitmap & PUSH_VLAN_MASK)
-            push_vlan.exec(md[i++].vid);
-
-        if (bitmap & POP_VLAN_MASK)
-            pop_vlan.exec();
-
-        if (bitmap & UPCALL_MASK)
-            // Send to CPU, ovs-vswitchd userspace for
-            // resolving the flow actions
-            perf_event_output.exec(packet_in p, in skb);
-
-        if (bitmap & SET_TUNNEL_MASK)
-            // light weight tunneling protocol support
-            set_tunnel_key.exec();
-
-        if (bitmap & GET_TUNNEL_MASK)
-            get_tunnel_key.exec();
-
-        // more actions later
+    action Reject()
+    {
+        pass = false;
     }
-    */
-    /**
-     * Use headers as key to lookup OVS actions list
-     * @parm headers
-     * @parm action_bitmap the executing actions
-     * @parm action_md_list executing actions' metadata
-    
-    table ovs_match_action(in ovs_packet headers, out McastCtrl mcast) {
-        key = {headers : exact; };
-        
-        /* use bitmap here?
-        actions = {
-            tc_bypass; // fallback to linux
-            ovs_dp_actions(in OvsActBitmap action_bitmap,
-                           in OvsActMd action_md,   // action metadata
-                           out McastCtrl mcast);    // read by mcast engine
 
-            // how do we specify mcast engine?
+    table match_action()
+    {
+        key = { hdr.ipv4.srcAddr : exact; }
+        actions = 
+        {
+            Reject;
+            NoAction;
         }
 
-        size = 1024;
-        default_action = tc_bypass;
+        implementation = hash_table(1024);
+        const default_action = NoAction;
     }
-    */
-    
+
     apply {
-        //ovs_match_action.apply(headers, mcast_ctrl);
-        // we can choose to use mcast engine or not
-        pass = false;
+        pass = true;
+
+        switch (match_action.apply().action_run) {
+        Reject: {
+            pass = false;
+        }
+        NoAction: {}
+        }
     }
 
 }

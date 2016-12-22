@@ -167,10 +167,38 @@ struct ovs_packet {
     struct vlan_tag_t vlan; /* vlan_tag_t */
 };
 
+struct match_action_key {
+    u32 field0;
+};
+enum match_action_actions {
+    Reject,
+    NoAction_1,
+};
+struct match_action_value {
+    enum match_action_actions action;
+    union {
+        struct {
+        } Reject;
+        struct {
+        } NoAction_1;
+    } u;
+};
+struct bpf_map_def SEC("maps") match_action = {
+    .type = BPF_MAP_TYPE_HASH,
+    .key_size = sizeof(struct match_action_key), 
+    .value_size = sizeof(struct match_action_value), 
+    .max_entries = 1024, 
+};
+struct bpf_map_def SEC("maps") match_action_defaultAction = {
+    .type = BPF_MAP_TYPE_ARRAY,
+    .key_size = sizeof(u32), 
+    .value_size = sizeof(struct match_action_value), 
+    .max_entries = 1, 
+};
 
 int ebpf_filter(struct __sk_buff* skb) {
 
-    printk("enter filter\n");
+    printk("enter\n");
 
     struct ovs_packet hdr = {
         .arp = {
@@ -657,11 +685,54 @@ int ebpf_filter(struct __sk_buff* skb) {
     {
         u8 hit;
         {
-            pass = false;
+            pass = true;
+            enum match_action_actions action_run;
+            {
+                /* construct key */
+                struct match_action_key key;
+                key.field0 = hdr.ipv4.srcAddr;
+                /* value */
+                struct match_action_value *value;
+                /* perform lookup */
+                value = bpf_map_lookup_elem(&match_action, &key);
+                if (value == NULL) {
+                    /* miss; find default action */
+                    hit = 0;
+                    value = bpf_map_lookup_elem(&match_action_defaultAction, &ebpf_zero);
+                } else {
+                    hit = 1;
+                }
+                if (value != NULL) {
+                    /* run action */
+                    switch (value->action) {
+                        case Reject: 
+                        {
+                            pass = false;
+                        }
+                        break;
+                        case NoAction_1: 
+                        {
+                        }
+                        break;
+                    }
+                    action_run = value->action;
+                }
+            }
+            switch (action_run) {
+                case Reject:
+                {
+                    pass = false;
+                }
+                break;
+                case NoAction_1:
+                {
+                }
+                break;
+            }
         }
     }
     ebpf_end:
-    printk("exit filter, pass = %d\n", pass);
+    printk("exit ebpf_filter, pass: %d\n", pass);
     return pass;
 }
 char _license[] SEC("license") = "GPL";
