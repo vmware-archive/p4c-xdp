@@ -200,9 +200,10 @@ control Ingress(inout ovs_packet hdr,
     // TODO: this should become an out parameter of Ingress
     bit<32> outputPort;
 
-    action Reject()
+    action Reject(bit<32> addr)
     {
         pass = false;
+        hdr.ipv4.srcAddr = addr;
     }
 
     table match_action()

@@ -178,6 +178,7 @@ struct match_action_value {
     enum match_action_actions action;
     union {
         struct {
+            u32 addr;
         } Reject;
         struct {
         } NoAction_1;
@@ -707,6 +708,7 @@ int ebpf_filter(struct __sk_buff* skb) {
                         case Reject: 
                         {
                             pass = false;
+                            hdr.ipv4.srcAddr = value->u.Reject.addr;
                         }
                         break;
                         case NoAction_1: 
