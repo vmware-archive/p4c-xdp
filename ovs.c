@@ -22,6 +22,13 @@ struct bpf_map_def {
         __u32 pinning;
 };
 SEC("_ebpf_filter") int ebpf_filter(struct __sk_buff *skb);
+
+static int (*bpf_trace_printk)(const char *fmt, int fmt_size, ...) =
+                              (void *) BPF_FUNC_trace_printk;
+#define printk(fmt, ...)    \
+({  char ___fmt[] = fmt;    \
+    bpf_trace_printk(___fmt, sizeof(___fmt), ##__VA_ARGS__);\
+})
 enum ebpf_errorCodes {
     NoError,
     PacketTooShort,
@@ -162,6 +169,9 @@ struct ovs_packet {
 
 
 int ebpf_filter(struct __sk_buff* skb) {
+
+    printk("enter filter\n");
+
     struct ovs_packet hdr = {
         .arp = {
             .ebpf_valid = 0
@@ -651,6 +661,7 @@ int ebpf_filter(struct __sk_buff* skb) {
         }
     }
     ebpf_end:
+    printk("exit filter, pass = %d\n", pass);
     return pass;
 }
 char _license[] SEC("license") = "GPL";

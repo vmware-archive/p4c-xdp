@@ -44,6 +44,13 @@ void KernelSamplesTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
         "        __u32 pinning;\n"
         "};\n"
         "SEC(\"_ebpf_filter\") int ebpf_filter(struct __sk_buff *skb);\n"
+        "\n"
+        "static int (*bpf_trace_printk)(const char *fmt, int fmt_size, ...) =\n"
+        "                              (void *) BPF_FUNC_trace_printk;\n"
+        "#define printk(fmt, ...)    \\\n"
+        "({  char ___fmt[] = fmt;    \\\n"
+        "    bpf_trace_printk(___fmt, sizeof(___fmt), ##__VA_ARGS__);\\\n"
+        "})\n"
         );
 }
 
