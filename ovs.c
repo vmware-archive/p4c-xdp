@@ -153,7 +153,7 @@ struct vlan_tag_t {
 
 struct metadata {
     struct pkt_metadata_t md; /* pkt_metadata_t */
-    struct flow_tnl_t tnl_md; /* flow_tnl_t */
+    struct flow_tnl_t tnl; /* flow_tnl_t */
 };
 
 struct ovs_packet {
@@ -171,12 +171,26 @@ struct match_action_key {
     u32 field0;
 };
 enum match_action_actions {
+    Output,
+    SetTunnelKey,
+    PushVlan,
+    PopVlan,
     Reject,
     NoAction_1,
 };
 struct match_action_value {
     enum match_action_actions action;
     union {
+        struct {
+            u32 port;
+        } Output;
+        struct {
+            struct flow_tnl_t tnl;
+        } SetTunnelKey;
+        struct {
+        } PushVlan;
+        struct {
+        } PopVlan;
         struct {
             u32 addr;
         } Reject;
@@ -684,6 +698,8 @@ int ebpf_filter(struct __sk_buff* skb) {
     accept:
     {
         u8 hit;
+        struct metadata md_1;
+        u32 outputPort;
         {
             pass = true;
             enum match_action_actions action_run;
@@ -705,6 +721,26 @@ int ebpf_filter(struct __sk_buff* skb) {
                 if (value != NULL) {
                     /* run action */
                     switch (value->action) {
+                        case Output: 
+                        {
+                            outputPort = value->u.Output.port;
+                        }
+                        break;
+                        case SetTunnelKey: 
+                        {
+                            md.tnl.ip_dst = value->u.SetTunnelKey.tnl.ip_dst;
+                            md.tnl.ip_src = value->u.SetTunnelKey.tnl.ip_src;
+                            md.tnl.ip_ttl = value->u.SetTunnelKey.tnl.ip_ttl;
+                        }
+                        break;
+                        case PushVlan: 
+                        {
+                        }
+                        break;
+                        case PopVlan: 
+                        {
+                        }
+                        break;
                         case Reject: 
                         {
                             pass = false;
@@ -720,6 +756,18 @@ int ebpf_filter(struct __sk_buff* skb) {
                 }
             }
             switch (action_run) {
+                case Output:
+                {
+                }
+                break;
+                case SetTunnelKey:
+                {
+                }
+                break;
+                case PushVlan:
+                {
+                }
+                break;
                 case Reject:
                 {
                     pass = false;

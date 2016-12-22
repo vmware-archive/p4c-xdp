@@ -116,7 +116,7 @@ header vlan_tag_t {
 
 struct metadata {
     pkt_metadata_t md;
-    flow_tnl_t     tnl_md;
+    flow_tnl_t     tnl;
 }
 
 struct ovs_packet {
@@ -200,6 +200,29 @@ control Ingress(inout ovs_packet hdr,
     // TODO: this should become an out parameter of Ingress
     bit<32> outputPort;
 
+    action Output(bit<32> port)
+    {
+        outputPort = port;
+    }
+
+    action SetTunnelKey(flow_tnl_t tnl)
+    {
+        md.tnl.ip_dst = tnl.ip_dst;
+        md.tnl.ip_src = tnl.ip_src;
+        md.tnl.ip_ttl = tnl.ip_ttl;
+        // bpf_set_tunnel_key
+    }
+
+    action PushVlan()
+    {
+        //extern bpf_skb_push_vlan
+    }
+
+    action PopVlan()
+    {
+        //exten bpf_skb_pop_vlan
+    }
+
     action Reject(bit<32> addr)
     {
         pass = false;
@@ -211,6 +234,10 @@ control Ingress(inout ovs_packet hdr,
         key = { hdr.ipv4.srcAddr : exact; }
         actions =
         {
+            Output;
+            SetTunnelKey;
+            PushVlan;
+            PopVlan;
             Reject;
             NoAction;
         }
@@ -223,13 +250,21 @@ control Ingress(inout ovs_packet hdr,
         pass = true;
 
         switch (match_action.apply().action_run) {
+        Output: {
+
+        }
+        SetTunnelKey: {
+
+        }
+        PushVlan: {
+
+        }
         Reject: {
             pass = false;
         }
         NoAction: {}
         }
     }
-
 }
 
 // TODO: this should be argument to the new model ovs_ebpf_model()
