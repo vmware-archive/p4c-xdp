@@ -187,19 +187,18 @@ struct bpf_map_def SEC("maps") match_action = {
     .type = BPF_MAP_TYPE_HASH,
     .key_size = sizeof(struct match_action_key), 
     .value_size = sizeof(struct match_action_value), 
+    .pinning = 2, //PIN_GLOBAL_NS
     .max_entries = 1024, 
 };
 struct bpf_map_def SEC("maps") match_action_defaultAction = {
     .type = BPF_MAP_TYPE_ARRAY,
     .key_size = sizeof(u32), 
     .value_size = sizeof(struct match_action_value), 
+    .pinning = 2, //PIN_GLOBAL_NS
     .max_entries = 1, 
 };
 
 int ebpf_filter(struct __sk_buff* skb) {
-
-    printk("enter\n");
-
     struct ovs_packet hdr = {
         .arp = {
             .ebpf_valid = 0
@@ -732,7 +731,6 @@ int ebpf_filter(struct __sk_buff* skb) {
         }
     }
     ebpf_end:
-    printk("exit ebpf_filter, pass: %d\n", pass);
     return pass;
 }
 char _license[] SEC("license") = "GPL";

@@ -89,6 +89,10 @@ void KernelSamplesTarget::emitTableDecl(Util::SourceCodeBuilder* builder,
     builder->newline();
 
     builder->emitIndent();
+    builder->appendFormat(".pinning = 2, //PIN_GLOBAL_NS");
+    builder->newline();
+
+    builder->emitIndent();
     builder->appendFormat(".max_entries = %d, ", size);
     builder->newline();
 
