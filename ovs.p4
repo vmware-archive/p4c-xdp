@@ -7,10 +7,11 @@ Requirements:
 Protocol supports:
     - L2: VLAN,...
     - L3: ...
-Tunneling: 
+Tunneling:
     - Support Linux's bpf tunnel protocol (ipip, vxlan, gre, geneve, etc)
 */
 
+// TODO: define a new model ovs_ebpf_model.p4
 #include <ebpf_model.p4>
 
 struct pkt_metadata_t {
@@ -189,16 +190,15 @@ parser TopParser(packet_in packet, /*inout bpf_sk_buff skbU, */ out ovs_packet h
     state start {
         transition parse_ethernet;
     }
-
-    // parse ovs skb metadata
-    // p.skb_mark = @skb("mark"); 
-    // p.skb_priority = @skb("priority");
-    // more...
 }
 
-control InPipe(inout ovs_packet hdr,
-               out bool pass)
+control Ingress(inout ovs_packet hdr,
+                out bool pass)
 {
+    // TODO: This should become an in parameter of Ingress
+    metadata md;
+    // TODO: this should become an out parameter of Ingress
+    bit<32> outputPort;
 
     action Reject()
     {
@@ -208,7 +208,7 @@ control InPipe(inout ovs_packet hdr,
     table match_action()
     {
         key = { hdr.ipv4.srcAddr : exact; }
-        actions = 
+        actions =
         {
             Reject;
             NoAction;
@@ -231,6 +231,7 @@ control InPipe(inout ovs_packet hdr,
 
 }
 
+// TODO: this should be argument to the new model ovs_ebpf_model()
 control Deparser(packet_out packet, in ovs_packet hdr) {
     apply {
         packet.emit(hdr.ethernet);
@@ -244,4 +245,5 @@ control Deparser(packet_out packet, in ovs_packet hdr) {
     }
 }
 
-ebpfFilter(TopParser(), InPipe()) main;
+// TODO: replace this with ovs_ebpf_model
+ebpfFilter(TopParser(), Ingress()) main;
