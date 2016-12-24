@@ -5,7 +5,7 @@ set -e
 # filename: tmp.o 
 # section name: _ebpf_filter
 
-DEV=ens37
+DEV=enp0s16
 
 tc qdisc add dev $DEV clsact
 tc filter add dev $DEV ingress bpf da obj tmp.o sec _ebpf_filter verb 

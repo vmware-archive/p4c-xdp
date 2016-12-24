@@ -167,48 +167,57 @@ struct ovs_packet {
     struct vlan_tag_t vlan; /* vlan_tag_t */
 };
 
-struct match_action_key {
+struct output_md_t {
+    u16 port; /* bit<16> */
+};
+
+struct pushvlan_md_t {
+    u16 tci; /* bit<16> */
+    u16 proto; /* bit<16> */
+};
+
+struct settunnel_md_t {
+    u32 ip_dst; /* bit<32> */
+    u32 ip_src; /* bit<32> */
+    char tun_id[8]; /* bit<64> */
+    u16 flags; /* bit<16> */
+};
+
+struct action_md_t {
+    struct output_md_t output; /* output_md_t */
+    struct pushvlan_md_t pushvlan; /* pushvlan_md_t */
+    struct settunnel_md_t settunnel; /* settunnel_md_t */
+};
+
+struct ovsTable_key {
     u32 field0;
 };
-enum match_action_actions {
-    Output,
-    SetTunnelKey,
-    PushVlan,
-    PopVlan,
-    Reject,
-    NoAction_1,
+enum ovsTable_actions {
+    OVS,
+    Upcall,
 };
-struct match_action_value {
-    enum match_action_actions action;
+struct ovsTable_value {
+    enum ovsTable_actions action;
     union {
         struct {
-            u32 port;
-        } Output;
+            u32 bitmap;
+            struct action_md_t md;
+        } OVS;
         struct {
-            struct flow_tnl_t tnl;
-        } SetTunnelKey;
-        struct {
-        } PushVlan;
-        struct {
-        } PopVlan;
-        struct {
-            u32 addr;
-        } Reject;
-        struct {
-        } NoAction_1;
+        } Upcall;
     } u;
 };
-struct bpf_map_def SEC("maps") match_action = {
+struct bpf_map_def SEC("maps") ovsTable = {
     .type = BPF_MAP_TYPE_HASH,
-    .key_size = sizeof(struct match_action_key), 
-    .value_size = sizeof(struct match_action_value), 
+    .key_size = sizeof(struct ovsTable_key), 
+    .value_size = sizeof(struct ovsTable_value), 
     .pinning = 2, //PIN_GLOBAL_NS
     .max_entries = 1024, 
 };
-struct bpf_map_def SEC("maps") match_action_defaultAction = {
+struct bpf_map_def SEC("maps") ovsTable_defaultAction = {
     .type = BPF_MAP_TYPE_ARRAY,
     .key_size = sizeof(u32), 
-    .value_size = sizeof(struct match_action_value), 
+    .value_size = sizeof(struct ovsTable_value), 
     .pinning = 2, //PIN_GLOBAL_NS
     .max_entries = 1, 
 };
@@ -698,86 +707,87 @@ int ebpf_filter(struct __sk_buff* skb) {
     accept:
     {
         u8 hit;
-        struct metadata md_1;
-        u32 outputPort;
+        u16 outputPort;
+        u32 toRun;
+        struct action_md_t action_md;
+        u32 tmp_11;
+        u8 tmp_12;
+        u32 tmp_13;
+        u8 tmp_14;
+        u32 tmp_15;
+        u8 tmp_16;
+        u32 tmp_17;
+        u8 tmp_18;
+        u32 tmp_19;
+        u8 tmp_20;
+        u32 tmp_21;
+        u8 tmp_22;
         {
             pass = true;
-            enum match_action_actions action_run;
+            toRun = 0;
             {
                 /* construct key */
-                struct match_action_key key;
+                struct ovsTable_key key;
                 key.field0 = hdr.ipv4.srcAddr;
                 /* value */
-                struct match_action_value *value;
+                struct ovsTable_value *value;
                 /* perform lookup */
-                value = bpf_map_lookup_elem(&match_action, &key);
+                value = bpf_map_lookup_elem(&ovsTable, &key);
                 if (value == NULL) {
                     /* miss; find default action */
                     hit = 0;
-                    value = bpf_map_lookup_elem(&match_action_defaultAction, &ebpf_zero);
+                    value = bpf_map_lookup_elem(&ovsTable_defaultAction, &ebpf_zero);
                 } else {
                     hit = 1;
                 }
                 if (value != NULL) {
                     /* run action */
                     switch (value->action) {
-                        case Output: 
+                        case OVS: 
                         {
-                            outputPort = value->u.Output.port;
+                            toRun = value->u.OVS.bitmap;
+                            action_md = value->u.OVS.md;
                         }
                         break;
-                        case SetTunnelKey: 
-                        {
-                            md.tnl.ip_dst = value->u.SetTunnelKey.tnl.ip_dst;
-                            md.tnl.ip_src = value->u.SetTunnelKey.tnl.ip_src;
-                            md.tnl.ip_ttl = value->u.SetTunnelKey.tnl.ip_ttl;
-                        }
-                        break;
-                        case PushVlan: 
-                        {
-                        }
-                        break;
-                        case PopVlan: 
-                        {
-                        }
-                        break;
-                        case Reject: 
-                        {
-                            pass = false;
-                            hdr.ipv4.srcAddr = value->u.Reject.addr;
-                        }
-                        break;
-                        case NoAction_1: 
+                        case Upcall: 
                         {
                         }
                         break;
                     }
-                    action_run = value->action;
                 }
             }
-            switch (action_run) {
-                case Output:
+;
+            tmp_11 = (toRun & 1);
+            tmp_12 = (tmp_11 != 0);
+            if (tmp_12) 
                 {
-                }
-                break;
-                case SetTunnelKey:
+                    outputPort = action_md.output.port;
+                };
+            tmp_13 = (toRun & 2);
+            tmp_14 = (tmp_13 != 0);
+            if (tmp_14) 
                 {
-                }
-                break;
-                case PushVlan:
+                };
+            tmp_15 = (toRun & 4);
+            tmp_16 = (tmp_15 != 0);
+            if (tmp_16) 
                 {
-                }
-                break;
-                case Reject:
+                };
+            tmp_17 = (toRun & 8);
+            tmp_18 = (tmp_17 != 0);
+            if (tmp_18) 
                 {
-                    pass = false;
-                }
-                break;
-                case NoAction_1:
+                };
+            tmp_19 = (toRun & 16);
+            tmp_20 = (tmp_19 != 0);
+            if (tmp_20) 
                 {
-                }
-                break;
-            }
+                };
+            tmp_21 = (toRun & 32);
+            tmp_22 = (tmp_21 != 0);
+            if (tmp_22) 
+                {
+                };
         }
     }
     ebpf_end:

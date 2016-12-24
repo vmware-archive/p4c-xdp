@@ -14,6 +14,17 @@ Tunneling:
 // TODO: define a new model ovs_ebpf_model.p4
 #include <ebpf_model.p4>
 
+#define OUTPUT_OFS      (1<<0)
+#define PUSHVLAN_OFS    (1<<1)
+#define POPVLAN_OFS     (1<<2)
+#define SETMASKED_OFS   (1<<3)
+#define SETTUNEL_OFS    (1<<4)
+#define TRUNC_OFS       (1<<5)
+
+extern void bpf_skb_clone_redirect(in bit<16> port);
+extern void bpf_skb_vlan_push(in bit<16> proto, in bit<16> tci);
+extern void bpf_skb_vlan_pop();
+
 struct pkt_metadata_t {
     bit<32>  recirc_id;
     bit<32>  dp_hash;
@@ -130,6 +141,30 @@ struct ovs_packet {
     vlan_tag_t vlan;
 }
 
+// metadata to execute on actions
+struct output_md_t {
+    bit<16> port;   //ifindex
+}
+
+struct pushvlan_md_t {
+    bit<16> tci;
+    bit<16> proto;
+}
+
+struct settunnel_md_t {
+    bit<32> ip_dst;
+    bit<32> ip_src;
+    bit<64> tun_id;
+    bit<16> flags;
+}
+
+// it's better if we have union
+struct action_md_t {
+    output_md_t output;
+    pushvlan_md_t pushvlan;
+    settunnel_md_t settunnel;
+}
+
 /* implement OVS's key_extract() in net/openvswitch/flow.c */
 parser TopParser(packet_in packet, /*inout bpf_sk_buff skbU, */ out ovs_packet hdr)
 {
@@ -192,77 +227,102 @@ parser TopParser(packet_in packet, /*inout bpf_sk_buff skbU, */ out ovs_packet h
     }
 }
 
+
 control Ingress(inout ovs_packet hdr,
                 out bool pass)
 {
     // TODO: This should become an in parameter of Ingress
     metadata md;
     // TODO: this should become an out parameter of Ingress
-    bit<32> outputPort;
+    bit<16> outputPort;
+    bit<32> toRun;
+    action_md_t action_md;
 
-    action Output(bit<32> port)
+    action Output()
     {
-        outputPort = port;
+        outputPort = action_md.output.port;
+        //bpf_skb_clone_redirect(outputPort); 
     }
-
-    action SetTunnelKey(flow_tnl_t tnl)
-    {
-        md.tnl.ip_dst = tnl.ip_dst;
-        md.tnl.ip_src = tnl.ip_src;
-        md.tnl.ip_ttl = tnl.ip_ttl;
-        // bpf_set_tunnel_key
-    }
-
+    
     action PushVlan()
     {
-        //extern bpf_skb_push_vlan
+        bit<16> tci = action_md.pushvlan.tci;
+        bit<16> proto = action_md.pushvlan.proto;
+        //bpf_skb_vlan_push(proto, tci);
     }
 
     action PopVlan()
     {
-        //exten bpf_skb_pop_vlan
+        //bpf_skb_vlan_pop();
+    }
+   
+    action SetMasked()
+    {
+        //bpf_skb_store_byte
     }
 
-    action Reject(bit<32> addr)
+    action SetTunnel()
     {
-        pass = false;
-        hdr.ipv4.srcAddr = addr;
+        // bpf_set_tunnel_key
     }
 
-    table match_action()
+    action Trunc()
     {
+        // bpf_skb_change_tail 
+    }
+
+    // a flow miss upcall sends the packet with its md
+    // to the userspace (ovs-vswitchd), which will look
+    // up OF tables and install flow entry into map
+    action Upcall()
+    {
+        // bpf_perf_event_output(skb, &perf_events, len, msg, sizeof(msg));
+    }
+
+    // OVS datapath action dispatcher
+    // Execute a fixed sequence of actions
+    action OVS(bit<32> bitmap, action_md_t md) {
+        // the bitmap is set by the control plane and indicates
+        // which actions should be executed
+        toRun = bitmap;
+        // the action_md is the metadata for action to execute
+        action_md = md;
+    }
+   
+    table ovsTable() {
         key = { hdr.ipv4.srcAddr : exact; }
-        actions =
-        {
-            Output;
-            SetTunnelKey;
-            PushVlan;
-            PopVlan;
-            Reject;
-            NoAction;
+        actions = {
+            OVS;
+            Upcall; // Send to userspce ovs-vswitchd
         }
-
+        default_action = Upcall; //NoAction;
         implementation = hash_table(1024);
-        const default_action = NoAction;
     }
 
     apply {
         pass = true;
+        toRun = 0;
 
-        switch (match_action.apply().action_run) {
-        Output: {
+        ovsTable.apply();
 
+        // the sequece matters
+        if ((toRun & OUTPUT_OFS) != 0) {
+            Output();
         }
-        SetTunnelKey: {
-
+        if ((toRun & PUSHVLAN_OFS) != 0) {
+            PushVlan();
         }
-        PushVlan: {
-
+        if ((toRun & POPVLAN_OFS) != 0) {
+            PopVlan();
         }
-        Reject: {
-            pass = false;
+        if ((toRun & SETMASKED_OFS) != 0) {
+            SetMasked();
         }
-        NoAction: {}
+        if ((toRun & SETTUNEL_OFS) != 0) {
+            SetTunnel();
+        }
+        if ((toRun & TRUNC_OFS) != 0) {
+            Trunc();
         }
     }
 }

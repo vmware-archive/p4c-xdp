@@ -74,6 +74,14 @@ bool ControlBodyTranslationVisitor::preorder(const IR::MethodCallExpression* exp
         return false;
     }
 
+    auto ac = mi->to<P4::ActionCall>();
+    if (ac != nullptr) {
+        // Action arguments have been eliminated by the mid-end.
+        BUG_CHECK(expression->arguments->size() == 0, "%1%: unexpected arguments for action call",
+                  expression);
+        visit(ac->action->body);
+    	return false;
+	} 
     BUG("Unexpected method invocation %1%", expression);
     return false;
 }
