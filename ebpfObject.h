@@ -58,6 +58,7 @@ class EBPFProgram : public EBPFObject {
 
     cstring endLabel;
     cstring offsetVar;
+    cstring lengthVar;
     cstring zeroKey;
     cstring functionName;
     cstring errorVar;
@@ -80,6 +81,7 @@ class EBPFProgram : public EBPFObject {
         errorVar = EBPFModel::reserved("errorCode");
         endLabel = EBPFModel::reserved("end");
         errorEnum = EBPFModel::reserved("errorCodes");
+        lengthVar = EBPFModel::reserved("packetLength");
     }
 
  private:

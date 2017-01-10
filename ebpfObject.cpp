@@ -75,7 +75,7 @@ void EBPFProgram::emit(CodeBuilder *builder) {
     builder->target->emitCodeSection(builder, functionName);
 #endif
     builder->emitIndent();
-    builder->appendFormat("int %s(struct __sk_buff* %s) ", functionName, model.CPacketName.str());
+    builder->target->emitMain(builder, functionName, model.CPacketName.str());
     builder->blockStart();
 
     emitHeaderInstances(builder);
@@ -158,6 +158,11 @@ void EBPFProgram::createLocalVariables(CodeBuilder* builder) {
     builder->emitIndent();
     builder->appendFormat("enum %s %s = %s;", errorEnum, errorVar,
                           P4::P4CoreLibrary::instance.noError.str());
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat("u32 %s = %s;",
+                          lengthVar, builder->target->packetLength(model.CPacketName.str()));
     builder->newline();
 
     builder->emitIndent();

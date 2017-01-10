@@ -42,8 +42,10 @@ void run_ebpf_backend(const EbpfOptions& options, const IR::ToplevelBlock* tople
         target = new BccTarget();
     } else if (options.target == "kernel") {
         target = new KernelSamplesTarget();
+    } else if (options.target == "xdp") {
+        target = new XdpTarget();
     } else {
-        ::error("Unknown target %s; legal choices are 'bcc' and 'kernel'", options.target);
+        ::error("Unknown target %s; legal choices are 'bcc', 'xdp', and 'kernel'", options.target);
         return;
     }
     auto ebpfprog = new EBPFProgram(toplevel->getProgram(), refMap, typeMap, toplevel);
