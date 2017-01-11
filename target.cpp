@@ -111,6 +111,12 @@ void KernelSamplesTarget::emitCodeSection(
     builder->appendFormat("SEC(\"%s\")\n", sectionName);
 }
 
+void KernelSamplesTarget::emitMain(Util::SourceCodeBuilder* builder,
+                                   cstring functionName,
+                                   cstring argName) const {
+    builder->appendFormat("int %s(struct __sk_buff* %s)", functionName, argName);
+}
+
 //////////////////////////////////////////////////////////////
 
 void BccTarget::emitTableLookup(Util::SourceCodeBuilder* builder, cstring tblName,
@@ -144,5 +150,38 @@ void BccTarget::emitTableDecl(Util::SourceCodeBuilder* builder,
 }
 
 void BccTarget::emitLicense(Util::SourceCodeBuilder*, cstring) const {}
+
+void BccTarget::emitMain(Util::SourceCodeBuilder* builder,
+                                   cstring functionName,
+                                   cstring argName) const {
+    builder->appendFormat("int %s(struct __sk_buff* %s)", functionName, argName);
+}
+
+////////////////////////////////////////////////////////////////
+
+void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
+    builder->append(
+        "#include <uapi/linux/bpf.h>\n"
+        "#include <linux/in.h>\n"
+        "#include <linux/if_ether.h>\n"
+        "#include <linux/if_packet.h>\n"
+        "#include <linux/if_vlan.h>\n"
+        "#include <linux/ip.h>\n"
+        "#include <linux/ipv6.h>\n"
+        "#include \"bpf_helpers.h\"\n"
+        "\n"
+        "static __always_inline int ebpf_filter(struct xdp_md *skb);\n"
+        "\n"
+        "#define load_byte(data, b)  (*(u8 *)(data + (b)))\n"
+        "#define load_half(data, b) ntohs(*(u16 *)(data + (b)))\n"
+        "#define load_word(data, b) ntohl(*(u32 *)(data + (b)))\n"
+                    );
+}
+
+void XdpTarget::emitMain(Util::SourceCodeBuilder* builder,
+                                   cstring functionName,
+                                   cstring argName) const {
+    builder->appendFormat("int %s(struct xdp_md* %s)", functionName, argName);
+}
 
 }  // namespace EBPF
