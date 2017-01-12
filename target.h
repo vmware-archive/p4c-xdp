@@ -106,6 +106,9 @@ class XdpTarget : public KernelSamplesTarget {
     { return cstring("((void*)(long)")+ base + "->data)"; }
     cstring packetLength(cstring packet) const override
     { return packet + "->data_end - " + packet + "->data"; }
+    void emitTableDecl(Util::SourceCodeBuilder* builder,
+                       cstring tblName, bool isHash,
+                       cstring keyType, cstring valueType, unsigned size) const override;
 };
 
 }  // namespace EBPF

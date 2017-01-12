@@ -161,6 +161,7 @@ void BccTarget::emitMain(Util::SourceCodeBuilder* builder,
 
 void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
+        "#define KBUILD_MODNAME \"xdptest\"\n"
         "#include <uapi/linux/bpf.h>\n"
         "#include <linux/in.h>\n"
         "#include <linux/if_ether.h>\n"
@@ -173,15 +174,46 @@ void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
         "static __always_inline int ebpf_filter(struct xdp_md *skb);\n"
         "\n"
         "#define load_byte(data, b)  (*(u8 *)(data + (b)))\n"
-        "#define load_half(data, b) ntohs(*(u16 *)(data + (b)))\n"
-        "#define load_word(data, b) ntohl(*(u32 *)(data + (b)))\n"
+        "#define load_half(data, b) __constant_ntohs(*(u16 *)(data + (b)))\n"
+        "#define load_word(data, b) __constant_ntohl(*(u32 *)(data + (b)))\n"
                     );
 }
 
 void XdpTarget::emitMain(Util::SourceCodeBuilder* builder,
                                    cstring functionName,
                                    cstring argName) const {
-    builder->appendFormat("int %s(struct xdp_md* %s)", functionName, argName);
+    builder->appendFormat("SEC(\"prog\")\n"
+                          "int %s(struct xdp_md* %s)", functionName, argName);
+}
+
+void XdpTarget::emitTableDecl(Util::SourceCodeBuilder* builder,
+                              cstring tblName, bool isHash,
+                              cstring keyType, cstring valueType,
+                              unsigned size) const {
+    builder->emitIndent();
+    builder->appendFormat("struct bpf_map_def SEC(\"maps\") %s = ", tblName);
+    builder->blockStart();
+    builder->emitIndent();
+    builder->append(".type = ");
+    if (isHash)
+        builder->appendLine("BPF_MAP_TYPE_HASH,");
+    else
+        builder->appendLine("BPF_MAP_TYPE_ARRAY,");
+
+    builder->emitIndent();
+    builder->appendFormat(".key_size = sizeof(%s), ", keyType);
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat(".value_size = sizeof(%s), ", valueType);
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat(".max_entries = %d, ", size);
+    builder->newline();
+
+    builder->blockEnd(false);
+    builder->endOfStatement(true);
 }
 
 }  // namespace EBPF
