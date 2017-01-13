@@ -161,8 +161,12 @@ void EBPFProgram::createLocalVariables(CodeBuilder* builder) {
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat("u32 %s = %s;",
-                          lengthVar, builder->target->packetLength(model.CPacketName.str()));
+    builder->appendFormat("void* %s = %s;",
+                          packetStartVar, builder->target->dataOffset(model.CPacketName.str()));
+    builder->newline();
+    builder->emitIndent();
+    builder->appendFormat("void* %s = %s;",
+                          packetEndVar, builder->target->dataEnd(model.CPacketName.str()));
     builder->newline();
 
     builder->emitIndent();
