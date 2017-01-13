@@ -48,7 +48,7 @@ class Target {
                           cstring functionName,
                           cstring argName) const = 0;
     virtual cstring dataOffset(cstring base) const = 0;
-    virtual cstring packetLength(cstring packet) const = 0;
+    virtual cstring dataEnd(cstring base) const = 0;
 };
 
 // Represents a target that is compiled within the kernel
@@ -70,7 +70,8 @@ class KernelSamplesTarget : public Target {
                   cstring functionName,
                   cstring argName) const override;
     cstring dataOffset(cstring base) const override { return base; }
-    cstring packetLength(cstring packet) const override { return packet + "->len"; }
+    cstring dataEnd(cstring base) const override
+    { return cstring("(") + base + " + " + base + "->len)"; }
 };
 
 // Represents a target compiled by bcc that uses the TC
@@ -91,7 +92,8 @@ class BccTarget : public Target {
                   cstring functionName,
                   cstring argName) const override;
     cstring dataOffset(cstring base) const override { return base; }
-    cstring packetLength(cstring packet) const override { return packet + "->len"; }
+    cstring dataEnd(cstring base) const override
+    { return cstring("(") + base + " + " + base + "->len)"; }
 };
 
 // Target XDP
@@ -104,11 +106,11 @@ class XdpTarget : public KernelSamplesTarget {
                   cstring argName) const override;
     cstring dataOffset(cstring base) const override
     { return cstring("((void*)(long)")+ base + "->data)"; }
-    cstring packetLength(cstring packet) const override
-    { return packet + "->data_end - " + packet + "->data"; }
     void emitTableDecl(Util::SourceCodeBuilder* builder,
                        cstring tblName, bool isHash,
                        cstring keyType, cstring valueType, unsigned size) const override;
+    cstring dataEnd(cstring base) const override
+    { return cstring("((void*)(long)")+ base + "->data_end)"; }
 };
 
 }  // namespace EBPF

@@ -56,15 +56,12 @@ class EBPFProgram : public EBPFObject {
     EBPFControl*         control;
     EBPFModel           &model;
 
-    cstring endLabel;
-    cstring offsetVar;
-    cstring lengthVar;
-    cstring zeroKey;
-    cstring functionName;
-    cstring errorVar;
+    cstring endLabel, offsetVar, lengthVar;
+    cstring zeroKey, functionName, errorVar;
     cstring errorEnum;
     cstring license = "GPL";  // TODO: this should be a compiler option probably
     cstring arrayIndexType = "u32";
+    cstring packetStartVar, packetEndVar;
 
     // write program as C source code
     void emit(CodeBuilder *builder) override;
@@ -81,7 +78,8 @@ class EBPFProgram : public EBPFObject {
         errorVar = EBPFModel::reserved("errorCode");
         endLabel = EBPFModel::reserved("end");
         errorEnum = EBPFModel::reserved("errorCodes");
-        lengthVar = EBPFModel::reserved("packetLength");
+        packetStartVar = EBPFModel::reserved("packetStart");
+        packetEndVar = EBPFModel::reserved("packetEnd");
     }
 
  private:
