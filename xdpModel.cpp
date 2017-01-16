@@ -1,5 +1,5 @@
 /*
-Copyright 2013-present Barefoot Networks, Inc. 
+Copyright 2017 VMware, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,17 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef _BACKENDS_EBPF_EBPFOPTIONS_H_
-#define _BACKENDS_EBPF_EBPFOPTIONS_H_
+#include "xdpModel.h"
 
-#include <getopt.h>
-#include "frontends/common/options.h"
+namespace XDP {
 
-class EbpfOptions : public CompilerOptions {
- public:
-    EbpfOptions() {
-        langVersion = CompilerOptions::FrontendVersion::P4_16;
-    }
-};
+XDPModel XDPModel::instance;
 
-#endif /* _BACKENDS_EBPF_EBPFOPTIONS_H_ */
+}  // namespace XDP

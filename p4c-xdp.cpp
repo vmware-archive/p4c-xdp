@@ -1,5 +1,5 @@
 /*
-Copyright 2013-present Barefoot Networks, Inc.
+Copyright 2017 VMware, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ limitations under the License.
 #include "lib/gc.h"
 #include "lib/nullstream.h"
 
-#include "midend.h"
-#include "ebpfOptions.h"
-#include "ebpfBackend.h"
+#include "backends/ebpf/midend.h"
+#include "backends/ebpf/ebpfOptions.h"
+#include "xdpBackend.h"
 #include "frontends/common/parseInput.h"
 #include "frontends/p4/frontend.h"
 
@@ -55,7 +55,7 @@ void compile(EbpfOptions& options) {
     if (::errorCount() > 0)
         return;
 
-    EBPF::run_ebpf_backend(options, toplevel, &midend.refMap, &midend.typeMap);
+    XDP::run_xdp_backend(options, toplevel, &midend.refMap, &midend.typeMap);
 }
 
 int main(int argc, char *const argv[]) {

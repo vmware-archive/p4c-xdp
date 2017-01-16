@@ -1,5 +1,5 @@
 /*
-Copyright 2013-present Barefoot Networks, Inc. 
+Copyright 2017 VMware, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "ebpfModel.h"
+#ifndef _EXTENSIONS_P4C_OVS_EBPF_XDPBACKEND_H_
+#define _EXTENSIONS_P4C_OVS_EBPF_XDPBACKEND_H_
 
-namespace EBPF {
+#include "backends/ebpf/ebpfOptions.h"
+#include "ir/ir.h"
+#include "frontends/p4/evaluator/evaluator.h"
 
-cstring EBPFModel::reservedPrefix = "ebpf_";
-EBPFModel EBPFModel::instance;
+namespace XDP {
 
-const IR::Type* EBPFModel::counterIndexType = IR::Type_Bits::get(32);
-const IR::Type* EBPFModel::counterValueType = IR::Type_Bits::get(32);
+void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplevel,
+                     P4::ReferenceMap* refMap, P4::TypeMap* typeMap);
 
-}  // namespace EBPF
+}  // namespace XDP
+
+#endif /* _EXTENSIONS_P4C_OVS_EBPF_XDPBACKEND_H_ */

@@ -1,5 +1,5 @@
 /*
-Copyright 2013-present Barefoot Networks, Inc.
+Copyright 2017 VMware, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@ limitations under the License.
 
 #include "target.h"
 
-namespace EBPF {
+namespace XDP {
 
+#if 0
 void KernelSamplesTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
         "#include <linux/skbuff.h>\n"
@@ -27,7 +28,13 @@ void KernelSamplesTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
         "/* TODO: these should be in some header somewhere in the kernel, but where? */\n"
         "#define SEC(NAME) __attribute__((section(NAME), used))\n"
         "static void *(*bpf_map_lookup_elem)(void *map, void *key) =\n"
-        "        (void *) BPF_FUNC_map_lookup_elem;\n"
+        "       (void *) BPF_FUNC_map_lookup_elem;\n"
+        "static int (*bpf_map_update_elem)(void *map, void *key, void *value,\n"
+        "                                  unsigned long long flags) =\n"
+        "       (void *) BPF_FUNC_map_update_elem;\n"
+        "static int (*bpf_map_update_elem)(void *map, void *key, void *value\n"
+        "                                  unsigned long long flags) =\n"
+        "       (void *) BPF_FUNC_map_update_elem;\n"
         "unsigned long long load_byte(void *skb,\n"
         "                             unsigned long long off) asm(\"llvm.bpf.load.byte\");\n"
         "unsigned long long load_half(void *skb,\n"
@@ -158,6 +165,7 @@ void BccTarget::emitMain(Util::SourceCodeBuilder* builder,
 }
 
 ////////////////////////////////////////////////////////////////
+#endif
 
 void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
@@ -216,4 +224,4 @@ void XdpTarget::emitTableDecl(Util::SourceCodeBuilder* builder,
     builder->endOfStatement(true);
 }
 
-}  // namespace EBPF
+}  // namespace XDP
