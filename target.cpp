@@ -20,10 +20,7 @@ namespace EBPF {
 
 void KernelSamplesTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
-        "#include <linux/skbuff.h>\n"
-        "#include <linux/netdevice.h>\n"
-        "#include <linux/version.h>\n"
-        "#include <uapi/linux/bpf.h>\n"
+        "#include <linux/bpf.h>\n"
         "/* TODO: these should be in some header somewhere in the kernel, but where? */\n"
         "#define SEC(NAME) __attribute__((section(NAME), used))\n"
         "static void *(*bpf_map_lookup_elem)(void *map, void *key) =\n"
@@ -132,12 +129,7 @@ void BccTarget::emitTableUpdate(Util::SourceCodeBuilder* builder, cstring tblNam
 }
 
 void BccTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
-    builder->append("#include <uapi/linux/bpf.h>\n"
-                    "#include <uapi/linux/if_ether.h>\n"
-                    "#include <uapi/linux/if_packet.h>\n"
-                    "#include <uapi/linux/ip.h>\n"
-                    "#include <linux/skbuff.h>\n"
-                    "#include <linux/netdevice.h>\n");
+    builder->append("#include <linux/bpf.h>\n");
 }
 
 void BccTarget::emitTableDecl(Util::SourceCodeBuilder* builder,
@@ -162,13 +154,7 @@ void BccTarget::emitMain(Util::SourceCodeBuilder* builder,
 void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
         "#define KBUILD_MODNAME \"xdptest\"\n"
-        "#include <uapi/linux/bpf.h>\n"
-        "#include <linux/in.h>\n"
-        "#include <linux/if_ether.h>\n"
-        "#include <linux/if_packet.h>\n"
-        "#include <linux/if_vlan.h>\n"
-        "#include <linux/ip.h>\n"
-        "#include <linux/ipv6.h>\n"
+        "#include <linux/bpf.h>\n"
         "#include \"bpf_helpers.h\"\n"
         "\n"
         "static __always_inline int ebpf_filter(struct xdp_md *skb);\n"
