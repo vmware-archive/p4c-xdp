@@ -3,8 +3,8 @@ CLANG ?= clang
 CC= gcc
 CFLAGS=-g
 BPFOBJ= two_ebpf.o hit_ebpf.o switch_ebpf.o count_ebpf.o 
-LINK= -lelf -lopenvswitch -lpthread -lrt
 IFACE=enp0s16
+P4C=/root/p4c/build/p4c-ebpf-sw
 
 all: $(BPFOBJ) verify_target_bpf
 
@@ -30,16 +30,26 @@ verify_target_bpf: verify_cmds
 		echo "pass verify_target_bpf:" \
 		true; fi
 
-verify:
+load:
 	@ip link show $(IFACE); \
 	for TOOL in $(BPFOBJ); do \
 		ip link set dev $(IFACE) xdp obj $${TOOL} verb; \
 		ip link set dev $(IFACE) xdp off; \
 	done
 
+# P4 generate .c
+# keep the intermediate .c file
+.PRECIOUS: %.c
+%.c: %.p4
+	@if ! ($(P4C) --help > /dev/null 2>&1); then \
+		echo "*** ERROR: Cannot find p4c-ebpf-sw"; \
+		exit 1;\
+	fi;\
+	$(P4C) --target xdp -o $@ $<;
+
 # BPF program
 %.o: %.c
-	$(CLANG) $(LINUXINCLUDE) \
+	$(CLANG) \
 		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
@@ -47,5 +57,5 @@ verify:
 		-O2 -emit-llvm -g -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
 
 clean:
-	@rm -f *.o
+	@rm -f *.o *.c
 
