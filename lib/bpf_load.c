@@ -54,7 +54,8 @@ static int load_and_attach(const char *event, struct bpf_insn *prog, int size)
 	bool is_kprobe = strncmp(event, "kprobe/", 7) == 0;
 	bool is_kretprobe = strncmp(event, "kretprobe/", 10) == 0;
 	bool is_tracepoint = strncmp(event, "tracepoint/", 11) == 0;
-	bool is_xdp = strncmp(event, "xdp", 3) == 0;
+	bool is_xdp = (strncmp(event, "xdp", 3) == 0) ||
+	              (strncmp(event, "prog", 4) == 0);
 	bool is_perf_event = strncmp(event, "perf_event", 10) == 0;
 	bool is_cgroup_skb = strncmp(event, "cgroup/skb", 10) == 0;
 	bool is_cgroup_sk = strncmp(event, "cgroup/sock", 11) == 0;
@@ -260,7 +261,7 @@ static int parse_relo_and_apply(Elf_Data *data, Elf_Data *symbols,
 
 int load_bpf_file(char *path)
 {
-	int fd, i;
+	int fd, i, ret;
 	Elf *elf;
 	GElf_Ehdr ehdr;
 	GElf_Shdr shdr, shdr_prog;
@@ -344,10 +345,13 @@ int load_bpf_file(char *path)
 			    memcmp(shname_prog, "kretprobe/", 10) == 0 ||
 			    memcmp(shname_prog, "tracepoint/", 11) == 0 ||
 			    memcmp(shname_prog, "xdp", 3) == 0 ||
+			    memcmp(shname_prog, "prog", 4) == 0 ||
 			    memcmp(shname_prog, "perf_event", 10) == 0 ||
 			    memcmp(shname_prog, "socket", 6) == 0 ||
 			    memcmp(shname_prog, "cgroup/", 7) == 0)
-				load_and_attach(shname_prog, insns, data_prog->d_size);
+				ret = load_and_attach(shname_prog, insns, data_prog->d_size);
+				if (ret)
+					return ret;
 		}
 	}
 
@@ -364,10 +368,13 @@ int load_bpf_file(char *path)
 		    memcmp(shname, "kretprobe/", 10) == 0 ||
 		    memcmp(shname, "tracepoint/", 11) == 0 ||
 		    memcmp(shname, "xdp", 3) == 0 ||
+		    memcmp(shname, "prog", 4) == 0 ||
 		    memcmp(shname, "perf_event", 10) == 0 ||
 		    memcmp(shname, "socket", 6) == 0 ||
 		    memcmp(shname, "cgroup/", 7) == 0)
-			load_and_attach(shname, data->d_buf, data->d_size);
+			ret = load_and_attach(shname, data->d_buf, data->d_size);
+			if (ret)
+				return ret;
 	}
 
 	close(fd);
