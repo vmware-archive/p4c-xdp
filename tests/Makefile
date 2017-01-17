@@ -2,11 +2,17 @@ LLC ?= llc
 CLANG ?= clang
 CC= gcc
 CFLAGS=-g
-BPFOBJ= two_ebpf.o hit_ebpf.o switch_ebpf.o count_ebpf.o 
-LINK= -lelf -lopenvswitch -lpthread -lrt
+BPFOBJ= two_ebpf.o hit_ebpf.o switch_ebpf.o count_ebpf.o
+BPFLOADER=bpfloader
+BPFLIB=../lib/
 IFACE=enp0s16
+P4C=/root/p4c/build/p4c-ebpf-sw
 
-all: $(BPFOBJ) verify_target_bpf
+all: bpfloader $(BPFOBJ) verify_target_bpf
+
+bpfloader: load_and_verify.c
+	make -C ../lib/
+	$(CC) -I$(BPFLIB) $(BPFLIB)/libbpf.o $(BPFLIB)/bpf_load.o load_and_verify.c -lelf -o bpfloader
 
 # Verify LLVM compiler tools are available and bpf target is supported by llc
 .PHONY: verify_cmds verify_target_bpf $(CLANG) $(LLC)
@@ -30,22 +36,37 @@ verify_target_bpf: verify_cmds
 		echo "pass verify_target_bpf:" \
 		true; fi
 
-verify:
-	@ip link show $(IFACE); \
-	for TOOL in $(BPFOBJ); do \
-		ip link set dev $(IFACE) xdp obj $${TOOL} verb; \
-		ip link set dev $(IFACE) xdp off; \
-	done
+# P4 generate .c
+# keep the intermediate .c file
+.PRECIOUS: %.c
+%.c: %.p4
+	@if ! ($(P4C) --help > /dev/null 2>&1); then \
+		echo "*** ERROR: Cannot find p4c-ebpf-sw"; \
+		exit 1;\
+	fi;\
+	$(P4C) --target xdp -o $@ $<;
 
 # BPF program
 %.o: %.c
-	$(CLANG) $(LINUXINCLUDE) \
+	$(CLANG) \
 		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
 		-Wno-address-of-packed-member -Wno-tautological-compare \
 		-O2 -emit-llvm -g -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
+	./$(BPFLOADER) $@
 
-clean:
-	@rm -f *.o
+clean: clean_loader
+	@rm -f *.o *_ebpf.c
+
+clean_loader:
+	@rm -f bpfloader
+
+# For actually attaching BPF 
+attach:
+	@ip link show $(IFACE); \
+	for TOOL in $(BPFOBJ); do \
+		ip link set dev $(IFACE) xdp obj $${TOOL} verb; \
+		ip link set dev $(IFACE) xdp off; \
+	done
 

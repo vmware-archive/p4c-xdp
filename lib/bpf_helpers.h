@@ -1,45 +1,6 @@
 #ifndef __BPF_HELPERS_H
 #define __BPF_HELPERS_H
 
-/* Additional headers */
-#include <stdbool.h>
-#include <stdio.h>
-typedef signed char s8; 
-typedef unsigned char u8; 
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-
-#define ___constant_swab16(x) ((__u16)(             \
-    (((__u16)(x) & (__u16)0x00ffU) << 8) |          \
-    (((__u16)(x) & (__u16)0xff00U) >> 8)))
-
-#define ___constant_swab32(x) ((__u32)(             \
-    (((__u32)(x) & (__u32)0x000000ffUL) << 24) |        \
-    (((__u32)(x) & (__u32)0x0000ff00UL) <<  8) |        \
-    (((__u32)(x) & (__u32)0x00ff0000UL) >>  8) |        \
-    (((__u32)(x) & (__u32)0xff000000UL) >> 24)))
-
-#define ___constant_swab64(x) ((__u64)(             \
-    (((__u64)(x) & (__u64)0x00000000000000ffULL) << 56) |   \
-    (((__u64)(x) & (__u64)0x000000000000ff00ULL) << 40) |   \
-    (((__u64)(x) & (__u64)0x0000000000ff0000ULL) << 24) |   \
-    (((__u64)(x) & (__u64)0x00000000ff000000ULL) <<  8) |   \
-    (((__u64)(x) & (__u64)0x000000ff00000000ULL) >>  8) |   \
-    (((__u64)(x) & (__u64)0x0000ff0000000000ULL) >> 24) |   \
-    (((__u64)(x) & (__u64)0x00ff000000000000ULL) >> 40) |   \
-    (((__u64)(x) & (__u64)0xff00000000000000ULL) >> 56)))
-
-#define __constant_htonl(x) (___constant_swab32((x)))
-#define __constant_ntohl(x) (___constant_swab32(x))
-#define __constant_htons(x) (___constant_swab16((x)))
-#define __constant_ntohs(x) ___constant_swab16((x))
-
-/* END */
-
 /* helper macro to place programs, maps, license in
  * different sections in elf_bpf file. Section names
  * are interpreted by elf_bpf loader
