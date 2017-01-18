@@ -1,34 +1,37 @@
-# Makefile for the EBPF P4-16 back-end.
+# Makefile for the XDP P4-16 back-end.
 # To be included in the main P4C compiler makefile
 
-bin_PROGRAMS += p4c-ebpf-sw
-p4c_ebpf_sw_LDADD = libfrontend.a libp4ctoolkit.a
+bin_PROGRAMS += p4c-xdp
+p4c_xdp_LDADD = libfrontend.a libp4ctoolkit.a
 
-p4c_ebpf_sw_UNIFIED = \
-	extensions/p4c-ovs-ebpf/p4c-ebpf-sw.cpp \
-	extensions/p4c-ovs-ebpf/ebpfBackend.cpp \
-	extensions/p4c-ovs-ebpf/ebpfObject.cpp \
-	extensions/p4c-ovs-ebpf/ebpfTable.cpp \
-	extensions/p4c-ovs-ebpf/ebpfControl.cpp \
-	extensions/p4c-ovs-ebpf/ebpfParser.cpp \
+p4c_xdp_UNIFIED = \
+	extensions/p4c-ovs-ebpf/p4c-xdp.cpp \
+	extensions/p4c-ovs-ebpf/xdpModel.cpp \
 	extensions/p4c-ovs-ebpf/target.cpp \
-	extensions/p4c-ovs-ebpf/ebpfType.cpp \
-	extensions/p4c-ovs-ebpf/codeGen.cpp \
-	extensions/p4c-ovs-ebpf/ebpfModel.cpp \
-	extensions/p4c-ovs-ebpf/midend.cpp
+	extensions/p4c-ovs-ebpf/xdpBackend.cpp \
+	backends/ebpf/ebpfObject.cpp \
+	backends/ebpf/ebpfTable.cpp \
+	backends/ebpf/ebpfControl.cpp \
+	backends/ebpf/ebpfParser.cpp \
+	backends/ebpf/target.cpp \
+	backends/ebpf/ebpfType.cpp \
+	backends/ebpf/codeGen.cpp \
+	backends/ebpf/ebpfModel.cpp \
+	backends/ebpf/midend.cpp
 
 noinst_HEADERS += \
-	extensions/p4c-ovs-ebpf/codeGen.h \
-	extensions/p4c-ovs-ebpf/ebpfBackend.h \
-	extensions/p4c-ovs-ebpf/ebpfControl.h \
-	extensions/p4c-ovs-ebpf/ebpfModel.h \
-	extensions/p4c-ovs-ebpf/ebpfObject.h \
-	extensions/p4c-ovs-ebpf/ebpfOptions.h \
-	extensions/p4c-ovs-ebpf/ebpfParser.h \
-	extensions/p4c-ovs-ebpf/ebpfTable.h \
-	extensions/p4c-ovs-ebpf/ebpfType.h \
-	extensions/p4c-ovs-ebpf/midend.h \
-	extensions/p4c-ovs-ebpf/target.h
+	extensions/p4c-ovs-ebpf/xdpModel.h \
+	extensions/p4c-ovs-ebpf/target.h \
+	extensions/p4c-ovs-ebpf/xdpBackend.h \
+	backends/ebpf/codeGen.h \
+	backends/ebpf/ebpfControl.h \
+	backends/ebpf/ebpfModel.h \
+	backends/ebpf/ebpfObject.h \
+	backends/ebpf/ebpfOptions.h \
+	backends/ebpf/ebpfParser.h \
+	backends/ebpf/ebpfTable.h \
+	backends/ebpf/ebpfType.h \
+	backends/ebpf/midend.h \
+	backends/ebpf/target.h
 
-cpplint_FILES += $(p4c_ebpf_sw_UNIFIED) $(p4c_ebpf_sw_NONUNIFIED)
-
+cpplint_FILES += $(p4c_xdp_UNIFIED) $(p4c_xdp_NONUNIFIED)
