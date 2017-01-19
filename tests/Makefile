@@ -5,8 +5,9 @@ CFLAGS=-g
 BPFOBJ= two_ebpf.o hit_ebpf.o switch_ebpf.o count_ebpf.o simple.o
 BPFLOADER=bpfloader
 BPFLIB=../lib/
-IFACE=enp0s16
-P4C=/root/p4c/build/p4c-ebpf-sw
+#IFACE=enp0s16
+#P4C=/root/p4c/build/p4c-ebpf-sw
+P4C=../p4c-xdp
 
 all: bpfloader $(BPFOBJ) verify_target_bpf
 
@@ -43,7 +44,7 @@ verify_target_bpf: verify_cmds
 	@if ! ($(P4C) --help > /dev/null 2>&1); then \
 		echo "*** ERROR: Cannot find p4c-ebpf-sw"; \
 		exit 1;\
-	fi;\
+	fi;
 	$(P4C) --target xdp -o $@ $<;
 
 # BPF program
