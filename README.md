@@ -6,6 +6,29 @@ This should be built as a back-end to the P4-16 compiler from http://github.com/
 
 ## Installation
 
+First you need the P4-16, then this project is an extension to the P4-16
+
+```bash
+git clone http://github.com/p4lang/p4c
+cd p4c
+./bootstrap.sh
+mkdir build
+cd build
+make
+```
+Now you have P4-16 compiler, then add this project as an extension, under p4c
+```bash
+mkdir extensions
+cd extensions
+git clone https://github.com/williamtu/p4c-ovs-ebpf.git 
+cd p4c-ovs-ebpf/
+cd tests/
+make
+```
+under tests, 'make' will check you llvm and clang version, 
+compile all .p4 file, generate .c file, and loading into kernel
+to check BPF verifier
+
 ## TC: Linux Traffic Control
 TC is Linux's QoS subsystem for traffic shaping and policing. eBPF program can be attached to
 a tc classifier as a hook point for eBPF bytecode execution. Use:
