@@ -49,7 +49,7 @@ to unload
 XDP is a packet processing mechanism implemented within the device driver with eBPF.  Currently this
 project supports 
 ```bash
-	./p4c-ovs-ebpf --target xdp -o <p4.c>  <P4 program>
+	./p4c-xdp --target xdp -o <p4.c>  <P4 program>
 ```
 then you need to compile this <p4.c> to eBPF bytecode, then loaded into your driver:
 ```bash
@@ -63,9 +63,12 @@ to unload
 see issues
 
 ## TODO
+- test the new xdp model
 - improve documentation (make headers_install ARCH= HDR_INSTALL_PATH=)
 - remove dependencies with Linux kernel headers
 - more test cases from P4 to XDP
 - add deparser supports
 - introduce extern function, bpf_xdp_adjust_head. 
+- introduce extern function, bpf_perf_event_output for sending data to userspace
+- add a docker or vagrant box for testing?
 
