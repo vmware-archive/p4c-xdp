@@ -32,17 +32,17 @@ https://www.iovisor.org/technology/xdp.  We support two different architectures:
 #include <ebpf_model.p4>  // we continue to support the EBPF packet filter model
 
 /* architectural model for a packet switch architecture */
-struct input_metadata {
+struct xdp_input {
     bit<32> input_port;
 }
 
-struct output_metadata {
+struct xdp_output {
     bool    drop;  // if set packet is dropped
     bit<32> output_port;  // output port for packet
 }
 
 parser xdp_parse<H>(packet_in packet, out H headers);
-control xdp_switch<H>(inout H headers, in input_metadata imd, out output_metadata omd);
+control xdp_switch<H>(inout H headers, in xdp_input imd, out xdp_output omd);
 control xdp_deparse<H>(in H headers, packet_out packet);
 
 package xdp<H>(xdp_parse<H> p, xdp_switch<H> s, xdp_deparse<H> d);

@@ -23,21 +23,44 @@ namespace XDP {
 
 struct XDP_Switch_Model : public ::Model::Elem {
     XDP_Switch_Model() : Elem("xdp"),
-                     parser("p"), swtch("s"), deparser("d") {}
+                         parser("p"), swtch("s"), deparser("d") {}
     ::Model::Elem parser;
     ::Model::Elem swtch;
     ::Model::Elem deparser;
 };
 
+struct InputMetadataModel : public ::Model::Type_Model {
+    InputMetadataModel() : ::Model::Type_Model("xdp_input"),
+        inputPort("input_port"), inputPortType(IR::Type_Bits::get(32))
+    {}
+
+    ::Model::Elem inputPort;
+    const IR::Type* inputPortType;
+};
+
+struct OutputMetadataModel : public ::Model::Type_Model {
+    OutputMetadataModel() : ::Model::Type_Model("xdp_output"),
+            outputPort("output_port"), outputPortType(IR::Type_Bits::get(32)),
+            drop("drop"), dropType(IR::Type_Boolean::get())
+    {}
+
+    ::Model::Elem outputPort;
+    const IR::Type* outputPortType;
+    ::Model::Elem drop;
+    const IR::Type* dropType;
+};
+
 // Keep this in sync with xdp_model.p4
 class XDPModel : public EBPF::EBPFModel {
  protected:
-    XDPModel() : EBPF::EBPFModel(), xdp()
+    XDPModel() : EBPF::EBPFModel(), xdp(), inputMetadataModel(), outputMetadataModel()
     {}
 
  public:
     static XDPModel instance;
     XDP_Switch_Model xdp;
+    InputMetadataModel inputMetadataModel;
+    OutputMetadataModel outputMetadataModel;
 };
 
 }  // namespace XDP
