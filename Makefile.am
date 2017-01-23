@@ -7,9 +7,11 @@ p4c_xdp_LDADD = libfrontend.a libp4ctoolkit.a
 p4c_xdp_UNIFIED = \
 	extensions/p4c-ovs-ebpf/p4c-xdp.cpp \
 	extensions/p4c-ovs-ebpf/xdpModel.cpp \
+	extensions/p4c-ovs-ebpf/xdpControl.cpp \
+	extensions/p4c-ovs-ebpf/xdpProgram.cpp \
 	extensions/p4c-ovs-ebpf/target.cpp \
 	extensions/p4c-ovs-ebpf/xdpBackend.cpp \
-	backends/ebpf/ebpfObject.cpp \
+	backends/ebpf/ebpfProgram.cpp \
 	backends/ebpf/ebpfTable.cpp \
 	backends/ebpf/ebpfControl.cpp \
 	backends/ebpf/ebpfParser.cpp \
@@ -21,17 +23,9 @@ p4c_xdp_UNIFIED = \
 
 noinst_HEADERS += \
 	extensions/p4c-ovs-ebpf/xdpModel.h \
+	extensions/p4c-ovs-ebpf/xdpProgram.h \
+	extensions/p4c-ovs-ebpf/xdpControl.h \
 	extensions/p4c-ovs-ebpf/target.h \
-	extensions/p4c-ovs-ebpf/xdpBackend.h \
-	backends/ebpf/codeGen.h \
-	backends/ebpf/ebpfControl.h \
-	backends/ebpf/ebpfModel.h \
-	backends/ebpf/ebpfObject.h \
-	backends/ebpf/ebpfOptions.h \
-	backends/ebpf/ebpfParser.h \
-	backends/ebpf/ebpfTable.h \
-	backends/ebpf/ebpfType.h \
-	backends/ebpf/midend.h \
-	backends/ebpf/target.h
+	extensions/p4c-ovs-ebpf/xdpBackend.h
 
 cpplint_FILES += $(p4c_xdp_UNIFIED) $(p4c_xdp_NONUNIFIED)

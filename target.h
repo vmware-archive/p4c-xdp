@@ -24,7 +24,7 @@ namespace XDP {
 // Target XDP
 class XdpTarget : public EBPF::KernelSamplesTarget {
  public:
-    XdpTarget() { name = "XDP"; }
+    XdpTarget() : KernelSamplesTarget("XDP") {}
     void emitIncludes(Util::SourceCodeBuilder* builder) const override;
     void emitMain(Util::SourceCodeBuilder* builder,
                   cstring functionName,
@@ -36,6 +36,8 @@ class XdpTarget : public EBPF::KernelSamplesTarget {
                        cstring keyType, cstring valueType, unsigned size) const override;
     cstring dataEnd(cstring base) const override
     { return cstring("((void*)(long)")+ base + "->data_end)"; }
+    void emitCodeSection(Util::SourceCodeBuilder* builder, cstring) const override
+    { EBPF::KernelSamplesTarget::emitCodeSection(builder, "prog"); }
 };
 
 }  // namespace XDP
