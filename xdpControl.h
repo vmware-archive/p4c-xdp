@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef _EXTENSIONS_P4C_OVS_EBPF_EBPFCONTROL_H_
-#define _EXTENSIONS_P4C_OVS_EBPF_EBPFCONTROL_H_
+#ifndef _EXTENSIONS_P4C_OVS_EBPF_XDPCONTROL_H_
+#define _EXTENSIONS_P4C_OVS_EBPF_XDPCONTROL_H_
 
 #include "backends/ebpf/ebpfControl.h"
 #include "xdpProgram.h"
@@ -43,4 +43,4 @@ class XDPDeparser : public EBPF::EBPFControl {
 
 }  // namespace XDP
 
-#endif /* _EXTENSIONS_P4C_OVS_EBPF_EBPFCONTROL_H_ */
+#endif /* _EXTENSIONS_P4C_OVS_EBPF_XDPCONTROL_H_ */

@@ -182,13 +182,16 @@ void XDPProgram::createLocalVariables(EBPF::CodeBuilder* builder) {
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat("%s %s;", xdp_model.outputMetadataModel.name,
+    builder->appendFormat("struct %s %s;", xdp_model.outputMetadataModel.name,
                           getSwitch()->outputMeta->name.name);
     builder->newline();
 
-    // TODO: this should be initialized by the environment. HOW?
     builder->emitIndent();
-    builder->appendFormat("%s %s;", xdp_model.inputMetadataModel.name,
+    builder->appendFormat("/* TODO: this should be initialized by the environment. HOW? */");
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat("struct %s %s;", xdp_model.inputMetadataModel.name,
                           getSwitch()->inputMeta->name.name);
     builder->newline();
 }
