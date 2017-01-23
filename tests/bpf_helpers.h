@@ -2,6 +2,14 @@
 #define __BPF_HELPERS_H
 
 /* Additional headers */
+# define printk(fmt, ...)                                               \
+                ({                                                      \
+                        char ____fmt[] = fmt;                           \
+                        bpf_trace_printk(____fmt, sizeof(____fmt),      \
+                                     ##__VA_ARGS__);                    \
+                })
+
+
 #include <stdbool.h>
 #include <stdio.h>
 typedef signed char s8; 
