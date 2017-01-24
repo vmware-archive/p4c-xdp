@@ -1,0 +1,5 @@
+lib/*.o
+tests/*.c
+tests/*.o
+tests/bpfloader
+p4c-xdp

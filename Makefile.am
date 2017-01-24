@@ -2,7 +2,7 @@
 # To be included in the main P4C compiler makefile
 
 bin_PROGRAMS += p4c-xdp
-p4c_xdp_LDADD = libfrontend.a libp4ctoolkit.a
+p4c_xdp_LDADD = libfrontend.la libp4ctoolkit.a
 
 p4c_xdp_UNIFIED = \
 	extensions/p4c-ovs-ebpf/p4c-xdp.cpp \
