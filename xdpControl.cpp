@@ -17,6 +17,7 @@ limitations under the License.
 #include "xdpControl.h"
 #include "lib/error.h"
 #include "backends/ebpf/ebpfControl.h"
+#include "frontends/p4/methodInstance.h"
 
 namespace XDP {
 
@@ -47,6 +48,86 @@ bool XDPSwitch::build() {
 
 //////////////////////////////////////////////////////////////////////////
 
+namespace {
+
+class OutHeaderSize final : public EBPF::CodeGenInspector {
+    P4::ReferenceMap*  refMap;
+    P4::TypeMap*       typeMap;
+    const XDPProgram*  program;
+    EBPF::CodeBuilder* builder;
+
+    std::map<const IR::Parameter*, const IR::Parameter*> substitution;
+
+    bool illegal(const IR::Statement* statement)
+    { ::error("%1%: not supported in deparser", statement); return false; }
+
+  public:
+    OutHeaderSize(P4::ReferenceMap* refMap, P4::TypeMap* typeMap,
+                  const XDPProgram* program, EBPF::CodeBuilder* builder):
+            EBPF::CodeGenInspector(builder, typeMap), refMap(refMap), typeMap(typeMap),
+            program(program), builder(builder) {
+        CHECK_NULL(refMap); CHECK_NULL(typeMap); CHECK_NULL(program); CHECK_NULL(builder);
+        setName("OutHeaderSize"); }
+    bool preorder(const IR::PathExpression* expression) override {
+        auto decl = refMap->getDeclaration(expression->path, true);
+        auto param = decl->getNode()->to<IR::Parameter>();
+        if (param != nullptr) {
+            auto subst = ::get(substitution, param);
+            if (subst != nullptr) {
+                builder->append(subst->name);
+                return false;
+            }
+        }
+        builder->append(expression->path->name);
+        return false;
+    }
+    bool preorder(const IR::SwitchStatement* statement) override
+    { return illegal(statement); }
+    bool preorder(const IR::IfStatement* statement) override
+    { return illegal(statement); }
+    bool preorder(const IR::AssignmentStatement* statement) override
+    { return illegal(statement); }
+    bool preorder(const IR::ReturnStatement* statement) override
+    { return illegal(statement); }
+    bool preorder(const IR::ExitStatement* statement) override
+    { return illegal(statement); }
+    bool preorder(const IR::MethodCallStatement* statement) override {
+        auto &p4lib = P4::P4CoreLibrary::instance;
+
+        auto mi = P4::MethodInstance::resolve(statement->methodCall, refMap, typeMap);
+        auto method = mi->to<P4::ExternMethod>();
+        if (method == nullptr)
+            return illegal(statement);
+
+        auto declType = method->originalExternType;
+        if (declType->name.name != p4lib.packetOut.name ||
+            method->method->name.name != p4lib.packetOut.emit.name ||
+            method->expr->arguments->size() != 1) {
+            return illegal(statement);
+        }
+
+        auto h = method->expr->arguments->at(0);
+        auto type = typeMap->getType(h);
+        auto ht = type->to<IR::Type_Header>();
+        if (ht == nullptr) {
+            ::error("Cannot emit a non-header type %1%", h);
+            return false;
+        }
+        unsigned width = ht->width_bits();
+
+        builder->append("if (");
+        visit(h);
+        builder->append(".ebpf_valid) ");
+        builder->appendFormat("%s += %d;", program->outHeaderLengthVar.c_str(), width);
+        return false;
+    }
+
+    void substitute(const IR::Parameter* p, const IR::Parameter* with)
+    { substitution.emplace(p, with); }
+};
+
+}  // namespace
+
 XDPDeparser::XDPDeparser(const XDPProgram* program,
                          const IR::ControlBlock* block,
                          const IR::Parameter* parserHeaders) :
@@ -66,6 +147,28 @@ bool XDPDeparser::build() {
     packet = *it;
 
     return true;
+}
+
+void XDPDeparser::emit(EBPF::CodeBuilder* builder) {
+    OutHeaderSize ohs(program->refMap, program->typeMap,
+                      static_cast<const XDPProgram*>(program), builder);
+    ohs.substitute(headers, parserHeaders);
+
+    builder->emitIndent();
+    (void)controlBlock->container->body->apply(ohs);
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat("bpf_xdp_adjust_head(BYTES(%s) - %s);",
+                          program->offsetVar.c_str(),
+                          getProgram()->outHeaderLengthVar.c_str());
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat("%s = 0;", program->offsetVar.c_str());
+    builder->newline();
+
+    EBPF::EBPFControl::emit(builder);
 }
 
 }  // namespace XDP
