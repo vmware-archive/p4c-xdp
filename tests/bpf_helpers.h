@@ -130,6 +130,17 @@ struct bpf_map_def {
 	unsigned int map_flags;
 };
 
+/* used in TC */
+struct bpf_elf_map {
+        __u32 type;
+        __u32 key_size;
+        __u32 value_size;
+        __u32 max_entries;
+        __u32 map_flags;
+        __u32 id;
+        __u32 pinning;
+};
+
 static int (*bpf_skb_load_bytes)(void *ctx, int off, void *to, int len) =
 	(void *) BPF_FUNC_skb_load_bytes;
 static int (*bpf_skb_store_bytes)(void *ctx, int off, void *from, int len, int flags) =
