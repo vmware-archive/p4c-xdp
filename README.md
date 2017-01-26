@@ -71,4 +71,8 @@ see issues
 - introduce extern function, bpf_xdp_adjust_head. 
 - introduce extern function, bpf_perf_event_output for sending data to userspace
 - add a docker or vagrant box for testing?
+- support for checksum
+- add userspace test
+- initialize xin somehow. Where is the input port for xdp
+- do something with xout. How do we pass information back to xdp?
 
