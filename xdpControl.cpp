@@ -159,9 +159,21 @@ void XDPDeparser::emit(EBPF::CodeBuilder* builder) {
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat("bpf_xdp_adjust_head(BYTES(%s) - %s);",
+    builder->appendFormat("bpf_xdp_adjust_head(%s, BYTES(%s) - %s);",
+                          program->model.CPacketName.str(),
                           program->offsetVar.c_str(),
                           getProgram()->outHeaderLengthVar.c_str());
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat("%s = %s;",
+                          program->packetStartVar,
+                          builder->target->dataOffset(program->model.CPacketName.str()));
+    builder->newline();
+    builder->emitIndent();
+    builder->appendFormat("%s = %s;",
+                          program->packetEndVar,
+                          builder->target->dataEnd(program->model.CPacketName.str()));
     builder->newline();
 
     builder->emitIndent();
