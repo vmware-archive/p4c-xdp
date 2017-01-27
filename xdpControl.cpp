@@ -61,7 +61,7 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
     bool illegal(const IR::Statement* statement)
     { ::error("%1%: not supported in deparser", statement); return false; }
 
-  public:
+ public:
     OutHeaderSize(P4::ReferenceMap* refMap, P4::TypeMap* typeMap,
                   const XDPProgram* program, EBPF::CodeBuilder* builder):
             EBPF::CodeGenInspector(builder, typeMap), refMap(refMap), typeMap(typeMap),
