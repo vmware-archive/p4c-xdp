@@ -114,9 +114,17 @@ void XDPProgram::emit(EBPF::CodeBuilder *builder) {
     builder->append(endLabel);
     builder->appendLine(":");
 
+    // TODO: write output port to a table
+
     builder->emitIndent();
-    builder->append("return 0");
-    builder->endOfStatement(true);
+    builder->appendFormat("if (%s.%s) return %s;",
+                          getSwitch()->outputMeta->name.name,
+                          XDPModel::instance.outputMetadataModel.drop.str(),
+                          builder->target->dropReturnCode().c_str());
+    builder->newline();
+    builder->emitIndent();
+    builder->appendFormat("else return %s;", builder->target->forwardReturnCode().c_str());
+    builder->newline();
     builder->blockEnd(true);  // end of function
 
     builder->target->emitLicense(builder, license);
@@ -134,11 +142,6 @@ void XDPProgram::emitPipeline(EBPF::CodeBuilder* builder) {
     builder->blockEnd(true);
 
     if (switchTarget()) {
-        builder->emitIndent();
-        builder->appendFormat("%s = 0;", offsetVar);
-        builder->newline();
-
-        // TODO: adjust packet size: bpf_xdp_adjust_head
         builder->emitIndent();
         builder->append("/* deparser */");
         builder->newline();
@@ -179,6 +182,10 @@ void XDPProgram::createLocalVariables(EBPF::CodeBuilder* builder) {
 
     builder->emitIndent();
     builder->appendFormat("u8 %s = 0;", byteVar);
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat("u32 %s = 0;", outHeaderLengthVar);
     builder->newline();
 
     builder->emitIndent();

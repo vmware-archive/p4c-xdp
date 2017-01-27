@@ -38,6 +38,9 @@ class XdpTarget : public EBPF::KernelSamplesTarget {
     { return cstring("((void*)(long)")+ base + "->data_end)"; }
     void emitCodeSection(Util::SourceCodeBuilder* builder, cstring) const override
     { EBPF::KernelSamplesTarget::emitCodeSection(builder, "prog"); }
+    cstring forwardReturnCode() const override { return "XDP_PASS"; }
+    cstring dropReturnCode() const override { return "XDP_DROP"; }
+    cstring abortReturnCode() const override { return "XDP_ABORTED"; }
 };
 
 }  // namespace XDP

@@ -39,6 +39,9 @@ class XDPDeparser : public EBPF::EBPFControl {
     XDPDeparser(const XDPProgram* program, const IR::ControlBlock* block,
                 const IR::Parameter* parserHeaders);
     bool build() override;
+    void emit(EBPF::CodeBuilder* builder) override;
+    const XDPProgram* getProgram() const
+    { return dynamic_cast<const XDPProgram*>(program); }
 };
 
 }  // namespace XDP
