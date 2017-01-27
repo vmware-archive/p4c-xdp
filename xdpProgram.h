@@ -36,12 +36,14 @@ class XDPProgram : public EBPF::EBPFProgram {
     XDPDeparser* deparser;
     XDPModel&    xdp_model;
     cstring outHeaderLengthVar;
+    cstring outTableName;
 
     XDPProgram(const IR::P4Program* program, P4::ReferenceMap* refMap,
                P4::TypeMap* typeMap, const IR::ToplevelBlock* toplevel) :
             EBPF::EBPFProgram(program, refMap, typeMap, toplevel),
             deparser(nullptr), xdp_model(XDPModel::instance) {
         outHeaderLengthVar = EBPF::EBPFModel::reserved("outHeaderLength");
+        outTableName = EBPF::EBPFModel::reserved("outTable");
     }
 
     // If the deparser is null we are compiling for the old EBPF model
