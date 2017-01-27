@@ -89,6 +89,36 @@ void XDPProgram::emit(EBPF::CodeBuilder *builder) {
     emitTypes(builder);
     control->emitTables(builder);
 
+    // The table used for forwarding: we write the output in it
+    // TODO: this should use target->emitTableDecl().
+    // We can't do it today because it has a different map type
+    builder->emitIndent();
+    builder->appendFormat("struct bpf_map_def SEC(\"maps\") %s = ", outTableName.c_str());
+    builder->blockStart();
+    builder->emitIndent();
+    builder->append(".type = ");
+    builder->appendLine("BPF_MAP_TYPE_PERCPU_ARRAY,");
+
+    builder->emitIndent();
+    builder->append(".key_size = sizeof(u32),");
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat(".value_size = sizeof(u32),");
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat(".pinning = 2, /* PIN_GLOBAL_NS */");
+    builder->newline();
+
+    builder->emitIndent();
+    builder->appendFormat(".max_entries = 1 /* No multicast support */");
+    builder->newline();
+
+    builder->blockEnd(false);
+    builder->endOfStatement(true);
+
+
     builder->newline();
     builder->emitIndent();
     builder->target->emitCodeSection(builder, functionName);
@@ -114,7 +144,13 @@ void XDPProgram::emit(EBPF::CodeBuilder *builder) {
     builder->append(endLabel);
     builder->appendLine(":");
 
-    // TODO: write output port to a table
+    // write output port to a table
+    builder->emitIndent();
+    builder->appendFormat("bpf_map_update_elem(&%s, &%s, &%s.%s, BPF_ANY)",
+                          outTableName.c_str(), zeroKey.c_str(),
+                          getSwitch()->outputMeta->name.name,
+                          XDPModel::instance.outputMetadataModel.outputPort.str());
+    builder->endOfStatement(true);
 
     builder->emitIndent();
     builder->appendFormat("if (%s.%s) return %s;",
