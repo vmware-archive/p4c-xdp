@@ -128,6 +128,8 @@ struct bpf_map_def {
 	unsigned int value_size;
 	unsigned int max_entries;
 	unsigned int map_flags;
+        __u32 id;
+        __u32 pinning;
 };
 
 /* used in TC */
