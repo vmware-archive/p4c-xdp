@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef _EXTENSIONS_P4C_OVS_EBPF_TARGET_H_
-#define _EXTENSIONS_P4C_OVS_EBPF_TARGET_H_
+#ifndef _EXTENSIONS_P4C_XDP_TARGET_H_
+#define _EXTENSIONS_P4C_XDP_TARGET_H_
 
 #include "backends/ebpf/target.h"
 
@@ -45,4 +45,4 @@ class XdpTarget : public EBPF::KernelSamplesTarget {
 
 }  // namespace XDP
 
-#endif /* _EXTENSIONS_P4C_OVS_EBPF_TARGET_H_ */
+#endif /* _EXTENSIONS_P4C_XDP_TARGET_H_ */

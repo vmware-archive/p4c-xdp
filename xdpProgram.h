@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef _EXTENSIONS_P4C_OVS_EBPF_XDPPROGRAM_H_
-#define _EXTENSIONS_P4C_OVS_EBPF_XDPPROGRAM_H_
+#ifndef _EXTENSIONS_P4C_XDP_XDPPROGRAM_H_
+#define _EXTENSIONS_P4C_XDP_XDPPROGRAM_H_
 
 #include "target.h"
 #include "xdpModel.h"
@@ -58,4 +58,4 @@ class XDPProgram : public EBPF::EBPFProgram {
 
 }  // namespace XDP
 
-#endif /* _EXTENSIONS_P4C_OVS_EBPF_XDPPROGRAM_H_ */
+#endif /* _EXTENSIONS_P4C_XDP_XDPPROGRAM_H_ */
