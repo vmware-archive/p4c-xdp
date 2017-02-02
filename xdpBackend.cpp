@@ -19,6 +19,7 @@ limitations under the License.
 #include "frontends/p4/evaluator/evaluator.h"
 
 #include "xdpBackend.h"
+#include "xdpProgram.h"
 #include "target.h"
 #include "backends/ebpf/ebpfType.h"
 

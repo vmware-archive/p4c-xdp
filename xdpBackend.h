@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef _EXTENSIONS_P4C_OVS_EBPF_XDPBACKEND_H_
-#define _EXTENSIONS_P4C_OVS_EBPF_XDPBACKEND_H_
+#ifndef _EXTENSIONS_P4C_XDP_XDPBACKEND_H_
+#define _EXTENSIONS_P4C_XDP_XDPBACKEND_H_
 
 #include "backends/ebpf/ebpfOptions.h"
 #include "ir/ir.h"
@@ -28,4 +28,4 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
 
 }  // namespace XDP
 
-#endif /* _EXTENSIONS_P4C_OVS_EBPF_XDPBACKEND_H_ */
+#endif /* _EXTENSIONS_P4C_XDP_XDPBACKEND_H_ */
