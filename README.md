@@ -4,8 +4,8 @@ Backend for the P4 compiler targeting XDP.  This should be built as a
 back-end to the P4-16 compiler from http://github.com/p4lang/p4c
 
 ## Installation
-
 First you need the P4-16, then this project is an extension to the P4-16
+Kernel version: 4.10+ due to some BPF verifier limitations
 
 ```bash
 git clone http://github.com/p4lang/p4c
@@ -48,7 +48,7 @@ to unload
 XDP is a packet processing mechanism implemented within the device driver with eBPF.  Currently this
 project supports
 ```bash
-	./p4c-xdp --target xdp -o <p4.c>  <P4 program>
+	./p4c-xdp --target xdp -I /root/p4c/p4include/ -I /root/p4c/backends/ebpf/p4include/ -o /tmp/x.c xdp1.p4 
 ```
 then you need to compile this <p4.c> to eBPF bytecode, then loaded into your driver:
 ```bash
@@ -58,6 +58,15 @@ to unload
 ```bash
     ip link set dev $DEV xdp off
 ```
+to compile a single .c file
+```bash
+clang -D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
+		-Wno-compare-distinct-pointer-types \
+		-Wno-gnu-variable-sized-type-not-at-end \
+		-Wno-tautological-compare \
+		-O2 -emit-llvm -g -c /tmp/x.c -o -| llc -march=bpf -filetype=obj -o /tmp/x.o
+```
+
 ## TODO
 - test the new xdp model
 - improve documentation (make headers_install ARCH= HDR_INSTALL_PATH=)

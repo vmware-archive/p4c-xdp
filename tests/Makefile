@@ -2,12 +2,14 @@ LLC ?= llc
 CLANG ?= clang
 CC= gcc
 CFLAGS=-g
-BPFOBJ= two_ebpf.o hit_ebpf.o switch_ebpf.o count_ebpf.o simple.o
+BPFOBJ= xdp1.o xdp2.o xdp3.o 
 BPFLOADER=bpfloader
 BPFLIB=../lib/
 #IFACE=enp0s16
 #P4C=/root/p4c/build/p4c-ebpf-sw
-P4C=../p4c-xdp
+SRC=/root/p4c
+INCLUDE=-I ../ 
+P4C=p4c-xdp
 
 all: bpfloader $(BPFOBJ) verify_target_bpf
 
@@ -45,7 +47,7 @@ verify_target_bpf: verify_cmds
 		echo "*** ERROR: Cannot find p4c-ebpf-sw"; \
 		exit 1;\
 	fi;
-	$(P4C) --target xdp -o $@ $<;
+	$(P4C) $(INCLUDE) --target xdp -o $@ $<;
 
 # BPF program
 %.o: %.c
