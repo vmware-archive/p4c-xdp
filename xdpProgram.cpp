@@ -79,6 +79,11 @@ bool XDPProgram::build() {
 }
 
 void XDPProgram::emit(EBPF::CodeBuilder *builder) {
+    if (!switchTarget()) {
+        EBPF::EBPFProgram::emit(builder);
+        return;
+    }
+
     if (builder->target->name != "XDP") {
         ::error("This program must be compiled with --target xdp");
         return;
@@ -117,7 +122,6 @@ void XDPProgram::emit(EBPF::CodeBuilder *builder) {
 
     builder->blockEnd(false);
     builder->endOfStatement(true);
-
 
     builder->newline();
     builder->emitIndent();
