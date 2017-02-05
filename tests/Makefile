@@ -2,7 +2,7 @@ LLC ?= llc
 CLANG ?= clang
 CC= gcc
 CFLAGS=-g
-BPFOBJ= xdp1.o xdp2.o xdp3.o 
+BPFOBJ= xdp1.o xdp2.o xdp3.o xdp4.o
 BPFLOADER=bpfloader
 BPFLIB=../lib/
 #IFACE=enp0s16
@@ -72,4 +72,5 @@ attach:
 		ip link set dev $(IFACE) xdp obj $${TOOL} verb; \
 		ip link set dev $(IFACE) xdp off; \
 	done
+
 
