@@ -66,6 +66,7 @@ control Ingress(inout Headers hdr, in xdp_input xin, out xdp_output xout) {
     }
 
     apply {
+        dstmactable.apply();
         xout.output_port = 0;
         xout.drop = xoutdrop;
     }
