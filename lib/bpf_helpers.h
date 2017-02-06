@@ -81,6 +81,9 @@ struct bpf_map_def {
 	unsigned int value_size;
 	unsigned int max_entries;
 	unsigned int map_flags;
+    /* we need this for tc, not for bpf syscall */
+    unsigned int id;
+    unsigned int pinning;
 };
 
 static int (*bpf_skb_load_bytes)(void *ctx, int off, void *to, int len) =

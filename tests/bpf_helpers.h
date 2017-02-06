@@ -127,9 +127,9 @@ struct bpf_map_def {
 	unsigned int key_size;
 	unsigned int value_size;
 	unsigned int max_entries;
-	unsigned int map_flags;
-        __u32 id;
-        __u32 pinning;
+    unsigned int map_flags;
+    unsigned int id;
+    unsigned int pinning;
 };
 
 /* used in TC */
