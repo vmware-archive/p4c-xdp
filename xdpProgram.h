@@ -39,8 +39,9 @@ class XDPProgram : public EBPF::EBPFProgram {
     cstring outTableName;
 
     XDPProgram(const IR::P4Program* program, P4::ReferenceMap* refMap,
-               P4::TypeMap* typeMap, const IR::ToplevelBlock* toplevel) :
-            EBPF::EBPFProgram(program, refMap, typeMap, toplevel),
+               P4::TypeMap* typeMap, const IR::ToplevelBlock* toplevel,
+               EBPF::CodeBuilder* builder) :
+            EBPF::EBPFProgram(program, refMap, typeMap, toplevel, builder),
             deparser(nullptr), xdp_model(XDPModel::instance) {
         outHeaderLengthVar = EBPF::EBPFModel::reserved("outHeaderLength");
         outTableName = EBPF::EBPFModel::reserved("outTable");
@@ -49,10 +50,10 @@ class XDPProgram : public EBPF::EBPFProgram {
     // If the deparser is null we are compiling for the old EBPF model
     bool switchTarget() const { return deparser != nullptr; }
 
-    void emit(EBPF::CodeBuilder *builder) override;
+    void emit() override;
     bool build() override;  // return 'true' on success
-    void createLocalVariables(EBPF::CodeBuilder* builder) override;
-    void emitPipeline(EBPF::CodeBuilder* builder) override;
+    void createLocalVariables() override;
+    void emitPipeline() override;
     XDPSwitch* getSwitch() const;
 };
 

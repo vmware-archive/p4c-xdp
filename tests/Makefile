@@ -6,10 +6,9 @@ BPFOBJ= xdp1.o xdp2.o xdp3.o xdp4.o xdp5.o
 BPFLOADER=bpfloader
 BPFLIB=../lib/
 #IFACE=enp0s16
-#P4C=/root/p4c/build/p4c-ebpf-sw
 SRC=/root/p4c
-INCLUDE=-I ../ 
-P4C=p4c-xdp
+INCLUDE=-I ../p4include
+P4C=../p4c-xdp
 
 all: bpfloader $(BPFOBJ) verify_target_bpf
 
@@ -21,7 +20,7 @@ bpfloader: load_and_verify.c
 .PHONY: verify_cmds verify_target_bpf $(CLANG) $(LLC)
 
 verify_cmds: $(CLANG) $(LLC)
-	@for TOOL in $^ ; do \
+	for TOOL in $^ ; do \
 		if ! (which -- "$${TOOL}" > /dev/null 2>&1); then \
 			echo "*** ERROR: Cannot find LLVM tool $${TOOL}" ;\
 			exit 1; \
@@ -31,7 +30,7 @@ verify_cmds: $(CLANG) $(LLC)
 	done
 
 verify_target_bpf: verify_cmds
-	@if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
+	if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
 		echo "*** ERROR: LLVM (${LLC}) does not support 'bpf' target" ;\
 		echo "   NOTICE: LLVM version >= 3.7.1 required" ;\
 		exit 2; \
@@ -43,8 +42,8 @@ verify_target_bpf: verify_cmds
 # keep the intermediate .c file
 .PRECIOUS: %.c
 %.c: %.p4
-	@if ! ($(P4C) --help > /dev/null 2>&1); then \
-		echo "*** ERROR: Cannot find p4c-ebpf-sw"; \
+	if ! ($(P4C) --help > /dev/null 2>&1); then \
+		echo "*** ERROR: Cannot find p4c-xdp"; \
 		exit 1;\
 	fi;
 	$(P4C) $(INCLUDE) --target xdp -o $@ $<;
@@ -60,17 +59,15 @@ verify_target_bpf: verify_cmds
 	./$(BPFLOADER) $@
 
 clean: clean_loader
-	@rm -f *.o *_ebpf.c
+	rm -f *.o *_ebpf.c xdp*.c
 
 clean_loader:
-	@rm -f bpfloader
+	rm -f bpfloader
 
-# For actually attaching BPF 
+# For actually attaching BPF
 attach:
-	@ip link show $(IFACE); \
+	ip link show $(IFACE); \
 	for TOOL in $(BPFOBJ); do \
 		ip link set dev $(IFACE) xdp obj $${TOOL} verb; \
 		ip link set dev $(IFACE) xdp off; \
 	done
-
-

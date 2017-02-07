@@ -28,4 +28,6 @@ noinst_HEADERS += \
 	extensions/p4c-xdp/target.h \
 	extensions/p4c-xdp/xdpBackend.h
 
+p4include_HEADERS += $(srcdir)/%reldir%/p4include/xdp_model.p4
+
 cpplint_FILES += $(p4c_xdp_UNIFIED) $(p4c_xdp_NONUNIFIED)

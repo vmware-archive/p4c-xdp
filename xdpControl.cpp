@@ -42,6 +42,9 @@ bool XDPSwitch::build() {
     ++it;
     outputMeta = *it;
 
+    codeGen = new EBPF::ControlBodyTranslator(this, builder);
+    codeGen->substitute(headers, parserHeaders);
+
     scanConstants();
     return ::errorCount() == 0;
 }
@@ -128,8 +131,7 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
 
 }  // namespace
 
-XDPDeparser::XDPDeparser(const XDPProgram* program,
-                         const IR::ControlBlock* block,
+XDPDeparser::XDPDeparser(const XDPProgram* program, const IR::ControlBlock* block,
                          const IR::Parameter* parserHeaders) :
         EBPF::EBPFControl(program, block, parserHeaders), packet(nullptr) {}
 
@@ -146,10 +148,13 @@ bool XDPDeparser::build() {
     ++it;
     packet = *it;
 
+    codeGen = new EBPF::ControlBodyTranslator(this, builder);
+    codeGen->substitute(headers, parserHeaders);
+
     return true;
 }
 
-void XDPDeparser::emit(EBPF::CodeBuilder* builder) {
+void XDPDeparser::emit() {
     OutHeaderSize ohs(program->refMap, program->typeMap,
                       static_cast<const XDPProgram*>(program), builder);
     ohs.substitute(headers, parserHeaders);
@@ -180,7 +185,7 @@ void XDPDeparser::emit(EBPF::CodeBuilder* builder) {
     builder->appendFormat("%s = 0;", program->offsetVar.c_str());
     builder->newline();
 
-    EBPF::EBPFControl::emit(builder);
+    EBPF::EBPFControl::emit();
 }
 
 }  // namespace XDP
