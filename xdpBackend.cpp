@@ -36,8 +36,6 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
         return;
     }
 
-    EBPF::EBPFTypeFactory::createFactory(typeMap);
-
     EBPF::Target* target;
     if (options.target == "bcc") {
         target = new EBPF::BccTarget();
@@ -49,7 +47,10 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
         ::error("Unknown target %s; legal choices are 'bcc', 'xdp', and 'kernel'", options.target);
         return;
     }
-    auto prog = new XDPProgram(toplevel->getProgram(), refMap, typeMap, toplevel);
+
+    EBPF::CodeBuilder builder(target);
+    EBPF::EBPFTypeFactory::createFactory(typeMap, &builder);
+    auto prog = new XDPProgram(toplevel->getProgram(), refMap, typeMap, toplevel, &builder);
     if (!prog->build())
         return;
 
@@ -59,8 +60,7 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
     if (stream == nullptr)
         return;
 
-    EBPF::CodeBuilder builder(target);
-    prog->emit(&builder);
+    prog->emit();
     *stream << builder.toString();
     stream->flush();
 }
