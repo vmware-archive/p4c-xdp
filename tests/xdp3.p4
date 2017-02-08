@@ -65,7 +65,7 @@ control Ingress(inout Headers hdr, in xdp_input xin, out xdp_output xout) {
 
 control Deparser(in Headers hdrs, packet_out packet) {
     apply {
-        //packet.emit(hdrs.ethernet);
+        packet.emit(hdrs.ethernet);
         packet.emit(hdrs.ipv4);
 	packet.emit(hdrs.icmp);
     }
