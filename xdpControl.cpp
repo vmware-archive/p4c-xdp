@@ -42,7 +42,7 @@ bool XDPSwitch::build() {
     ++it;
     outputMeta = *it;
 
-    codeGen = new EBPF::ControlBodyTranslator(this, builder);
+    codeGen = new EBPF::ControlBodyTranslator(this);
     codeGen->substitute(headers, parserHeaders);
 
     scanConstants();
@@ -57,7 +57,6 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
     P4::ReferenceMap*  refMap;
     P4::TypeMap*       typeMap;
     const XDPProgram*  program;
-    EBPF::CodeBuilder* builder;
 
     std::map<const IR::Parameter*, const IR::Parameter*> substitution;
 
@@ -66,11 +65,11 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
 
  public:
     OutHeaderSize(P4::ReferenceMap* refMap, P4::TypeMap* typeMap,
-                  const XDPProgram* program, EBPF::CodeBuilder* builder):
-            EBPF::CodeGenInspector(builder, typeMap), refMap(refMap), typeMap(typeMap),
-            program(program), builder(builder) {
-        CHECK_NULL(refMap); CHECK_NULL(typeMap); CHECK_NULL(program); CHECK_NULL(builder);
-        setName("OutHeaderSize"); }
+                  const XDPProgram* program):
+            EBPF::CodeGenInspector(typeMap), refMap(refMap), typeMap(typeMap),
+            program(program) {
+                CHECK_NULL(refMap); CHECK_NULL(typeMap); CHECK_NULL(program);
+                setName("OutHeaderSize"); }
     bool preorder(const IR::PathExpression* expression) override {
         auto decl = refMap->getDeclaration(expression->path, true);
         auto param = decl->getNode()->to<IR::Parameter>();
@@ -148,16 +147,17 @@ bool XDPDeparser::build() {
     ++it;
     packet = *it;
 
-    codeGen = new EBPF::ControlBodyTranslator(this, builder);
+    codeGen = new EBPF::ControlBodyTranslator(this);
     codeGen->substitute(headers, parserHeaders);
 
     return true;
 }
 
-void XDPDeparser::emit() {
+void XDPDeparser::emit(EBPF::CodeBuilder* builder) {
     OutHeaderSize ohs(program->refMap, program->typeMap,
-                      static_cast<const XDPProgram*>(program), builder);
+                      static_cast<const XDPProgram*>(program));
     ohs.substitute(headers, parserHeaders);
+    ohs.setBuilder(builder);
 
     builder->emitIndent();
     (void)controlBlock->container->body->apply(ohs);
@@ -185,7 +185,7 @@ void XDPDeparser::emit() {
     builder->appendFormat("%s = 0;", program->offsetVar.c_str());
     builder->newline();
 
-    EBPF::EBPFControl::emit();
+    EBPF::EBPFControl::emit(builder);
 }
 
 }  // namespace XDP

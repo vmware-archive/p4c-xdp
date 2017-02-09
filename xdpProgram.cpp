@@ -40,7 +40,7 @@ bool XDPProgram::build() {
     auto pb = pack->getParameterValue(parserParamName)
             ->to<IR::ParserBlock>();
     BUG_CHECK(pb != nullptr, "No parser block found");
-    parser = new EBPF::EBPFParser(this, pb, typeMap, builder);
+    parser = new EBPF::EBPFParser(this, pb, typeMap);
     bool success = parser->build();
     if (!success)
         return success;
@@ -78,9 +78,11 @@ bool XDPProgram::build() {
     return true;
 }
 
-void XDPProgram::emit() {
+void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
+    emitGeneratedComment(builder);
+
     if (!switchTarget()) {
-        EBPF::EBPFProgram::emit();
+        EBPF::EBPFProgram::emitC(builder, headerFile);
         return;
     }
 
@@ -89,10 +91,12 @@ void XDPProgram::emit() {
         return;
     }
 
+    builder->appendFormat("#include \"%s\"", headerFile);
+    builder->newline();
+
     builder->target->emitIncludes(builder);
-    emitPreamble();
-    emitTypes();
-    control->emitTables();
+    emitPreamble(builder);
+    control->emitTableInstances(builder);
 
     // The table used for forwarding: we write the output in it
     // TODO: this should use target->emitTableDecl().
@@ -130,19 +134,19 @@ void XDPProgram::emit() {
     builder->target->emitMain(builder, functionName, model.CPacketName.str());
     builder->blockStart();
 
-    emitHeaderInstances();
+    emitHeaderInstances(builder);
     builder->append(" = ");
-    parser->headerType->emitInitializer();
+    parser->headerType->emitInitializer(builder);
     builder->endOfStatement(true);
 
-    createLocalVariables();
+    emitLocalVariables(builder);
     builder->newline();
     builder->emitIndent();
     builder->appendFormat("goto %s;", IR::ParserState::start.c_str());
     builder->newline();
 
-    parser->emit();
-    emitPipeline();
+    parser->emit(builder);
+    emitPipeline(builder);
 
     builder->emitIndent();
     builder->append(endLabel);
@@ -170,7 +174,7 @@ void XDPProgram::emit() {
     builder->target->emitLicense(builder, license);
 }
 
-void XDPProgram::emitPipeline() {
+void XDPProgram::emitPipeline(EBPF::CodeBuilder* builder) {
     builder->emitIndent();
     builder->append(IR::ParserState::accept);
     builder->append(":");
@@ -178,7 +182,7 @@ void XDPProgram::emitPipeline() {
 
     builder->emitIndent();
     builder->blockStart();
-    control->emit();
+    control->emit(builder);
     builder->blockEnd(true);
 
     if (switchTarget()) {
@@ -187,14 +191,14 @@ void XDPProgram::emitPipeline() {
         builder->newline();
         builder->emitIndent();
         builder->blockStart();
-        deparser->emit();
+        deparser->emit(builder);
         builder->blockEnd(true);
     }
 }
 
-void XDPProgram::createLocalVariables() {
+void XDPProgram::emitLocalVariables(EBPF::CodeBuilder* builder) {
     if (!switchTarget()) {
-        EBPF::EBPFProgram::createLocalVariables();
+        EBPF::EBPFProgram::emitLocalVariables(builder);
         return;
     }
 

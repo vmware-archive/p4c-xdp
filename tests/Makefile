@@ -20,7 +20,7 @@ bpfloader: load_and_verify.c
 .PHONY: verify_cmds verify_target_bpf $(CLANG) $(LLC)
 
 verify_cmds: $(CLANG) $(LLC)
-	for TOOL in $^ ; do \
+	@for TOOL in $^ ; do \
 		if ! (which -- "$${TOOL}" > /dev/null 2>&1); then \
 			echo "*** ERROR: Cannot find LLVM tool $${TOOL}" ;\
 			exit 1; \
@@ -30,7 +30,7 @@ verify_cmds: $(CLANG) $(LLC)
 	done
 
 verify_target_bpf: verify_cmds
-	if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
+	@if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
 		echo "*** ERROR: LLVM (${LLC}) does not support 'bpf' target" ;\
 		echo "   NOTICE: LLVM version >= 3.7.1 required" ;\
 		exit 2; \
@@ -42,7 +42,7 @@ verify_target_bpf: verify_cmds
 # keep the intermediate .c file
 .PRECIOUS: %.c
 %.c: %.p4
-	if ! ($(P4C) --help > /dev/null 2>&1); then \
+	@if ! ($(P4C) --help > /dev/null 2>&1); then \
 		echo "*** ERROR: Cannot find p4c-xdp"; \
 		exit 1;\
 	fi;
@@ -59,7 +59,7 @@ verify_target_bpf: verify_cmds
 	./$(BPFLOADER) $@
 
 clean: clean_loader
-	rm -f *.o *_ebpf.c xdp*.c
+	rm -f *.o *_ebpf.c xdp*.c xdp*.h
 
 clean_loader:
 	rm -f bpfloader

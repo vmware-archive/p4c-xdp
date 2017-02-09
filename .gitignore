@@ -1,5 +1,6 @@
 lib/*.o
 tests/*.c
+tests/*.h
 tests/*.o
 tests/bpfloader
 p4c-xdp

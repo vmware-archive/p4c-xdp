@@ -69,7 +69,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
             Drop_action;
             SetTTL_action;
         }
-        default_action = Drop_action; 
+        default_action = Drop_action;
         implementation = hash_table(64);
     }
 
