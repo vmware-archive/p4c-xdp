@@ -41,6 +41,12 @@ struct xdp_output {
     bit<32> output_port;  // output port for packet
 }
 
+// Rather ugly to have this very specific function here.
+extern bit<16> ebpf_ipv4_checksum(in bit<4> version, in bit<4> ihl, in bit<8> diffserv,
+                                  in bit<16> totalLen, in bit<16> identification, in bit<3> flags,
+                                  in bit<13> fragOffset, in bit<8> ttl, in bit<8> protocol,
+                                  in bit<32> srcAddr, in bit<32> dstAddr);
+
 parser xdp_parse<H>(packet_in packet, out H headers);
 control xdp_switch<H>(inout H headers, in xdp_input imd, out xdp_output omd);
 control xdp_deparse<H>(in H headers, packet_out packet);

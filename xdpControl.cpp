@@ -66,7 +66,7 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
  public:
     OutHeaderSize(P4::ReferenceMap* refMap, P4::TypeMap* typeMap,
                   const XDPProgram* program):
-            EBPF::CodeGenInspector(typeMap), refMap(refMap), typeMap(typeMap),
+            EBPF::CodeGenInspector(refMap, typeMap), refMap(refMap), typeMap(typeMap),
             program(program) {
                 CHECK_NULL(refMap); CHECK_NULL(typeMap); CHECK_NULL(program);
                 setName("OutHeaderSize"); }
@@ -164,7 +164,7 @@ void XDPDeparser::emit(EBPF::CodeBuilder* builder) {
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat("// bpf_xdp_adjust_head(%s, BYTES(%s) - %s);",
+    builder->appendFormat("bpf_xdp_adjust_head(%s, BYTES(%s) - %s);",
                           program->model.CPacketName.str(),
                           program->offsetVar.c_str(),
                           getProgram()->outHeaderLengthVar.c_str());
