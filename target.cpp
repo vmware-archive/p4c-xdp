@@ -24,9 +24,9 @@ void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
         "#include <linux/bpf.h>\n"
         "#include \"bpf_helpers.h\"\n"
         "\n"
-        "#define load_byte(data, b)  (*(u8 *)(data + (b)))\n"
-        "#define load_half(data, b) __constant_ntohs(*(u16 *)(data + (b)))\n"
-        "#define load_word(data, b) __constant_ntohl(*(u32 *)(data + (b)))\n"
+        "#define load_byte(data, b)  (*(((u8*)(data)) + (b)))\n"
+        "#define load_half(data, b) __constant_ntohs(*(u16 *)((u8*)(data) + (b)))\n"
+        "#define load_word(data, b) __constant_ntohl(*(u32 *)((u8*)(data) + (b)))\n"
         "#define htonl(d) __constant_htonl(d)\n"
         "#define htons(d) __constant_htons(d)\n");
 }
