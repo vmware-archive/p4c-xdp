@@ -2,7 +2,7 @@ LLC ?= llc
 CLANG ?= clang
 CC= gcc
 CFLAGS=-g
-BPFOBJ= xdp1.o xdp2.o xdp3.o xdp4.o xdp5.o xdp6.o xdp7.o
+BPFOBJ= xdp8.o xdp1.o xdp2.o xdp3.o xdp4.o xdp5.o xdp6.o xdp7.o
 BPFLOADER=bpfloader
 BPFLIB=../lib/
 #IFACE=enp0s16
@@ -59,7 +59,7 @@ verify_target_bpf: verify_cmds
 	./$(BPFLOADER) $@
 
 clean: clean_loader
-	rm -f *.o *_ebpf.c xdp*.c xdp*.h
+	rm -f *.o *_ebpf.c xdp[1-9]*.[ch]
 
 clean_loader:
 	rm -f bpfloader
