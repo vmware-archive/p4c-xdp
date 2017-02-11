@@ -50,6 +50,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
     action SetTTL_action(action_md_t md)
     {
         hd.ipv4.ttl = md.ttl;
+		xout.drop = false;
     }
 
     action Fallback_action()
@@ -63,7 +64,10 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
     }
 
     table dstmactable() {
-        key = { hd.ethernet.protocol : exact; }
+        key = {
+				hd.ethernet.protocol : exact;
+				hd.ipv4.dstAddr : exact;
+			  }
         actions = {
             Fallback_action;
             Drop_action;
