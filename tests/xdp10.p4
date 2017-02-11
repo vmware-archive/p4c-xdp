@@ -1,5 +1,9 @@
 #include "xdp_model.p4"
 
+/* change ipv4.ttl to 4 
+ * update iph->csum
+ */
+
 header Ethernet {
     bit<48> source;
     bit<48> destination;
@@ -26,10 +30,6 @@ struct Headers {
     IPv4     ipv4;
 }
 
-struct action_md_t {
-    bit<8> ttl;
-}
-
 parser Parser(packet_in packet, out Headers hd) {
     state start {
         packet.extract(hd.ethernet);
@@ -38,48 +38,54 @@ parser Parser(packet_in packet, out Headers hd) {
             default: accept;
         }
     }
-
     state parse_ipv4 {
         packet.extract(hd.ipv4);
-        transition accept;
+        transition select(hd.ipv4.protocol) {
+            default: accept;
+        }
     }
 }
 
 control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 
-    action SetTTL_action(action_md_t md)
+    bool xoutdrop = false;
+	CounterArray(32w10, true) counters;
+
+    action SetTTL_action()
     {
-        hd.ipv4.ttl = md.ttl;
-		xout.drop = false;
+        hd.ipv4.ttl = 4;
+        xoutdrop = false;
     }
 
     action Fallback_action()
     {
-        xout.drop = false;
+        xoutdrop = false;
     }
 
     action Drop_action()
     {
-        xout.drop = true;
+        xoutdrop = true;
     }
 
     table dstmactable() {
-        key = {
-				hd.ethernet.protocol : exact;
-				hd.ipv4.dstAddr : exact;
-			  }
+        key = { hd.ipv4.dstAddr : exact; }
         actions = {
+            SetTTL_action;
             Fallback_action;
             Drop_action;
-            SetTTL_action;
         }
-        default_action = Drop_action;
+        default_action = SetTTL_action; 
         implementation = hash_table(64);
     }
 
     apply {
+		if (hd.ipv4.isValid())
+		{
+			counters.increment((bit<32>)hd.ipv4.dstAddr);
+		}
         dstmactable.apply();
         xout.output_port = 0;
+        xout.drop = xoutdrop;
     }
 }
 

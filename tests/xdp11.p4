@@ -26,10 +26,6 @@ struct Headers {
     IPv4     ipv4;
 }
 
-struct action_md_t {
-    bit<8> ttl;
-}
-
 parser Parser(packet_in packet, out Headers hd) {
     state start {
         packet.extract(hd.ethernet);
@@ -38,55 +34,34 @@ parser Parser(packet_in packet, out Headers hd) {
             default: accept;
         }
     }
-
     state parse_ipv4 {
         packet.extract(hd.ipv4);
-        transition accept;
+        transition select(hd.ipv4.protocol) {
+            default: accept;
+        }
     }
 }
 
 control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 
-    action SetTTL_action(action_md_t md)
-    {
-        hd.ipv4.ttl = md.ttl;
-		xout.drop = false;
-    }
-
-    action Fallback_action()
-    {
-        xout.drop = false;
-    }
-
-    action Drop_action()
-    {
-        xout.drop = true;
-    }
-
-    table dstmactable() {
-        key = {
-				hd.ethernet.protocol : exact;
-				hd.ipv4.dstAddr : exact;
-			  }
-        actions = {
-            Fallback_action;
-            Drop_action;
-            SetTTL_action;
-        }
-        default_action = Drop_action;
-        implementation = hash_table(64);
-    }
+    bit<48> tmp;
+    bool xoutdrop = false;
 
     apply {
-        dstmactable.apply();
+		if (hd.ipv4.isValid())
+		{
+			tmp = hd.ethernet.destination;
+			hd.ethernet.destination = hd.ethernet.source;
+			hd.ethernet.source = tmp;
+		}
         xout.output_port = 0;
+        xout.drop = xoutdrop;
     }
 }
 
 control Deparser(in Headers hdrs, packet_out packet) {
     apply {
         packet.emit(hdrs.ethernet);
-        packet.emit(hdrs.ipv4);
     }
 }
 
