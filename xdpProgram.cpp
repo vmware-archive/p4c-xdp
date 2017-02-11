@@ -93,7 +93,6 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
 
     builder->appendFormat("#include \"%s\"", headerFile);
     builder->newline();
-
     builder->target->emitIncludes(builder);
     emitPreamble(builder);
     control->emitTableInstances(builder);
