@@ -72,6 +72,7 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
 
     EBPF::CodeBuilder c(target);
     EBPF::CodeBuilder h(target);
+    // The order is important
     prog->emitH(&h, hfile);
     prog->emitC(&c, hfile);
 
