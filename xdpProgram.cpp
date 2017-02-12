@@ -102,7 +102,7 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "                  u16 totalLen, u16 identification, u8 flags,\n"
         "                  u16 fragOffset, u8 ttl, u8 protocol,\n"
         "                  u32 srcAddr, u32 dstAddr) {\n"
-        "    u16 checksum = htons(((u16)version << 12) | ((u16)ihl << 8) | (u16)diffserv);\n"
+        "    u32 checksum = htons(((u16)version << 12) | ((u16)ihl << 8) | (u16)diffserv);\n"
         "    checksum += htons(totalLen);\n"
         "    checksum += htons(identification);\n"
         "    checksum += htons(((u16)flags << 13) | fragOffset);\n"
