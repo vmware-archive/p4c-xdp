@@ -53,7 +53,8 @@ struct OutputMetadataModel : public ::Model::Type_Model {
 // Keep this in sync with xdp_model.p4
 class XDPModel : public EBPF::EBPFModel {
  protected:
-    XDPModel() : EBPF::EBPFModel(), xdp(), inputMetadataModel(), outputMetadataModel()
+    XDPModel() : EBPF::EBPFModel(), xdp(), inputMetadataModel(), outputMetadataModel(),
+                 ipv4_checksum("ebpf_ipv4_checksum")
     {}
 
  public:
@@ -61,6 +62,7 @@ class XDPModel : public EBPF::EBPFModel {
     XDP_Switch_Model xdp;
     InputMetadataModel inputMetadataModel;
     OutputMetadataModel outputMetadataModel;
+    ::Model::Extern_Model ipv4_checksum;
 };
 
 }  // namespace XDP

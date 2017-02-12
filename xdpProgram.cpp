@@ -93,14 +93,30 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
 
     builder->appendFormat("#include \"%s\"", headerFile);
     builder->newline();
-
     builder->target->emitIncludes(builder);
     emitPreamble(builder);
     control->emitTableInstances(builder);
 
+    builder->appendLine(
+        "inline u16 ebpf_ipv4_checksum(u8 version, u8 ihl, u8 diffserv,\n"
+        "                  u16 totalLen, u16 identification, u8 flags,\n"
+        "                  u16 fragOffset, u8 ttl, u8 protocol,\n"
+        "                  u32 srcAddr, u32 dstAddr) {\n"
+        "    u16 checksum = htons(((u16)version << 12) | ((u16)ihl << 8) | (u16)diffserv);\n"
+        "    checksum += htons(totalLen);\n"
+        "    checksum += htons(identification);\n"
+        "    checksum += htons(((u16)flags << 13) | fragOffset);\n"
+        "    checksum += htons(((u16)ttl << 8) | (u16)protocol);\n"
+        "    srcAddr = htonl(srcAddr);\n"
+        "    dstAddr = htonl(dstAddr);\n"
+        "    checksum += (srcAddr >> 16) + (u16)srcAddr;\n"
+        "    checksum += (dstAddr >> 16) + (u16)dstAddr;\n"
+        "    return ~((checksum & 0xFFFF) + (checksum >> 16));\n"
+        "}");
+
     // The table used for forwarding: we write the output in it
     // TODO: this should use target->emitTableDecl().
-    // We can't do it today because it has a different map type
+    // We can't do it today because it has a different map type PERCPU_ARRAY
     builder->emitIndent();
     builder->appendFormat("struct bpf_map_def SEC(\"maps\") %s = ", outTableName.c_str());
     builder->blockStart();

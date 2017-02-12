@@ -41,6 +41,7 @@ class XdpTarget : public EBPF::KernelSamplesTarget {
     cstring forwardReturnCode() const override { return "XDP_PASS"; }
     cstring dropReturnCode() const override { return "XDP_DROP"; }
     cstring abortReturnCode() const override { return "XDP_ABORTED"; }
+    cstring sysMapPath() const override { return "/sys/fs/bpf/xdp/globals"; }
 };
 
 }  // namespace XDP
