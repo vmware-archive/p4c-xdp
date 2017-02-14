@@ -121,7 +121,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
     apply {
         dstmactable.apply();
         xout.output_port = 0;
-        xout.drop = xoutdrop;
+        xout.output_action = xoutdrop ? xdp_action.XDP_DROP : xdp_action.XDP_PASS;
     }
 }
 

@@ -55,6 +55,7 @@ class XDPProgram : public EBPF::EBPFProgram {
     void emitLocalVariables(EBPF::CodeBuilder* builder) override;
     void emitPipeline(EBPF::CodeBuilder* builder) override;
     XDPSwitch* getSwitch() const;
+    void emitTypes(EBPF::CodeBuilder* builder) override;
 };
 
 }  // namespace XDP
