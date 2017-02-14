@@ -21,7 +21,6 @@ limitations under the License.
 #include "frontends/p4/coreLibrary.h"
 #include "xdpProgram.h"
 #include "xdpControl.h"
-#include "xdpType.h"
 
 namespace XDP {
 
@@ -93,7 +92,7 @@ void XDPProgram::emitTypes(EBPF::CodeBuilder* builder) {
                 continue;
         }
 
-        auto type = XDPTypeFactory::instance->create(d->to<IR::Type>());
+        auto type = EBPF::EBPFTypeFactory::instance->create(d->to<IR::Type>());
         if (type == nullptr)
             continue;
         type->emit(builder);

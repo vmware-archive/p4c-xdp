@@ -48,7 +48,7 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
         return;
     }
 
-    XDPTypeFactory::createFactory(typeMap);
+    EBPF::EBPFTypeFactory::createFactory(typeMap);
     auto prog = new XDPProgram(options, toplevel->getProgram(), refMap, typeMap, toplevel);
     if (!prog->build())
         return;

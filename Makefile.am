@@ -11,7 +11,6 @@ p4c_xdp_UNIFIED = \
 	extensions/p4c-xdp/xdpProgram.cpp \
 	extensions/p4c-xdp/target.cpp \
 	extensions/p4c-xdp/xdpBackend.cpp \
-	extensions/p4c-xdp/xdpType.cpp \
 	backends/ebpf/ebpfProgram.cpp \
 	backends/ebpf/ebpfTable.cpp \
 	backends/ebpf/ebpfControl.cpp \
@@ -27,8 +26,7 @@ noinst_HEADERS += \
 	extensions/p4c-xdp/xdpProgram.h \
 	extensions/p4c-xdp/xdpControl.h \
 	extensions/p4c-xdp/target.h \
-	extensions/p4c-xdp/xdpBackend.h \
-	extensions/p4c-xdp/xdpType.h
+	extensions/p4c-xdp/xdpBackend.h
 
 p4include_HEADERS += $(srcdir)/%reldir%/p4include/xdp_model.p4
 
