@@ -21,6 +21,16 @@ limitations under the License.
 
 namespace XDP {
 
+struct XDP_Action_Model : public ::Model::Enum_Model {
+    XDP_Action_Model() : Enum_Model("xdp_action"),
+                         aborted("XDP_ABORTED"), drop("XDP_DROP"),
+                         pass("XDP_PASS"), tx("XDP_TX") {}
+    ::Model::Elem aborted;
+    ::Model::Elem drop;
+    ::Model::Elem pass;
+    ::Model::Elem tx;
+};
+
 struct XDP_Switch_Model : public ::Model::Elem {
     XDP_Switch_Model() : Elem("xdp"),
                          parser("p"), swtch("s"), deparser("d") {}
@@ -41,20 +51,19 @@ struct InputMetadataModel : public ::Model::Type_Model {
 struct OutputMetadataModel : public ::Model::Type_Model {
     OutputMetadataModel() : ::Model::Type_Model("xdp_output"),
             outputPort("output_port"), outputPortType(IR::Type_Bits::get(32)),
-            drop("drop"), dropType(IR::Type_Boolean::get())
+                            output_action("output_action")
     {}
 
     ::Model::Elem outputPort;
     const IR::Type* outputPortType;
-    ::Model::Elem drop;
-    const IR::Type* dropType;
+    ::Model::Elem output_action;
 };
 
 // Keep this in sync with xdp_model.p4
 class XDPModel : public EBPF::EBPFModel {
  protected:
     XDPModel() : EBPF::EBPFModel(), xdp(), inputMetadataModel(), outputMetadataModel(),
-                 ipv4_checksum("ebpf_ipv4_checksum")
+                 ipv4_checksum("ebpf_ipv4_checksum"), action_enum()
     {}
 
  public:
@@ -63,6 +72,7 @@ class XDPModel : public EBPF::EBPFModel {
     InputMetadataModel inputMetadataModel;
     OutputMetadataModel outputMetadataModel;
     ::Model::Extern_Model ipv4_checksum;
+    XDP_Action_Model      action_enum;
 };
 
 }  // namespace XDP

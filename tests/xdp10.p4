@@ -1,6 +1,6 @@
 #include "xdp_model.p4"
 
-/* change ipv4.ttl to 4 
+/* change ipv4.ttl to 4
  * update iph->csum
  */
 
@@ -47,9 +47,8 @@ parser Parser(packet_in packet, out Headers hd) {
 }
 
 control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
-
     bool xoutdrop = false;
-	CounterArray(32w10, true) counters;
+    CounterArray(32w10, true) counters;
 
     action SetTTL_action()
     {
@@ -74,7 +73,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
             Fallback_action;
             Drop_action;
         }
-        default_action = SetTTL_action; 
+        default_action = SetTTL_action;
         implementation = hash_table(64);
     }
 
@@ -85,7 +84,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 		}
         dstmactable.apply();
         xout.output_port = 0;
-        xout.drop = xoutdrop;
+        xout.output_action = xoutdrop ? xdp_action.XDP_DROP : xdp_action.XDP_PASS;
     }
 }
 

@@ -31,13 +31,20 @@ https://www.iovisor.org/technology/xdp.  We support two different architectures:
 #include <core.p4>
 #include <ebpf_model.p4>  // we continue to support the EBPF packet filter model
 
+enum xdp_action {
+    XDP_ABORTED,  // some fatal error occurred during processing;
+    XDP_DROP,     // packet should be dropped
+    XDP_PASS,     // packet should be passed to the Linux kernel
+    XDP_TX        // packet should be resent out on the same interface
+}
+
 /* architectural model for a packet switch architecture */
 struct xdp_input {
     bit<32> input_port;
 }
 
 struct xdp_output {
-    bool    drop;  // if set packet is dropped
+    xdp_action output_action;
     bit<32> output_port;  // output port for packet
 }
 

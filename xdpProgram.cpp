@@ -78,6 +78,28 @@ bool XDPProgram::build() {
     return true;
 }
 
+void XDPProgram::emitTypes(EBPF::CodeBuilder* builder) {
+    for (auto d : *program->declarations) {
+        if (!d->is<IR::Type>()) continue;
+
+        if (d->is<IR::IContainer>() || d->is<IR::Type_Extern>() ||
+            d->is<IR::Type_Parser>() || d->is<IR::Type_Control>() ||
+            d->is<IR::Type_Typedef>() || d->is<IR::Type_Error>())
+            continue;
+
+        if (d->is<IR::Type_Enum>()) {
+            if (d->to<IR::Type_Enum>()->name == XDPModel::instance.action_enum.name)
+                continue;
+        }
+
+        auto type = EBPF::EBPFTypeFactory::instance->create(d->to<IR::Type>());
+        if (type == nullptr)
+            continue;
+        type->emit(builder);
+        builder->newline();
+    }
+}
+
 void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
     emitGeneratedComment(builder);
 
@@ -177,14 +199,10 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
     builder->endOfStatement(true);
 
     builder->emitIndent();
-    builder->appendFormat("if (%s.%s) return %s;",
+    builder->appendFormat("return %s.%s",
                           getSwitch()->outputMeta->name.name,
-                          XDPModel::instance.outputMetadataModel.drop.str(),
-                          builder->target->dropReturnCode().c_str());
-    builder->newline();
-    builder->emitIndent();
-    builder->appendFormat("else return %s;", builder->target->forwardReturnCode().c_str());
-    builder->newline();
+                          XDPModel::instance.outputMetadataModel.output_action.str());
+    builder->endOfStatement(true);
     builder->blockEnd(true);  // end of function
 
     builder->target->emitLicense(builder, license);

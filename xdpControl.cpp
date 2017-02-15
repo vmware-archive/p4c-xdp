@@ -17,7 +17,6 @@ limitations under the License.
 #include "xdpControl.h"
 #include "lib/error.h"
 #include "backends/ebpf/ebpfControl.h"
-#include "frontends/p4/methodInstance.h"
 
 namespace XDP {
 
