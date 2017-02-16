@@ -45,7 +45,6 @@ parser Parser(packet_in packet, out Headers hd) {
 control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 
     bit<48> tmp;
-    bool xoutdrop = false;
 
     apply {
 		if (hd.ipv4.isValid())
@@ -55,7 +54,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 			hd.ethernet.source = tmp;
 		}
         xout.output_port = 0;
-        xout.drop = xoutdrop;
+        xout.output_action = xdp_action.XDP_TX;
     }
 }
 
