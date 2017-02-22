@@ -1,10 +1,8 @@
 #include "xdp_model.p4"
 
-/* change ipv4.ttl to 4 */
-
 header Ethernet {
-    bit<48> source;
     bit<48> destination;
+    bit<48> source;
     bit<16> protocol;
 }
 
@@ -129,7 +127,9 @@ control Deparser(in Headers hdrs, packet_out packet) {
     apply {
         packet.emit(hdrs.ethernet);
         packet.emit(hdrs.ipv4);
-        packet.emit(hdrs.tcp);
+
+    /* hit BPF_MAX_STACK size */
+    //    packet.emit(hdrs.tcp);
     //    packet.emit(hdrs.udp);
         packet.emit(hdrs.icmp);
     }
