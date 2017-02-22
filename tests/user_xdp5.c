@@ -15,33 +15,12 @@
 #include <stdint.h>
 #include <assert.h>
 #include "libbpf.h"
+
+#define CONTROL_PLANE 1
 #include "xdp5.h"
 
 // we might want to put this into header
-#define MAP_PATH            "/sys/fs/bpf/xdp/globals/dstmactable"
-#define DEFAULT_MAP_PATH    "/sys/fs/bpf/xdp/globals/dstmactable_defaultAction"
-
-#define CONTROL_PLANE 1
-#if CONTROL_PLANE
-void initialize_tables()
-{
-    int fd;
-
-    fd = bpf_obj_get(DEFAULT_MAP_PATH);
-    if (fd < 0) {
-        printf("BPF map %s not loaded\n", DEFAULT_MAP_PATH);
-        exit(1);
-    }
-
-    u32 ebpf_zero = 0;
-    {
-        struct dstmactable_value value = {
-            .action = Fallback_action,
-        };
-        assert(bpf_update_elem(fd, &ebpf_zero, &value, BPF_ANY) == 0);
-    }
-}
-#endif
+#define TABLE "/dstmactable"
 
 int main(void)
 {
@@ -54,12 +33,12 @@ int main(void)
 	initialize_tables();
 
 	value.action = Fallback_action;
-	key.field0 = 0x800;
+	key.field0 = 0x800; // IP packet
 
-    printf("=== Open BPF map: %s ===\n", MAP_PATH);
-    fd = bpf_obj_get(MAP_PATH);
+    printf("=== Open BPF map: %s ===\n", MAP_PATH TABLE);
+    fd = bpf_obj_get(MAP_PATH TABLE);
     if (fd < 0) {
-        printf("BPF map %s not loaded\n", MAP_PATH);
+        printf("BPF map %s not loaded\n", MAP_PATH TABLE);
         exit(1);
     }
 

@@ -1,8 +1,8 @@
 #include "xdp_model.p4"
 
 header Ethernet {
-    bit<48> source;
     bit<48> destination;
+    bit<48> source;
     bit<16> protocol;
 }
 
@@ -56,7 +56,8 @@ control Ingress(inout Headers hdr, in xdp_input xin, out xdp_output xout) {
     }
 
     table dstmactable() {
-        key = { hdr.ethernet.destination : exact; }
+        key = { hdr.ethernet.destination : exact;
+                hdr.ethernet.protocol: exact;}
         actions = {
             Fallback_action;
             Drop_action;

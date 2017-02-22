@@ -1,8 +1,8 @@
 #include "xdp_model.p4"
 
 header Ethernet {
-    bit<48> source;
     bit<48> destination;
+    bit<48> source;
     bit<16> protocol;
 }
 
@@ -21,16 +21,9 @@ header IPv4 {
     bit<32> dstAddr;
 }
 
-header icmp_h {
-    bit<8> type_;
-    bit<8> code;
-    bit<16> hdrChecksum;
-}
-
 struct Headers {
     Ethernet ethernet;
     IPv4     ipv4;
-    icmp_h     icmp;
 }
 
 parser Parser(packet_in packet, out Headers hd) {
@@ -44,22 +37,38 @@ parser Parser(packet_in packet, out Headers hd) {
 
     state parse_ipv4 {
         packet.extract(hd.ipv4);
-	transition select(hd.ipv4.protocol) {
-		8w0x1: parse_icmp;
-		default: accept;
-	}
-    }
-
-    state parse_icmp {
-	packet.extract(hd.icmp);
-	transition accept;
+        transition accept;
     }
 }
 
 control Ingress(inout Headers hdr, in xdp_input xin, out xdp_output xout) {
+
+    bool xoutdrop = false;
+
+    action Fallback_action()
+    {
+        xoutdrop = false;
+    }
+
+    action Drop_action()
+    {
+        xoutdrop = true;
+    }
+
+    table dstmactable() {
+        key = { hdr.ethernet.destination : exact; }
+        actions = {
+            Fallback_action;
+            Drop_action;
+        }
+        default_action = Drop_action;
+        implementation = hash_table(64);
+    }
+
     apply {
+        dstmactable.apply();
         xout.output_port = 0;
-        xout.output_action = hdr.ethernet.protocol != 0x800 ? xdp_action.XDP_DROP : xdp_action.XDP_PASS;
+        xout.output_action = xoutdrop ? xdp_action.XDP_DROP : xdp_action.XDP_PASS;
     }
 }
 
@@ -67,7 +76,6 @@ control Deparser(in Headers hdrs, packet_out packet) {
     apply {
         packet.emit(hdrs.ethernet);
         packet.emit(hdrs.ipv4);
-	packet.emit(hdrs.icmp);
     }
 }
 

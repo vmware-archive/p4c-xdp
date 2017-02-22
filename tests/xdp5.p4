@@ -1,8 +1,8 @@
 #include "xdp_model.p4"
 
 header Ethernet {
-    bit<48> source;
     bit<48> destination;
+    bit<48> source;
     bit<16> protocol;
 }
 

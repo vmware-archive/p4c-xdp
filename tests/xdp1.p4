@@ -1,8 +1,8 @@
 #include "xdp_model.p4"
 
 header Ethernet {
-    bit<48> source;
     bit<48> destination;
+    bit<48> source;
     bit<16> protocol;
 }
 
@@ -50,8 +50,7 @@ control Ingress(inout Headers hdr, in xdp_input xin, out xdp_output xout) {
 
 control Deparser(in Headers hdrs, packet_out packet) {
     apply {
-        packet.emit(hdrs.ethernet);
-        packet.emit(hdrs.ipv4);
+        ;
     }
 }
 
