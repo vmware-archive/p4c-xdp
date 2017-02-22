@@ -117,11 +117,15 @@ Try to do similar feature as kernel's samples/bpf/xdp2\_kern.c
 - Drop ipv6 ping, and return XDP\_DROP
 
 ## xdp13.p4 (Multiple Tables, Single Action)
-- Create L2, L3, L4 tables
+- Parse L2, L3, L4 (icmp)
+- Create and lookup L2, L3, L4 tables
 - Default will drop ipv4 ICMP
 - XDP\_PASS for the rest of the traffic
 
 ## xdp14.p4 (Multiple Actions, Single Table)
+- Parse L2, L3, L4 (icmp)
+- Create 1 table with value = bitmap of actions to execute
+-
 
 ## xdp15.p4 (BPF XDP helpers)
 
