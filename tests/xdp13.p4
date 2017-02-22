@@ -87,17 +87,19 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
     table l4table() {
         key = {hd.icmp.typeCode : exact; }
         actions = {
+            l4_Drop_action;     // Default Drop
             l4_Fallback_action;
-            l4_Drop_action;
         }
-        default_action = l4_Fallback_action;
+        default_action = l4_Drop_action;
         implementation = hash_table(64);
     }
 
     apply {
         l2table.apply();
         l3table.apply();
-        l4table.apply();
+        if (hd.icmp.isValid()) {
+            l4table.apply();
+        }
         xout.output_port = 0;
         xout.output_action = xact;
     }

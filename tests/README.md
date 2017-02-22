@@ -118,7 +118,8 @@ Try to do similar feature as kernel's samples/bpf/xdp2\_kern.c
 
 ## xdp13.p4 (Multiple Tables, Single Action)
 - Create L2, L3, L4 tables
-- Default XDP\_PASS
+- Default will drop ipv4 ICMP
+- XDP\_PASS for the rest of the traffic
 
 ## xdp14.p4 (Multiple Actions, Single Table)
 
