@@ -100,6 +100,16 @@ equals ipv4.dstAddr, value equals u32 counter.
 Compile the user\_xdp10.c and it will dump the counter
 
 ## xdp11.p4 (Swap ethernet src and dst, then XDP\_TX)
-
+Try to do similar feature as kernel's samples/bpf/xdp2\_kern.c
+```C
+    bit<48> tmp;
+    apply {
+        if (hd.ipv4.isValid())
+        {
+            tmp = hd.ethernet.destination;
+            hd.ethernet.destination = hd.ethernet.source;
+            hd.ethernet.source = tmp;
+        }
+```
 
 ## TODO
