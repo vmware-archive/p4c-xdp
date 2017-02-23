@@ -126,8 +126,12 @@ Try to do similar feature as kernel's samples/bpf/xdp2\_kern.c
 - Parse L2, L3, L4 (icmp)
 - Create 1 table with value = bitmap of actions to execute
 
+## xdp15.p4 (Encapsulation)
+-
 
-## xdp15.p4 (BPF XDP helpers)
+## xdp16.p4 (Decapsulation)
+- remove a vlan tag
 
+## xdp17.p4 (BPF XDP helpers)
 ## TODO
 
