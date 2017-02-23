@@ -1,6 +1,6 @@
 # p4c-xdp test cases
 
-## xdp1.p4[](xdp1.p4) (basic parser)
+## xdp1.p4 (basic parser)
 - Parse:
   L2(Ethernet) and L3 (IPv4) 
 - Action:
@@ -125,7 +125,7 @@ Try to do similar feature as kernel's samples/bpf/xdp2\_kern.c
 ## xdp14.p4 (Multiple Actions, Single Table)
 - Parse L2, L3, L4 (icmp)
 - Create 1 table with value = bitmap of actions to execute
--
+
 
 ## xdp15.p4 (BPF XDP helpers)
 
