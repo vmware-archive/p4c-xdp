@@ -1,4 +1,6 @@
 # p4c-xdp
+[![Build Status](https://travis-ci.org/williamtu/p4c-xdp.svg?branch=master)](https://travis-ci.org/williamtu/p4c-xdp)
+
 This work presents a P4 compiler backend targeting XDP, the eXpress Data Path.
 P4 is a domain-specific language describing how packets are processed by the
 data plane of a programmable network elements, including network interface
@@ -19,6 +21,11 @@ is an extension to the P4-16. To execute the XDP, you need Linux kernel
 version >= 4.10.0-rc7+ due to some BPF verifier limitations
 
 ## Installation
+### Docker
+Please see Dockerfile. There is also a public docker image available as u9012063/p4xdp
+$ docker pull u9012063/p4xdp
+will pull the latest image
+
 ### P4-16 Compiler
 First you need to follow the installation guide of [P4-16](https://github.com/p4lang/p4c/)
 When you have P4-16 compiler, then add this project as an extension.
@@ -47,31 +54,15 @@ under tests, 'make' will check you llvm and clang version,
 compile all .p4 file, generate .c file, and loading into kernel
 to check BPF verifier
 
-## TC: Linux Traffic Control
-TC is Linux's QoS subsystem for traffic shaping and policing. eBPF program can be attached to
-a tc classifier as a hook point for eBPF bytecode execution. Use:
-
-```bash
-	./p4c-xdp --target ebpf -o <p4.c> <p4 program>
-```
-then you need to compile this <p4.c> to eBPF bytecode, then loaded into Linux tc
-```bash
-	tc qdisc add dev $DEV clsact
-	tc filter add dev $DEV ingress bpf obj p4.o sec ingress verb
-```
-to unload
-```bash
-	tc qdisc delete dev $DEV clsact
-```
 ## XDP: eXpress Data Path
 XDP is a packet processing mechanism implemented within the device driver with eBPF.  Currently this
 project supports
 ```bash
-	./p4c-xdp --target xdp -I /root/p4c/p4include/ -I /root/p4c/backends/ebpf/p4include/ -o /tmp/x.c xdp1.p4 
+	./p4c-xdp --target xdp -o /tmp/xdp1.c xdp1.p4 
 ```
-then you need to compile this <p4.c> to eBPF bytecode, then loaded into your driver:
+then you need to compile this <xdp1.c> to eBPF bytecode, xdp1.o, then loaded into your driver:
 ```bash
-    ip link set dev $DEV xdp obj p4.o verb
+    ip link set dev $DEV xdp obj xdp1.o verb
 ```
 to unload
 ```bash
@@ -83,7 +74,7 @@ clang -D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
 		-Wno-tautological-compare \
-		-O2 -emit-llvm -g -c /tmp/x.c -o -| llc -march=bpf -filetype=obj -o /tmp/x.o
+		-O2 -emit-llvm -g -c /tmp/xdp1.c -o -| llc -march=bpf -filetype=obj -o /tmp/xdp1.o
 ```
 
 ## TODO
