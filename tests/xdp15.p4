@@ -6,30 +6,14 @@ header Ethernet {
     bit<16> protocol;
 }
 
-header IPv4 {
-    bit<4>  version;
-    bit<4>  ihl;
-    bit<8>  diffserv;
-    bit<16> totalLen;
-    bit<16> identification;
-    bit<3>  flags;
-    bit<13> fragOffset;
-    bit<8>  ttl;
-    bit<8>  protocol;
-    bit<16> hdrChecksum;
-    bit<32> srcAddr;
-    bit<32> dstAddr;
-}
-
 /* encap my own header */
 header myhdr_t {
-    bit<32> timestamp;
     bit<32> id;
+    bit<32> timestamp;
 }
 
 struct Headers {
     Ethernet ethernet;
-    IPv4     ipv4;
     myhdr_t  myhdr;
 }
 
@@ -37,48 +21,19 @@ parser Parser(packet_in packet, out Headers hd) {
     state start {
         packet.extract(hd.ethernet);
         transition select(hd.ethernet.protocol) {
-            16w0x800: parse_ipv4;
             default: accept;
         }
-    }
-
-    state parse_ipv4 {
-        packet.extract(hd.ipv4);
-        transition accept;
     }
 }
 
 control Ingress(inout Headers hdr, in xdp_input xin, out xdp_output xout) {
 
-    bool xoutdrop = false;
-
-    action Fallback_action()
-    {
-        xoutdrop = false;
-    }
-
-    action Drop_action()
-    {
-        xoutdrop = true;
-    }
-
-    table dstmactable() {
-        key = { hdr.ethernet.destination : exact; }
-        actions = {
-            Fallback_action;
-            Drop_action;
-        }
-        default_action = Drop_action;
-        implementation = hash_table(64);
-    }
-
     apply {
         hdr.myhdr.id = 0xfefefefe; // get ID from map or else
-        hdr.myhdr.timestamp = 0xabababab; // get TS from system
+        hdr.myhdr.timestamp = 0x12345678;
         hdr.myhdr.setValid();
-        dstmactable.apply();
         xout.output_port = 0;
-        xout.output_action = xoutdrop ? xdp_action.XDP_DROP : xdp_action.XDP_PASS;
+        xout.output_action = xdp_action.XDP_PASS;
     }
 }
 
@@ -86,7 +41,6 @@ control Deparser(in Headers hdrs, packet_out packet) {
     apply {
         packet.emit(hdrs.myhdr);
         packet.emit(hdrs.ethernet);
-        packet.emit(hdrs.ipv4);
     }
 }
 

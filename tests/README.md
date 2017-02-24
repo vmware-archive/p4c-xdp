@@ -127,7 +127,23 @@ Try to do similar feature as kernel's samples/bpf/xdp2\_kern.c
 - Create 1 table with value = bitmap of actions to execute
 
 ## xdp15.p4 (Encapsulation)
--
+- unconditionally append a fixed customized header in front of Ethernet header
+```C
+/* encap my own header */
+header myhdr_t {
+    bit<32> id; 
+    bit<32> timestamp;
+}
+```
+then at deparser, emit it before ethernet header
+```C
+control Deparser(in Headers hdrs, packet_out packet) {
+    apply {
+        packet.emit(hdrs.myhdr);
+        packet.emit(hdrs.ethernet);
+    }   
+}
+```
 
 ## xdp16.p4 (Decapsulation)
 - remove a vlan tag
