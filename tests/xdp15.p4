@@ -75,6 +75,7 @@ control Ingress(inout Headers hdr, in xdp_input xin, out xdp_output xout) {
     apply {
         hdr.myhdr.id = 0xfefefefe; // get ID from map or else
         hdr.myhdr.timestamp = 0xabababab; // get TS from system
+        hdr.myhdr.setValid();
         dstmactable.apply();
         xout.output_port = 0;
         xout.output_action = xoutdrop ? xdp_action.XDP_DROP : xdp_action.XDP_PASS;
