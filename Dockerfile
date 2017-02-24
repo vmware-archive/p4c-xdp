@@ -91,7 +91,7 @@ ENV PATH="/usr/local/clang+llvm/bin:$PATH"
 # Setup new kernel headers
 # P4XDP begin
 RUN apt-get install -y --no-install-recommends libelf-dev libc6-dev.i386 
-RUN apt-get install -y --no-install-recommends sudo 
+RUN apt-get install -y --no-install-recommends sudo vim
 RUN cd /home/p4c-clone/extensions/p4c-xdp/ && git pull && \
 	ln -s /home/p4c-clone/build/p4c-xdp p4c-xdp && \ 
 	cd tests && \

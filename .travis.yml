@@ -1,0 +1,11 @@
+# Travis CI integration for p4c using Docker.
+
+services:
+  - docker
+
+install:
+  - docker build -t p4c-xdp .
+
+script:
+  - docker run -w /home/p4c/extension/p4c-xdp/tests make 
+
