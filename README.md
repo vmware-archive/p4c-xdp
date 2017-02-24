@@ -1,28 +1,47 @@
 # p4c-xdp
+This work presents a P4 compiler backend targeting XDP, the eXpress Data Path.
+P4 is a domain-specific language describing how packets are processed by the
+data plane of a programmable network elements, including network interface
+cards, appliances, and virtual switches.  With P4, programmers focus on
+defining the protocol parsing, matching, and action executions, instead
+of the platform-specific language or implementation details.
+ 
+XDP is designed for users who want programmability as well as performance.
+XDP allows users to write a C-like  packet processing program and loads into
+the device driver's receiving queue.  When the device observes an incoming
+packet, before hanging the packet to the Linux stack, the user-defined XDP
+program is triggered to execute against the packet payload, making the
+decision as early as possible.
 
-Backend for the P4 compiler targeting XDP.  This should be built as a
-back-end to the P4-16 compiler from http://github.com/p4lang/p4c
+We bring together the benefits of the two: P4 and XDP.  To get started,
+first you need to setup the P4-16 compiler, then this project
+is an extension to the P4-16. To execute the XDP, you need Linux kernel
+version >= 4.10.0-rc7+ due to some BPF verifier limitations
 
 ## Installation
-First you need the P4-16, then this project is an extension to the P4-16
-Kernel version: 4.10+ due to some BPF verifier limitations
-
+### P4-16 Compiler
+First you need to follow the installation guide of [P4-16](https://github.com/p4lang/p4c/)
+When you have P4-16 compiler, then add this project as an extension.
+Assuming you have P4-16 at your dir  ~/p4c/, to setup P4C-XDP:
 ```bash
-git clone http://github.com/p4lang/p4c
-cd p4c
-./bootstrap.sh
-mkdir build
-cd build
-make
-```
-Now you have P4-16 compiler, then add this project as an extension, under p4c
-```bash
+cd ~/p4c/
 mkdir extensions
 cd extensions
-git clone https://github.com/williamtu/p4c-ovs-ebpf.git
-cd p4c-ovs-ebpf/
-cd tests/
+git clone https://github.com/williamtu/p4c-xdp.git
+```
+Now you have p4c-xdp at ~/p4c/extensions/p4c-xdp, next is to
+recompile p4c
+```bash
+cd ~/p4c/
+./bootstrap.sh
+cd ~/p4c/build/
 make
+```
+Then you will have p4c-xdp binary at ~/p4c/build
+Next is to create a soft link to the binary
+```bash
+cd ~/p4c/extensions/p4c-xdp
+ln -s ~/p4c/build/p4c-xdp p4c-xdp
 ```
 under tests, 'make' will check you llvm and clang version,
 compile all .p4 file, generate .c file, and loading into kernel
