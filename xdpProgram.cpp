@@ -137,6 +137,25 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "    return __constant_ntohs(~((checksum & 0xFFFF) + (checksum >> 16)));\n"
         "}");
 
+    builder->appendLine(
+        "struct bpf_map_def SEC(\"maps\") perf_event = {\n"
+        "   .type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,\n"
+        "   .key_size = sizeof(u32),\n"
+        "   .value_size = sizeof(u32),\n"
+        "   .pinning = 2,\n"
+        "   .max_entries = 2,\n"
+        "};\n"
+        "#define BPF_PERF_EVENT_OUTPUT() do {\\\n"
+        "    int pktsize = (int)(skb->data_end - skb->data);\\\n"
+        "    bpf_perf_event_output(skb, &perf_event, ((u64)pktsize << 32), &pktsize, 4);\\\n"
+        "} while(0);\n"
+    );
+
+    builder->appendLine(
+        "#define BPF_KTIME_GET_NS() ({\\\n"
+        "   u32 ___ts = (u32)bpf_ktime_get_ns(); ___ts; })\\\n"
+    );
+
     // The table used for forwarding: we write the output in it
     // TODO: this should use target->emitTableDecl().
     // We can't do it today because it has a different map type PERCPU_ARRAY

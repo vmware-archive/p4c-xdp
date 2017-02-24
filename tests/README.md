@@ -144,10 +144,6 @@ control Deparser(in Headers hdrs, packet_out packet) {
     }   
 }
 ```
-
-## xdp16.p4 (Decapsulation)
-- remove a vlan tag
-
-## xdp17.p4 (BPF XDP helpers)
+## xdp16.p4 (BPF XDP helpers)
 ## TODO
 

@@ -54,6 +54,10 @@ extern bit<16> ebpf_ipv4_checksum(in bit<4> version, in bit<4> ihl, in bit<8> di
                                   in bit<13> fragOffset, in bit<8> ttl, in bit<8> protocol,
                                   in bit<32> srcAddr, in bit<32> dstAddr);
 
+extern bit<32> BPF_PERF_EVENT_OUTPUT();
+// FIXME: use 64 bit
+extern bit<32> BPF_KTIME_GET_NS();
+
 parser xdp_parse<H>(packet_in packet, out H headers);
 control xdp_switch<H>(inout H headers, in xdp_input imd, out xdp_output omd);
 control xdp_deparse<H>(in H headers, packet_out packet);
