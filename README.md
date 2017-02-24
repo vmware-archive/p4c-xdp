@@ -23,7 +23,9 @@ version >= 4.10.0-rc7+ due to some BPF verifier limitations
 ## Installation
 ### Docker
 Please see Dockerfile. There is also a public docker image available as u9012063/p4xdp
+```bash
 $ docker pull u9012063/p4xdp
+```
 will pull the latest image
 
 ### P4-16 Compiler

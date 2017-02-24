@@ -6,8 +6,8 @@ services:
 install:
   - docker build -t p4c-xdp .
 
-#script:
-#  - docker run -w /home/p4c/extension/p4c-xdp/tests make 
+script:
+  - docker run -w /home/p4c-clone/extensions/p4c-xdp/tests p4c-xdp make
 
 notifications:
   email:
