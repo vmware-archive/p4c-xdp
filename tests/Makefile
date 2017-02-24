@@ -57,7 +57,7 @@ verify_target_bpf: verify_cmds
 		-Wno-gnu-variable-sized-type-not-at-end \
 		-Wno-tautological-compare \
 		-O2 -emit-llvm -g -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
-	./$(BPFLOADER) $@
+	sudo ./$(BPFLOADER) $@ || true
 
 clean: clean_loader
 	rm -f *.o *_ebpf.c xdp[1-9]*.[ch]
