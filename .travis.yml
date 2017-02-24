@@ -6,6 +6,11 @@ services:
 install:
   - docker build -t p4c-xdp .
 
-script:
-  - docker run -w /home/p4c/extension/p4c-xdp/tests make 
+#script:
+#  - docker run -w /home/p4c/extension/p4c-xdp/tests make 
+
+notifications:
+  email:
+    recipients:
+      - tuc@vmware.com
 
