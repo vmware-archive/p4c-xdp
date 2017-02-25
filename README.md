@@ -21,12 +21,18 @@ is an extension to the P4-16. To execute the XDP, you need Linux kernel
 version >= 4.10.0-rc7+ due to some BPF verifier limitations
 
 ## Installation
-### Docker
+### Docker/Vagrant
 Please see Dockerfile. There is also a public docker image available as u9012063/p4xdp
 ```bash
 $ docker pull u9012063/p4xdp
 ```
-will pull the latest image
+will pull the latest image. However, the XDP BPF code has dependency on your kernel version.
+Currently for some complicated cases we require kernel >= 4.10.0-rc7.  So a vagrant box is 
+also provided with kernel 4.10.0-rc8.
+```bash
+$ vagrant up
+```
+Will boot this VM.
 
 ### P4-16 Compiler
 First you need to follow the installation guide of [P4-16](https://github.com/p4lang/p4c/)
@@ -57,34 +63,30 @@ compile all .p4 file, generate .c file, and loading into kernel
 to check BPF verifier
 
 ## XDP: eXpress Data Path
-XDP is a packet processing mechanism implemented within the device driver with eBPF.  Currently this
-project supports
+XDP is a packet processing mechanism implemented within the device driver with eBPF.
+Currently to compile a P4 to C program, uses
 ```bash
+	# ./p4c-xdp --target xdp -o <output_c_file> <input_p4>
 	./p4c-xdp --target xdp -o /tmp/xdp1.c xdp1.p4 
 ```
-then you need to compile this <xdp1.c> to eBPF bytecode, xdp1.o, then loaded into your driver:
+then you need to compile the xdp1.c to eBPF bytecode, xdp1.o, then loaded
+into your driver. To compile a single .c file
 ```bash
-    ip link set dev $DEV xdp obj xdp1.o verb
-```
-to unload
-```bash
-    ip link set dev $DEV xdp off
-```
-to compile a single .c file
-```bash
-clang -D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
+clang -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
 		-Wno-tautological-compare \
 		-O2 -emit-llvm -g -c /tmp/xdp1.c -o -| llc -march=bpf -filetype=obj -o /tmp/xdp1.o
 ```
+Then loaded into driver with XDP support
+```bash
+    ip link set dev $DEV xdp obj xdp1.o verb
+```
+to unload the XDP object
+```bash
+    ip link set dev $DEV xdp off
+```
+## Sample Code
+Please see the [tests folder](https://github.com/williamtu/p4c-xdp/tree/master/tests)
+Simply run 'make' will start the build
 
-## TODO
-- test the new xdp model
-- improve documentation (make headers_install ARCH= HDR_INSTALL_PATH=)
-- more test cases from P4 to XDP
-- introduce extern function, bpf_perf_event_output for sending data to userspace
-- add a docker or vagrant box for testing?
-- support for checksum
-- add userspace test
-- initialize xin somehow. Where is the input port for xdp
