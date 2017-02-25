@@ -14,7 +14,7 @@
 int main(int ac, char **argv)
 {
 	char filename[256];
-	struct rlimit r = {115200, 115200};
+	struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
 
 	snprintf(filename, sizeof(filename), "%s", argv[1]);
 
