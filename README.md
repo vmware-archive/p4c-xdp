@@ -20,6 +20,10 @@ first you need to setup the P4-16 compiler, then this project
 is an extension to the P4-16. To execute the XDP, you need Linux kernel
 version >= 4.10.0-rc7+ due to some BPF verifier limitations
 
+<p align="center">
+  <img src="doc/images/p4xdp-workflow.png" />
+</p>
+
 ## Installation
 ### Docker/Vagrant
 Please see Dockerfile. There is also a public docker image available as u9012063/p4xdp
