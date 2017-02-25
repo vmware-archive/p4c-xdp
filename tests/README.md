@@ -1,4 +1,5 @@
 # p4c-xdp test cases
+To get started, simply run 'make'
 
 ## xdp1.p4 (basic parser)
 - Parse:
