@@ -35,8 +35,14 @@ Currently for some complicated cases we require kernel >= 4.10.0-rc7.  So a vagr
 also provided with kernel 4.10.0-rc8.
 ```bash
 $ vagrant up
+$ vagrant ssh
+ubuntu@ubuntu-xenial:~$ sudo su
+root@ubuntu-xenial:/home/ubuntu# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+u9012063/p4xdp      latest              3c77fbbd84e5        41 hours ago        2.469 GB
+root@ubuntu-xenial:/home/ubuntu# docker run -it -u root --privileged <IMAGE ID>
 ```
-Will boot this VM.
+Will boot this VM, pull the docker image, and you can try p4c-xdp.
 
 ### P4-16 Compiler
 First you need to follow the installation guide of [P4-16](https://github.com/p4lang/p4c/)
