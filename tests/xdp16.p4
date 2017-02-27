@@ -9,7 +9,7 @@ header Ethernet {
 // your customized header
 header myhdr_t {
     bit<32> id;
-    bit<32> ts;
+    bit<32> ts; // timestamp
 }
 
 struct Headers {
