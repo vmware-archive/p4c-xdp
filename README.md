@@ -24,6 +24,11 @@ version >= 4.10.0-rc7+ due to some BPF verifier limitations
   <img src="doc/images/p4xdp-workflow.png" />
 </p>
 
+## Presentation
+- IOVisor Summit 2017
+[slides](https://github.com/williamtu/p4c-xdp/blob/master/doc/p4xdp-iovisor17.pdf),
+[demo1](https://youtu.be/On7hEJ6bPVU), [demo2](https://youtu.be/vlp1MzWVOc8), [demo3](https://youtu.be/TibGxCXPNVc)
+
 ## Installation
 ### Docker/Vagrant
 Please see Dockerfile. There is also a public docker image available as u9012063/p4xdp
