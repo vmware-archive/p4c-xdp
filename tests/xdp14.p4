@@ -124,7 +124,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
     }
 
     apply {
-        action_md.output.port = 0;
+        //action_md.output.port = 0;
         action_bitmap.apply();
 
         /* Execute 3 actions in order, if its bit is set */

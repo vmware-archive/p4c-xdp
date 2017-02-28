@@ -9,7 +9,7 @@ BPFLIB=../lib/
 #IFACE=enp0s16
 SRC=/root/p4c
 INCLUDE=-I ../p4include
-P4C=../p4c-xdp
+P4C=p4c-xdp
 
 all: bpfloader $(BPFOBJ) verify_target_bpf
 
@@ -47,7 +47,7 @@ verify_target_bpf: verify_cmds
 		echo "*** ERROR: Cannot find p4c-xdp"; \
 		exit 1;\
 	fi;
-	$(P4C) $(INCLUDE) --target xdp -o $@ $<;
+	$(P4C) $(INCLUDE) --Werror --target xdp -o $@ $<;
 
 # BPF program
 %.o: %.c
