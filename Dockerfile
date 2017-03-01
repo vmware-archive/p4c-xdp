@@ -43,8 +43,8 @@ RUN git clone https://github.com/google/protobuf.git && \
     cd ../ 
 
 # P4C and P4C-XDP
-RUN git clone https://github.com/p4lang/p4c.git && \ 
-    cd p4c && \
+RUN git clone https://github.com/mbudiu-vmw/p4c-clone.git && \ 
+    cd p4c-clone && \
     git submodule update --init --recursive && \
     git submodule update --recursive && \
 # p4xdp download begin
@@ -54,7 +54,7 @@ RUN git clone https://github.com/p4lang/p4c.git && \
     cd ..
 # p4xdp download end
 # build p4c-xdp
-RUN cd /home/p4c/ && \
+RUN cd /home/p4c-clone/ && \
     ./bootstrap.sh && \
     cd build && \
     make -j `getconf _NPROCESSORS_ONLN` && \ 
@@ -92,8 +92,8 @@ ENV PATH="/usr/local/clang+llvm/bin:$PATH"
 # P4XDP begin
 RUN apt-get install -y --no-install-recommends libelf-dev libc6-dev.i386 
 RUN apt-get install -y --no-install-recommends sudo vim
-RUN cd /home/p4c/extensions/p4c-xdp/ && git pull && \
-	ln -s /home/p4c/build/p4c-xdp p4c-xdp && \ 
+RUN cd /home/p4c-clone/extensions/p4c-xdp/ && git pull && \
+	ln -s /home/p4c-clone/build/p4c-xdp p4c-xdp && \ 
 	cd tests && \
 	make
 	
