@@ -89,18 +89,23 @@ parser Parser(packet_in packet, out Headers hd) {
 control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 
     bool xoutdrop = false;
+    // from, to are host byte order
     bit<16> from;
     bit<16> to;
 
     action Fallback_action()
     {
-        // from, to are host byte order
-        from = hd.udp.srcPort;
-        to = 16w0x4;
-
-        // update csum
-        hd.udp.srcPort = to;
+        // UDP
+        from = hd.udp.dstPort;
+        to = 16w0x400;
+        hd.udp.dstPort = to;
         hd.udp.checksum = csum_replace2(hd.udp.checksum, from, to);
+
+        // TCP
+        from = hd.tcp.srcPort;
+        to = 16w0x841;
+        hd.tcp.srcPort = to;
+        hd.tcp.checksum = csum_replace2(hd.tcp.checksum, from, to);
 
         xoutdrop = false;
     }
@@ -138,6 +143,7 @@ control Deparser(in Headers hdrs, packet_out packet) {
 
         packet.emit(hdrs.icmp);
         packet.emit(hdrs.udp);
+        packet.emit(hdrs.tcp);
     }
 }
 
