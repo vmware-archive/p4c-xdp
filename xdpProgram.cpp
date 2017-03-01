@@ -151,6 +151,29 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
 	"}\n");
 
     builder->appendLine(
+        "inline u16 csum_fold(u32 csum) {\n"
+        "    u32 r = csum << 16 | csum >> 16;\n"
+        "    csum = ~csum;\n"
+        "    csum -= r;\n"
+        "    return (u16)(csum >> 16);\n"
+        "}\n"
+        "inline u32 csum_unfold(u16 csum) {\n"
+        "    return (u32)csum;\n"
+        "}\n"
+		"inline u32 csum32_add(u32 csum, u32 addend) {\n"
+		"    u32 res = csum;\n"
+		"    res += addend;\n"
+		"    return (res + (res < addend));\n"
+		"}\n"
+		"inline u32 csum32_sub(u32 csum, u32 addend) {\n"
+		"    return csum32_add(csum, ~addend);\n"
+		"}\n"
+		"inline u16 csum_replace4(u16 csum, u32 from, u32 to) {\n"
+        "    u32 tmp = csum32_sub(~csum_unfold(csum), from);\n"
+		"    return csum_fold(csum32_add(tmp, to));\n"
+	"}\n");
+
+    builder->appendLine(
         "struct bpf_map_def SEC(\"maps\") perf_event = {\n"
         "   .type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,\n"
         "   .key_size = sizeof(u32),\n"

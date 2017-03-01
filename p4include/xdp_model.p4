@@ -59,6 +59,10 @@ extern bit<16> csum_replace2(in bit<16> csum,  // current csum
                              in bit<16> old,   // old value of the field
                              in bit<16> new);
 
+extern bit<16> csum_replace4(in bit<16> csum,
+                             in bit<32> old,
+                             in bit<32> new);
+
 extern bit<32> BPF_PERF_EVENT_OUTPUT();
 // FIXME: use 64 bit
 extern bit<32> BPF_KTIME_GET_NS();

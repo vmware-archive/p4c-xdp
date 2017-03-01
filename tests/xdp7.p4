@@ -16,14 +16,14 @@ header IPv4 {
     bit<13> fragOffset;
     bit<8>  ttl;
     bit<8>  protocol;
-    bit<16> hdrChecksum;
+    bit<16> checksum;
     bit<32> srcAddr;
     bit<32> dstAddr;
 }
 
 header icmp_t {
     bit<16> typeCode;
-    bit<16> hdrChecksum;
+    bit<16> checksum;
 }
 
 header tcp_t {
@@ -92,20 +92,37 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
     // from, to are host byte order
     bit<16> from;
     bit<16> to;
+    bit<32> from_addr;
+    bit<32> to_addr;
 
     action Fallback_action()
     {
-        // UDP
+#if 0
+        // UDP port
         from = hd.udp.dstPort;
         to = 16w0x400;
         hd.udp.dstPort = to;
         hd.udp.checksum = csum_replace2(hd.udp.checksum, from, to);
 
+        // UDP IP addr
+        from_addr = hd.ipv4.dstAddr;
+        to_addr = 32w0x01020304;
+        hd.ipv4.dstAddr = to_addr;
+        hd.ipv4.checksum = csum_replace4(hd.ipv4.checksum, from_addr, to_addr);
+        hd.udp.checksum = csum_replace4(hd.udp.checksum, from_addr, to_addr);
+#endif
         // TCP
         from = hd.tcp.srcPort;
         to = 16w0x841;
         hd.tcp.srcPort = to;
         hd.tcp.checksum = csum_replace2(hd.tcp.checksum, from, to);
+
+        // TCP IP addr
+        from_addr = hd.ipv4.srcAddr;
+        to_addr = 32w0x05060708;
+        hd.ipv4.srcAddr = to_addr;
+        hd.ipv4.checksum = csum_replace4(hd.ipv4.checksum, from_addr, to_addr);
+        hd.tcp.checksum = csum_replace4(hd.tcp.checksum, from_addr, to_addr);
 
         xoutdrop = false;
     }

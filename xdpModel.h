@@ -65,6 +65,7 @@ class XDPModel : public EBPF::EBPFModel {
     XDPModel() : EBPF::EBPFModel(), xdp(), inputMetadataModel(), outputMetadataModel(),
                  ipv4_checksum("ebpf_ipv4_checksum"), bpf_event_output("bpf_event_output"),
                  bpf_ktime_get_ns("bpf_ktime_get_ns"), csum_replace2("csum_replace2"),
+                 csum_replace4("csum_replace4"),
                  action_enum()
     {}
 
@@ -75,6 +76,7 @@ class XDPModel : public EBPF::EBPFModel {
     OutputMetadataModel outputMetadataModel;
     ::Model::Extern_Model ipv4_checksum;
     ::Model::Extern_Model csum_replace2;
+    ::Model::Extern_Model csum_replace4;
     ::Model::Extern_Model bpf_event_output;
     ::Model::Extern_Model bpf_ktime_get_ns;
     XDP_Action_Model      action_enum;
