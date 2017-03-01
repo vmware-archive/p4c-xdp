@@ -54,6 +54,11 @@ extern bit<16> ebpf_ipv4_checksum(in bit<4> version, in bit<4> ihl, in bit<8> di
                                   in bit<13> fragOffset, in bit<8> ttl, in bit<8> protocol,
                                   in bit<32> srcAddr, in bit<32> dstAddr);
 
+//Implements RFC 1624 (Incremental Internet Checksum)
+extern bit<16> csum_replace2(in bit<16> csum,  // current csum
+                             in bit<16> old,   // old value of the field
+                             in bit<16> new);
+
 extern bit<32> BPF_PERF_EVENT_OUTPUT();
 // FIXME: use 64 bit
 extern bit<32> BPF_KTIME_GET_NS();
