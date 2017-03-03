@@ -105,3 +105,7 @@ to unload the XDP object
 Please see the [tests folder](https://github.com/williamtu/p4c-xdp/tree/master/tests)
 Simply run 'make' will start the build
 
+## Related BPF/XDP work
+ * Dive into BPF: a list of reading material, Quentin Monnet [link](https://qmonnet.github.io/whirl-offload/2016/09/01/dive-into-bpf/)
+ * BPF: Next Generation of Programmable Datapath by Thomas Graf, OVS Conf 2016 [video](https://www.youtube.com/watch?v=QJfmmoH2nSQ&t=1046s)
+ * Fast Programmable Networks & Encapsulated Protocols, David S. Miller, netdev 1.2 [video](https://www.youtube.com/watch?v=NlMQ0i09HMU)

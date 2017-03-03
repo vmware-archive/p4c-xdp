@@ -69,7 +69,7 @@ Then we populate the table by allowing the IP packet to execute Fallback\_action
 - Deparse:
   L2, L3 (IPv4)
 
-## xdp7.p4 (SNAT and checksum update)
+## [xdp7.p4](https://github.com/williamtu/p4c-xdp/blob/master/tests/xdp7.p4) (SNAT and checksum update)
 - Parse L2, L3, and L4 to TCP
 - Modify source port and source IP
 - Return to Linux network stack (XDP\_PASS)
