@@ -109,3 +109,6 @@ Simply run 'make' will start the build
  * Dive into BPF: a list of reading material, Quentin Monnet [link](https://qmonnet.github.io/whirl-offload/2016/09/01/dive-into-bpf/)
  * BPF: Next Generation of Programmable Datapath by Thomas Graf, OVS Conf 2016 [video](https://www.youtube.com/watch?v=QJfmmoH2nSQ&t=1046s)
  * Fast Programmable Networks & Encapsulated Protocols, David S. Miller, netdev 1.2 [video](https://www.youtube.com/watch?v=NlMQ0i09HMU)
+
+## License
+The p4c-xdp/lib/\* contains BPF loader is licensed under the [General Public License, Version 2.0](lib/COPYING). The rest of p4c-xdp components are licensed under the [Apache License, Version 2.0](LICENSE).
