@@ -1,5 +1,7 @@
 # p4c-xdp
 [![Build Status](https://travis-ci.org/williamtu/p4c-xdp.svg?branch=master)](https://travis-ci.org/williamtu/p4c-xdp)
+[![Apache licensed](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/williamtu/p4c-xdp/blob/master/LICENSE)
+[![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg)](https://github.com/williamtu/p4c-xdp/blob/master/lib/COPYING)
 
 This work presents a P4 compiler backend targeting XDP, the eXpress Data Path.
 P4 is a domain-specific language describing how packets are processed by the
@@ -111,4 +113,4 @@ Simply run 'make' will start the build
  * Fast Programmable Networks & Encapsulated Protocols, David S. Miller, netdev 1.2 [video](https://www.youtube.com/watch?v=NlMQ0i09HMU)
 
 ## License
-The p4c-xdp/lib/\* contains BPF loader is licensed under the [General Public License, Version 2.0](lib/COPYING). The rest of p4c-xdp components are licensed under the [Apache License, Version 2.0](LICENSE).
+The p4c-xdp/lib/\* contains BPF loader licensed under the [General Public License, Version 2.0](lib/COPYING). The rest of p4c-xdp components are licensed under the [Apache License, Version 2.0](LICENSE).
