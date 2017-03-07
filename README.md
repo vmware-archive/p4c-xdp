@@ -114,3 +114,8 @@ Simply run 'make' will start the build
 
 ## License
 The p4c-xdp/lib/\* contains BPF loader licensed under the [General Public License, Version 2.0](lib/COPYING). The rest of p4c-xdp components are licensed under the [Apache License, Version 2.0](LICENSE).
+
+## TODO
+* Remove the private kernel patch requirement when latest kernel with BPF fixed is ready
+* Apply the workaround of BPF\_MAX\_STACK
+* Control plane example using perf\_event\_output
