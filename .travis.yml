@@ -13,4 +13,5 @@ notifications:
   email:
     recipients:
       - tuc@vmware.com
+      - mbudiu@vmware.com
 
