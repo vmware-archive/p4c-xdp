@@ -53,13 +53,13 @@ verify_target_bpf: verify_cmds
 # do extra CLANG so first pass can return non-zero to shell and stop make
 %.o: %.c
 	@$(CLANG) \
-		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
+		-I ../lib -D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
 		-Wno-tautological-compare \
 		-O2 -emit-llvm -g -c $< -o - > /dev/null
 	$(CLANG) \
-		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
+        -I ../lib -D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
 		-Wno-tautological-compare \
