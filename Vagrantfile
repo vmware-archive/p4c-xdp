@@ -16,15 +16,19 @@ Vagrant.configure(2) do |config|
       sudo apt-get update
       sudo apt-get install -y build-essential dpkg
 
-    # get the kernel 4.10.0-rc8 because we need newer kernel's BPF verifier
-      wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.10-rc8/linux-image-4.10.0-041000rc8-generic_4.10.0-041000rc8.201702121731_amd64.deb
-      dpkg -i linux-image-4.10.0-041000rc8-generic_4.10.0-041000rc8.201702121731_amd64.deb 
-      wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.10-rc8/linux-headers-4.10.0-041000rc8_4.10.0-041000rc8.201702121731_all.deb
-      dpkg -i linux-headers-4.10.0-041000rc8_4.10.0-041000rc8.201702121731_all.deb
-    
-      # Fetch the p4xdp docker image
-      apt-get install -y docker.io
-      docker pull u9012063/p4xdp
+    # Kernel v4.11-rc1
+    # This has our latest changes to BPF verifier
+    # However the MAX_BPF_STACK issue hasn't been resolved.
+    wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.11-rc1/linux-image-4.11.0-041100rc1-generic_4.11.0-041100rc1.201703051731_amd64.deb
+    dpkg -i linux-image-4.11.0-041100rc1-generic_4.11.0-041100rc1.201703051731_amd64.deb
+    wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.11-rc1/linux-headers-4.11.0-041100rc1-generic_4.11.0-041100rc1.201703051731_amd64.deb
+    dpkg -i linux-headers-4.11.0-041100rc1-generic_4.11.0-041100rc1.201703051731_amd64.deb
+    wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.11-rc1/linux-headers-4.11.0-041100rc1_4.11.0-041100rc1.201703051731_all.deb
+    dpkg -i linux-headers-4.11.0-041100rc1_4.11.0-041100rc1.201703051731_all.deb
+
+    # Fetch the p4xdp docker image
+    apt-get install -y docker.io
+    docker pull u9012063/p4xdp
   SHELL
   # reboot to the newer kernel
   config.vm.provision :reload
