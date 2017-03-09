@@ -21,7 +21,7 @@ namespace XDP {
 void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
         "#define KBUILD_MODNAME \"xdptest\"\n"
-        "#include \"bpf.h\"\n"
+        "#include <linux/bpf.h>\n"
         "#include \"bpf_helpers.h\"\n"
         "\n"
         "#define load_byte(data, b)  (*(((u8*)(data)) + (b)))\n"

@@ -24,7 +24,7 @@ ENV PROTOBUF_DEPS autoconf \
 				  libprotoc-dev \
 				  libprotobuf-c1
 
-RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev
+RUN apt-get update && apt-get install -y git curl unzip gawk
 
 # curl ca issue
 RUN curl http://curl.haxx.se/ca/cacert.pem | awk '{print > "cert" (1+n) ".pem"} /-----END CERTIFICATE-----/ {n++}' && c_rehash
@@ -43,8 +43,6 @@ RUN git clone https://github.com/google/protobuf.git && \
     cd ../
 
 # P4C and P4C-XDP
-COPY . /tmp/p4c-xdp
-
 RUN git clone https://github.com/p4lang/p4c.git && \
     cd p4c && \
     git submodule update --init --recursive && \
@@ -52,9 +50,8 @@ RUN git clone https://github.com/p4lang/p4c.git && \
 # p4xdp download begin
     mkdir extensions && \
     cd extensions && \
-#   git clone https://github.com/williamtu/p4c-xdp.git && \
-    ln -s /tmp/p4c-xdp p4c-xdp
-
+    git clone https://github.com/williamtu/p4c-xdp.git && \
+    cd ..
 # p4xdp download end
 # build p4c-xdp
 RUN cd /home/p4c/ && \
@@ -94,6 +91,8 @@ ENV PATH="/usr/local/clang+llvm/bin:$PATH"
 
 # Setup new kernel headers
 # P4XDP begin
+RUN apt-get install -y --no-install-recommends libelf-dev libc6-dev.i386
+RUN apt-get install -y --no-install-recommends sudo vim
 RUN cd /home/p4c/extensions/p4c-xdp/ && git pull && \
 	ln -s /home/p4c/build/p4c-xdp p4c-xdp && \
 	cd tests && \

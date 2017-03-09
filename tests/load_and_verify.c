@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <linux/bpf.h>
 #include <assert.h>
 #include <errno.h>
 #include <signal.h>
@@ -23,7 +24,6 @@ limitations under the License.
 #include <unistd.h>
 #include <sys/resource.h>
 
-#include "bpf.h"
 #include "bpf_load.h"
 #include "libbpf.h"
 

@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <linux/bpf.h>
 #include <linux/filter.h>
 #include <linux/perf_event.h>
 #include <linux/netlink.h>
@@ -20,7 +21,6 @@
 #include <sys/mman.h>
 #include <poll.h>
 #include <ctype.h>
-#include "bpf.h"
 #include "libbpf.h"
 #include "bpf_helpers.h"
 #include "bpf_load.h"
