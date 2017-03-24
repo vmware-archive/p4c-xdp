@@ -1,0 +1,50 @@
+03/24/2017
+Performance test using ixgbe XDP dirver
+sender is using DPDK pktgen, receiving side is running XDP
+
+=== xdp2_kern.c ===
+# at receiving side
+$ sar -n DEV 1 
+03:33:16 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+3:33:17 PM  enp5s0f1 1139681.00 1139681.00 231286.55 231286.55      0.00      0.00      0.00     18.95
+
+    53.42%  [kernel]          [k] __bpf_prog_run
+     2.57%  [kernel]          [k] menu_select
+     2.22%  [kernel]          [k] cpuidle_enter_state
+     2.19%  [kernel]          [k] irq_entries_start
+     1.66%  [kernel]          [k] __tick_nohz_idle_enter
+     1.35%  [kernel]          [k] copy_page
+     1.25%  [kernel]          [k] napi_complete_done
+     1.17%  [kernel]          [k] swiotlb_sync_single_for_device
+     0.98%  [kernel]          [k] percpu_array_map_lookup_elem
+
+=== xdp11.o ===
+03:33:16 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+03:47:36 PM  enp5s0f1 1139756.00 1139735.00 231301.22 231295.65      0.00      0.00      0.00     18.95
+
+    71.04%  [kernel]          [k] __bpf_prog_run
+     2.56%  [kernel]          [k] page_frag_free
+     0.87%  [kernel]          [k] cpuidle_enter_state
+     0.73%  [kernel]          [k] irq_entries_start
+     0.64%  [kernel]          [k] memcpy_erms
+     0.63%  [kernel]          [k] menu_select
+
+    88.43%  [kernel]          [k] __bpf_prog_run
+     0.98%  [kernel]          [k] memcpy_erms
+     0.57%  [kernel]          [k] irq_entries_start
+     0.49%  [kernel]          [k] swiotlb_map_page
+     0.46%  [kernel]          [k] __tick_nohz_idle_enter
+     0.43%  [kernel]          [k] array_map_update_elem
+     0.32%  [kernel]          [k] cpuidle_enter_state
+
+=== xdp9 (force to do XDP_TX) ===
+03:33:16 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+03:52:59 PM  enp5s0f1 1139754.00 1139722.00 231299.64 222388.89      0.00      0.00      0.00     18.95
+    87.06%  [kernel]          [k] __bpf_prog_run
+     0.59%  [kernel]          [k] memcpy_erms
+     0.55%  [kernel]          [k] htab_map_lookup_elem
+     0.55%  [kernel]          [k] menu_select
+     0.53%  [kernel]          [k] __htab_map_lookup_elem
+     0.48%  [kernel]          [k] array_map_lookup_elem
+     0.47%  [kernel]          [k] __tick_nohz_idle_enter
+
