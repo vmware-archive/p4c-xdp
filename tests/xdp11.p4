@@ -78,8 +78,8 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 
 control Deparser(in Headers hdrs, packet_out packet) {
     apply {
-        // we only need to emit ethernet header
         packet.emit(hdrs.ethernet);
+        packet.emit(hdrs.ipv4);
     }
 }
 
