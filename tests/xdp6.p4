@@ -79,7 +79,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
         xout.output_action = xdp_action.XDP_DROP;
     }
 
-    table dstmactable() {
+    table dstmactable {
         key = {
 	    hd.ethernet.protocol : exact;
 	    hd.ipv4.dstAddr : exact;

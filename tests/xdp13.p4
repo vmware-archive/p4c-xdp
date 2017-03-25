@@ -76,7 +76,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
     action l2_Fallback_action() { xact = xdp_action.XDP_PASS; }
     action l2_Drop_action() { xact = xdp_action.XDP_DROP; }
 
-    table l2table() {
+    table l2table {
         key = { hd.ethernet.protocol : exact; }
         actions = {
             l2_Fallback_action;
@@ -88,7 +88,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 
     action l3_Fallback_action() { xact = xdp_action.XDP_PASS; }
     action l3_Drop_action() { xact = xdp_action.XDP_DROP; }
-    table l3table() {
+    table l3table {
         key = { hd.ipv4.dstAddr : exact; }
         actions = {
             l3_Fallback_action;
@@ -100,7 +100,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
 
     action l4_Fallback_action() { xact = xdp_action.XDP_PASS; }
     action l4_Drop_action() { xact = xdp_action.XDP_DROP; }
-    table l4table() {
+    table l4table {
         key = {hd.icmp.typeCode : exact; }
         actions = {
             l4_Drop_action;     // Default Drop
