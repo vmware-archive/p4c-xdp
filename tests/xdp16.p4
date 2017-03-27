@@ -60,7 +60,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
         xoutdrop = true;
     }
 
-    table dstmactable() {
+    table dstmactable {
         key = { hd.ethernet.protocol : exact; }
         actions = {
             TS_action;

@@ -129,7 +129,7 @@ control Ingress(inout Headers hd, in xdp_input xin, out xdp_output xout) {
         action_md = md;
     }
 
-    table action_bitmap() {
+    table action_bitmap {
         key = { hd.ethernet.protocol : exact; }
         actions = {
             fallback;
