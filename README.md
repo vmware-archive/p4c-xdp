@@ -1,7 +1,7 @@
 # p4c-xdp
-[![Build Status](https://travis-ci.org/williamtu/p4c-xdp.svg?branch=master)](https://travis-ci.org/williamtu/p4c-xdp)
-[![Apache licensed](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/williamtu/p4c-xdp/blob/master/LICENSE)
-[![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg)](https://github.com/williamtu/p4c-xdp/blob/master/lib/COPYING)
+[![Build Status](https://travis-ci.org/vmware/p4c-xdp.svg?branch=master)](https://travis-ci.org/vmware/p4c-xdp)
+[![Apache licensed](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/vmware/p4c-xdp/blob/master/LICENSE)
+[![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg)](https://github.com/vmware/p4c-xdp/blob/master/lib/COPYING)
 
 This work presents a P4 compiler backend targeting XDP, the eXpress Data Path.
 P4 is a domain-specific language describing how packets are processed by the
@@ -28,7 +28,7 @@ version >= 4.10.0-rc7+ due to some BPF verifier limitations
 
 ## Presentation
 - IOVisor Summit 2017
-[slides](https://github.com/williamtu/p4c-xdp/blob/master/doc/p4xdp-iovisor17.pdf),
+[slides](https://github.com/vmware/p4c-xdp/blob/master/doc/p4xdp-iovisor17.pdf),
 [demo1](https://youtu.be/On7hEJ6bPVU), [demo2](https://youtu.be/vlp1MzWVOc8), [demo3](https://youtu.be/TibGxCXPNVc)
 
 ## Installation
@@ -59,7 +59,7 @@ Assuming you have P4-16 at your dir  ~/p4c/, to setup P4C-XDP:
 cd ~/p4c/
 mkdir extensions
 cd extensions
-git clone https://github.com/williamtu/p4c-xdp.git
+git clone https://github.com/vmware/p4c-xdp.git
 ```
 Now you have p4c-xdp at ~/p4c/extensions/p4c-xdp, next is to
 recompile p4c
@@ -104,7 +104,7 @@ to unload the XDP object
     ip link set dev $DEV xdp off
 ```
 ## Sample Code
-Please see the [tests folder](https://github.com/williamtu/p4c-xdp/tree/master/tests)
+Please see the [tests folder](https://github.com/vmware/p4c-xdp/tree/master/tests)
 Simply run 'make' will start the build
 
 ## Related BPF/XDP work
