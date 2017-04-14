@@ -2,12 +2,20 @@
 Performance test using ixgbe XDP dirver
 sender is using DPDK pktgen, receiving side is running XDP
 
+=== sender at server prmh-138 ===
+root@prmh-nsx-perf-server138:~/dpdk/pktgen-dpdk-new# ./pktgendpdk.sh pcap/test1.pcap 
+
+=== XDP receiver ===
+root@prmh-nsx-perf-server139:# echo 1 > /proc/sys/net/core/bpf_jit_enable
+root@prmh-nsx-perf-server139:# ip link set dev enp5s0f1 xdp obj xdp11.o
+
 === xdp2_kern.c ===
 # at receiving side
 $ sar -n DEV 1 
 03:33:16 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
 3:33:17 PM  enp5s0f1 1139681.00 1139681.00 231286.55 231286.55      0.00      0.00      0.00     18.95
 
+$ perf top
     53.42%  [kernel]          [k] __bpf_prog_run
      2.57%  [kernel]          [k] menu_select
      2.22%  [kernel]          [k] cpuidle_enter_state
