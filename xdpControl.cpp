@@ -34,7 +34,7 @@ bool XDPSwitch::build() {
         return false;
     }
 
-    auto it = pl->parameters->begin();
+    auto it = pl->parameters.begin();
     headers = *it;
     ++it;
     inputMeta = *it;
@@ -141,7 +141,7 @@ bool XDPDeparser::build() {
         return false;
     }
 
-    auto it = pl->parameters->begin();
+    auto it = pl->parameters.begin();
     headers = *it;
     ++it;
     packet = *it;

@@ -79,7 +79,7 @@ bool XDPProgram::build() {
 }
 
 void XDPProgram::emitTypes(EBPF::CodeBuilder* builder) {
-    for (auto d : *program->declarations) {
+    for (auto d : program->declarations) {
         if (!d->is<IR::Type>()) continue;
 
         if (d->is<IR::IContainer>() || d->is<IR::Type_Extern>() ||
@@ -138,17 +138,17 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "}");
 
     builder->appendLine(
-		"inline u16 csum16_add(u16 csum, u16 addend) {\n"
-		"    u16 res = csum;\n"
-		"    res += addend;\n"
-		"    return (res + (res < addend));\n"
-		"}\n"
-		"inline u16 csum16_sub(u16 csum, u16 addend) {\n"
-		"    return csum16_add(csum, ~addend);\n"
-		"}\n"
-		"inline u16 csum_replace2(u16 csum, u16 old, u16 new) {\n"
-		"    return (~csum16_add(csum16_sub(~csum, old), new));\n"
-	"}\n");
+                "inline u16 csum16_add(u16 csum, u16 addend) {\n"
+                "    u16 res = csum;\n"
+                "    res += addend;\n"
+                "    return (res + (res < addend));\n"
+                "}\n"
+                "inline u16 csum16_sub(u16 csum, u16 addend) {\n"
+                "    return csum16_add(csum, ~addend);\n"
+                "}\n"
+                "inline u16 csum_replace2(u16 csum, u16 old, u16 new) {\n"
+                "    return (~csum16_add(csum16_sub(~csum, old), new));\n"
+        "}\n");
 
     builder->appendLine(
         "inline u16 csum_fold(u32 csum) {\n"
@@ -160,18 +160,18 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "inline u32 csum_unfold(u16 csum) {\n"
         "    return (u32)csum;\n"
         "}\n"
-		"inline u32 csum32_add(u32 csum, u32 addend) {\n"
-		"    u32 res = csum;\n"
-		"    res += addend;\n"
-		"    return (res + (res < addend));\n"
-		"}\n"
-		"inline u32 csum32_sub(u32 csum, u32 addend) {\n"
-		"    return csum32_add(csum, ~addend);\n"
-		"}\n"
-		"inline u16 csum_replace4(u16 csum, u32 from, u32 to) {\n"
+                "inline u32 csum32_add(u32 csum, u32 addend) {\n"
+                "    u32 res = csum;\n"
+                "    res += addend;\n"
+                "    return (res + (res < addend));\n"
+                "}\n"
+                "inline u32 csum32_sub(u32 csum, u32 addend) {\n"
+                "    return csum32_add(csum, ~addend);\n"
+                "}\n"
+                "inline u16 csum_replace4(u16 csum, u32 from, u32 to) {\n"
         "    u32 tmp = csum32_sub(~csum_unfold(csum), from);\n"
-		"    return csum_fold(csum32_add(tmp, to));\n"
-	"}\n");
+                "    return csum_fold(csum32_add(tmp, to));\n"
+        "}\n");
 
     builder->appendLine(
         "struct bpf_map_def SEC(\"maps\") perf_event = {\n"
@@ -184,13 +184,11 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "#define BPF_PERF_EVENT_OUTPUT() do {\\\n"
         "    int pktsize = (int)(skb->data_end - skb->data);\\\n"
         "    bpf_perf_event_output(skb, &perf_event, ((u64)pktsize << 32), &pktsize, 4);\\\n"
-        "} while(0);\n"
-    );
+        "} while(0);\n");
 
     builder->appendLine(
         "#define BPF_KTIME_GET_NS() ({\\\n"
-        "   u32 ___ts = (u32)bpf_ktime_get_ns(); ___ts; })\\\n"
-    );
+        "   u32 ___ts = (u32)bpf_ktime_get_ns(); ___ts; })\\\n");
 
     // The table used for forwarding: we write the output in it
     // TODO: this should use target->emitTableDecl().

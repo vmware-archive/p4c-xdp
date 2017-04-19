@@ -63,9 +63,11 @@ struct OutputMetadataModel : public ::Model::Type_Model {
 class XDPModel : public EBPF::EBPFModel {
  protected:
     XDPModel() : EBPF::EBPFModel(), xdp(), inputMetadataModel(), outputMetadataModel(),
-                 ipv4_checksum("ebpf_ipv4_checksum"), bpf_event_output("bpf_event_output"),
-                 bpf_ktime_get_ns("bpf_ktime_get_ns"), csum_replace2("csum_replace2"),
+                 ipv4_checksum("ebpf_ipv4_checksum"),
+                 csum_replace2("csum_replace2"),
                  csum_replace4("csum_replace4"),
+                 bpf_event_output("bpf_event_output"),
+                 bpf_ktime_get_ns("bpf_ktime_get_ns"),
                  action_enum()
     {}
 
