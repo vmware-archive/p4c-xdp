@@ -133,7 +133,8 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "    dstAddr = htonl(dstAddr);\n"
         "    checksum += (srcAddr >> 16) + (u16)srcAddr;\n"
         "    checksum += (dstAddr >> 16) + (u16)dstAddr;\n"
-        "    // Fields in 'struct Headers' are host byte order. Deparser converts to network byte-order\n"
+        "    // Fields in 'struct Headers' are host byte order.\n"
+        "    // Deparser converts to network byte-order\n"
         "    return __constant_ntohs(~((checksum & 0xFFFF) + (checksum >> 16)));\n"
         "}");
 
