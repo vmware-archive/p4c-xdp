@@ -6,6 +6,7 @@ ENV P4C_DEPS automake \
              bison \
              build-essential \
              flex \
+             libfl-dev \
              g++ \
              libboost-dev \
              libgc-dev \
@@ -21,8 +22,8 @@ ENV P4C_DEPS automake \
 ENV PROTOBUF_DEPS autoconf \
                   curl \
                   unzip \
-				  libprotoc-dev \
-				  libprotobuf-c1
+		  libprotoc-dev \
+		  libprotobuf-c1
 
 RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev
 
@@ -98,5 +99,5 @@ RUN cd /home/p4c/extensions/p4c-xdp/ && git pull && \
 	ln -s /home/p4c/build/p4c-xdp p4c-xdp && \
 	cd tests && \
 	make
-	
+
 # P4XDP end
