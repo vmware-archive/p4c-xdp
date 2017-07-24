@@ -59,8 +59,9 @@ RUN git clone https://github.com/p4lang/p4c.git && \
 # p4xdp download end
 # build p4c-xdp
 RUN cd /home/p4c/ && \
-    ./bootstrap.sh && \
+    mkdir -p build \
     cd build && \
+    cmake .. \
     make -j `getconf _NPROCESSORS_ONLN` && \
     make install && \
     cd ..
