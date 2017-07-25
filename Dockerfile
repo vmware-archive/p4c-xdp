@@ -16,6 +16,7 @@ ENV P4C_DEPS automake \
              python \
              python-ipaddr \
              python-scapy \
+             cmake \
              tcpdump \
              git
 
