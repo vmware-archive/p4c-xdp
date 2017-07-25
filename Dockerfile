@@ -9,6 +9,7 @@ ENV P4C_DEPS automake \
              libfl-dev \
              g++ \
              libboost-dev \
+             libboost-iostreams1.58-dev \
              libgc-dev \
              libgmp-dev \
              libtool \
@@ -16,16 +17,11 @@ ENV P4C_DEPS automake \
              python \
              python-ipaddr \
              python-scapy \
+             python-pip \
+             python-setuptools \
              cmake \
              tcpdump \
              git
-
-ENV P4C_RUNTIME_DEPS cpp \
-                     libboost-iostreams1.58.0 \
-                     libgc1c2 \
-                     libgmp10 \
-                     libgmpxx4ldbl \
-                     python
 
 ENV PROTOBUF_DEPS autoconf \
                   curl \
@@ -38,7 +34,7 @@ RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev
 # curl ca issue
 RUN curl http://curl.haxx.se/ca/cacert.pem | awk '{print > "cert" (1+n) ".pem"} /-----END CERTIFICATE-----/ {n++}' && c_rehash
 
-RUN apt-get install -y --no-install-recommends $P4C_DEPS $P4C_RUNTIME_DEPS
+RUN apt-get install -y --no-install-recommends $P4C_DEPS
 RUN apt-get install -y --no-install-recommends $PROTOBUF_DEPS
 
 RUN ldconfig
