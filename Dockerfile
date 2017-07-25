@@ -62,7 +62,7 @@ RUN git clone https://github.com/p4lang/p4c.git && \
 RUN cd /home/p4c/ && \
     mkdir -p build \
     cd build && \
-    cmake .. \
+    cmake .. && \
     make -j `getconf _NPROCESSORS_ONLN` && \
     make install && \
     cd ..
