@@ -10,11 +10,7 @@ ENV P4C_DEPS automake \
              libfl-dev \
              g++ \
              libboost-dev \
-<<<<<<< b928c810c7ec65b70a9e48539f2a68a05af2522e
              libboost-iostreams1.62-dev \
-=======
-             libboost-iostreams1.58-dev \
->>>>>>> Missing dependence
              libgc-dev \
              libgmp-dev \
              libtool \
@@ -22,8 +18,6 @@ ENV P4C_DEPS automake \
              python \
              python-ipaddr \
              python-scapy \
-             python-pip \
-             python-setuptools \
              cmake \
              tcpdump \
              git
