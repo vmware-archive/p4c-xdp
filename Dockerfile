@@ -9,7 +9,6 @@ ENV P4C_DEPS automake \
              libfl-dev \
              g++ \
              libboost-dev \
-             libboost-iostreams1.58-dev \
              libgc-dev \
              libgmp-dev \
              libtool \
@@ -17,8 +16,6 @@ ENV P4C_DEPS automake \
              python \
              python-ipaddr \
              python-scapy \
-             python-pip \
-             python-setuptools \
              cmake \
              tcpdump \
              git
