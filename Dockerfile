@@ -22,6 +22,13 @@ ENV P4C_DEPS automake \
              tcpdump \
              git
 
+ENV P4C_RUNTIME_DEPS cpp \
+                     libboost-iostreams1.58.0 \
+                     libgc1c2 \
+                     libgmp10 \
+                     libgmpxx4ldbl \
+                     python
+
 ENV PROTOBUF_DEPS autoconf \
                   curl \
                   unzip \
@@ -34,7 +41,7 @@ RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev
 RUN curl http://curl.haxx.se/ca/cacert.pem | awk '{print > "cert" (1+n) ".pem"} /-----END CERTIFICATE-----/ {n++}' && c_rehash
 
 RUN apt-get install -y --no-install-recommends $P4C_DEPS
-RUN apt-get install -y --no-install-recommends $PROTOBUF_DEPS
+RUN apt-get install -y --no-install-recommends $PROTOBUF_DEPS $P4C_RUNTIME_DEPS
 
 RUN ldconfig
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
