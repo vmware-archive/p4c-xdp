@@ -10,7 +10,7 @@ ENV P4C_DEPS automake \
              libfl-dev \
              g++ \
              libboost-dev \
-             libboost-iostreams1.61-dev \
+             libboost-iostreams1.62-dev \
              libgc-dev \
              libgmp-dev \
              libtool \
