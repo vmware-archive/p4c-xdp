@@ -23,6 +23,7 @@ limitations under the License.
 #include "frontends/p4/typeMap.h"
 #include "frontends/p4/evaluator/evaluator.h"
 #include "backends/ebpf/ebpfObject.h"
+#include "backends/ebpf/ebpfProgram.h"
 
 namespace XDP {
 

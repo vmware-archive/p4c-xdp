@@ -3,12 +3,14 @@ FROM ubuntu:zesty
 
 WORKDIR /home/
 ENV P4C_DEPS automake \
+             build-essential \
              bison \
              build-essential \
              flex \
              libfl-dev \
              g++ \
              libboost-dev \
+             libboost-iostreams1.62-dev \
              libgc-dev \
              libgmp-dev \
              libtool \
@@ -16,6 +18,7 @@ ENV P4C_DEPS automake \
              python \
              python-ipaddr \
              python-scapy \
+             cmake \
              tcpdump \
              git
 
@@ -32,6 +35,7 @@ RUN curl http://curl.haxx.se/ca/cacert.pem | awk '{print > "cert" (1+n) ".pem"} 
 
 RUN apt-get install -y --no-install-recommends $P4C_DEPS
 RUN apt-get install -y --no-install-recommends $PROTOBUF_DEPS
+
 RUN ldconfig
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
@@ -59,8 +63,9 @@ RUN git clone https://github.com/p4lang/p4c.git && \
 # p4xdp download end
 # build p4c-xdp
 RUN cd /home/p4c/ && \
-    ./bootstrap.sh && \
+    mkdir -p build && \
     cd build && \
+    cmake .. && \
     make -j `getconf _NPROCESSORS_ONLN` && \
     make install && \
     cd ..
