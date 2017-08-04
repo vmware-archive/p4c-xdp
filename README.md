@@ -61,23 +61,31 @@ mkdir extensions
 cd extensions
 git clone https://github.com/vmware/p4c-xdp.git
 ```
-Now you have p4c-xdp at ~/p4c/extensions/p4c-xdp, next is to
-recompile p4c
+Now that you have cloned p4c-xdp at ~/p4c/extensions/p4c-xdp, the next step is to
+recompile p4c:
 ```bash
 cd ~/p4c/
-./bootstrap.sh
-cd ~/p4c/build/
+mkdir -p build
+cd build/
+cmake ..
 make
 ```
-Then you will have p4c-xdp binary at ~/p4c/build
-Next is to create a soft link to the binary
+This generates a p4c-xdp binary in ~/p4c/build.
+Next create a soft link to the binary:
 ```bash
 cd ~/p4c/extensions/p4c-xdp
 ln -s ~/p4c/build/p4c-xdp p4c-xdp
 ```
-under tests, 'make' will check you llvm and clang version,
-compile all .p4 file, generate .c file, and loading into kernel
-to check BPF verifier
+
+Now you can run the p4c-xdp tests:
+```
+cd tests
+make
+```
+
+This will check your llvm and clang version,
+compile all .p4 files, generate .c files, and load them into the kernel
+to be checked by the BPF verifier.
 
 ## XDP: eXpress Data Path
 XDP is a packet processing mechanism implemented within the device driver with eBPF.
