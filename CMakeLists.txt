@@ -16,6 +16,7 @@ set (P4C_XDP_SOURCES
   ../../backends/ebpf/codeGen.cpp
   ../../backends/ebpf/ebpfModel.cpp
   ../../backends/ebpf/midend.cpp
+  ../../backends/ebpf/lower.cpp
   )
 
 set (P4C_XDP_HEADERS
