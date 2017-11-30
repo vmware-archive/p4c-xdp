@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# This program is invoked by make check-xdp to run
+# some xdp tests.
+
 folder="$1"
 verbose=0
 shift
