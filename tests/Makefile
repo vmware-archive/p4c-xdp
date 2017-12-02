@@ -47,7 +47,7 @@ verify_target_bpf: verify_cmds
 		echo "*** ERROR: Cannot find p4c-xdp"; \
 		exit 1;\
 	fi;
-	$(P4C) --Wwarnings-as-errors $(INCLUDE) --target xdp -o $@ $<;
+	$(P4C) --Werror $(INCLUDE) --target xdp -o $@ $<;
 
 # BPF program
 # do extra CLANG so first pass can return non-zero to shell and stop make
