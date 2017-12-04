@@ -105,4 +105,7 @@ RUN cd /home/p4c/extensions/p4c-xdp/ && git pull && \
 	cd tests && \
 	make
 
+# end to end test under tests/
+RUN ./test_xdp_redirect.sh xdp2.o
+
 # P4XDP end
