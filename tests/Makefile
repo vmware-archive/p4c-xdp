@@ -3,7 +3,7 @@ CLANG ?= clang
 CC= gcc
 CFLAGS=-g
 BPFOBJ= xdp1.o xdp2.o xdp3.o xdp4.o xdp5.o xdp6.o xdp7.o xdp8.o xdp9.o xdp10.o \
-        xdp11.o xdp12.o xdp13.o xdp14.o xdp15.o xdp16.o
+        xdp11.o xdp12.o xdp13.o xdp14.o xdp15.o xdp16.o xdp17.o
 BPFLOADER=bpfloader
 BPFLIB=../lib/
 #IFACE=enp0s16
