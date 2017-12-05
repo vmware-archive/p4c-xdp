@@ -9,6 +9,7 @@ install:
 
 script:
   - docker run --privileged -w /tmp/p4c-xdp/tests p4c-xdp ./test_iproute.sh
+  - docker run --privileged -w /tmp/p4c-xdp/tests p4c-xdp ./test_xdp_redirect.sh
 
 notifications:
   email:

@@ -28,7 +28,8 @@ ENV PROTOBUF_DEPS autoconf \
 		  libprotoc-dev \
 		  libprotobuf-c1
 
-RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev iproute2
+RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev iproute2 bridge-utils iputils-ping
+
 # P4C and P4C-XDP
 COPY . /tmp/p4c-xdp
 
