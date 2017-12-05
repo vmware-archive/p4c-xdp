@@ -29,6 +29,7 @@ ENV PROTOBUF_DEPS autoconf \
 		  libprotobuf-c1
 
 RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev
+RUN apt-get install -y sudo 
 
 # curl ca issue
 RUN curl http://curl.haxx.se/ca/cacert.pem | awk '{print > "cert" (1+n) ".pem"} /-----END CERTIFICATE-----/ {n++}' && c_rehash
