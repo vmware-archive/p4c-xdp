@@ -1,5 +1,4 @@
-#FROM ubuntu:16.04
-FROM ubuntu:zesty
+FROM ubuntu:artful
 
 WORKDIR /home/
 ENV P4C_DEPS automake \
@@ -10,7 +9,7 @@ ENV P4C_DEPS automake \
              libfl-dev \
              g++ \
              libboost-dev \
-             libboost-iostreams1.62-dev \
+             libboost-iostreams-dev \
              libgc-dev \
              libgmp-dev \
              libtool \
@@ -90,8 +89,8 @@ RUN apt-get install -y --no-install-recommends xz-utils && \
 
 # iproute2-begin
 RUN cd /tmp && \
-    git clone -b v4.9.0 git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git && \
- 	cd /tmp/iproute2 && \
+    git clone -b v4.14.0 https://git.kernel.org/pub/scm/linux/kernel/git/dsahern/iproute2-next.git/ && \
+	cd /tmp/iproute2-next && git checkout -b v414 && \
 	./configure && \
 	make -j `getconf _NPROCESSORS_ONLN` && \
 	make install
@@ -100,6 +99,7 @@ ENV PATH="/usr/local/clang+llvm/bin:$PATH"
 
 # Setup new kernel headers
 # P4XDP begin
+RUN apt-get install -y sudo
 RUN cd /home/p4c/extensions/p4c-xdp/ && git pull && \
 	ln -s /home/p4c/build/p4c-xdp p4c-xdp && \
 	cd tests && \
