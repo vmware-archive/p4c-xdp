@@ -71,23 +71,10 @@ RUN cd /home/p4c/ && \
 
 # COPY from cilium
 # clang-3.8.1-begin
-RUN apt-get install -y --no-install-recommends xz-utils && \
-    cd /tmp && \
-    curl -Ssl -o clang+llvm.tar.xz \
-        http://releases.llvm.org/3.8.1/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz && \
-    mkdir -p /usr/local && \
-    tar -C /usr/local -xJf ./clang+llvm.tar.xz && \
-    mv /usr/local/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04 /usr/local/clang+llvm && \
-    rm clang+llvm.tar.xz && \
-	rm -fr /usr/local/clang+llvm/include/llvm-c && \
-	rm -fr /usr/local/clang+llvm/include/clang-c && \
-	rm -fr /usr/local/clang+llvm/include/c++ && \
-	rm -fr /usr/local/clang+llvm/share && \
-	ls -d /usr/local/clang+llvm/lib/* | grep -vE clang$ | xargs rm -r && \
-	ls -d /usr/local/clang+llvm/bin/* | grep -vE "clang$|clang-3.8$|llc$" | xargs rm -r
-# clang-3.8.1-end
+RUN apt-get install -y llvm-4.0 && ln -s /usr/bin/llc-4.0 /usr/bin/llc
+RUN apt-get install -y clang-4.0 && ln /usr/bin/clang-4.0 /usr/bin/clang
 
-# iproute2-begin
+# iproute2-next
 RUN cd /tmp && \
     git clone -b v4.14.0 https://git.kernel.org/pub/scm/linux/kernel/git/dsahern/iproute2-next.git/ && \
 	cd /tmp/iproute2-next && git checkout -b v414 && \
