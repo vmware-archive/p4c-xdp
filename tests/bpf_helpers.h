@@ -41,6 +41,8 @@ typedef unsigned long long u64;
     (((__u64)(x) & (__u64)0x00ff000000000000ULL) >> 40) |   \
     (((__u64)(x) & (__u64)0xff00000000000000ULL) >> 56)))
 
+#define __constant_htonll(x) (___constant_swab64(x))
+#define __constant_ntohll(x) (___constant_swab64(x))
 #define __constant_htonl(x) (___constant_swab32((x)))
 #define __constant_ntohl(x) (___constant_swab32(x))
 #define __constant_htons(x) (___constant_swab16((x)))
