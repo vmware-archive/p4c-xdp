@@ -7,7 +7,7 @@ install:
   - docker build -t p4c-xdp .
 
 script:
-  - docker run -w /home/p4c/extensions/p4c-xdp/tests p4c-xdp ./test_iproute.sh
+  - docker run -w /home/p4c/extensions/p4c-xdp/tests p4c-xdp make
 
 notifications:
   email:
