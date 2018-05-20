@@ -1,5 +1,4 @@
-#FROM ubuntu:16.04
-FROM ubuntu:zesty
+FROM ubuntu:artful
 
 WORKDIR /home/
 ENV P4C_DEPS automake \
@@ -10,7 +9,7 @@ ENV P4C_DEPS automake \
              libfl-dev \
              g++ \
              libboost-dev \
-             libboost-iostreams1.62-dev \
+             libboost-iostreams-dev \
              libgc-dev \
              libgmp-dev \
              libtool \
@@ -73,26 +72,13 @@ RUN cd /home/p4c/ && \
 
 # COPY from cilium
 # clang-3.8.1-begin
-RUN apt-get install -y --no-install-recommends xz-utils && \
-    cd /tmp && \
-    curl -Ssl -o clang+llvm.tar.xz \
-        http://releases.llvm.org/3.8.1/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz && \
-    mkdir -p /usr/local && \
-    tar -C /usr/local -xJf ./clang+llvm.tar.xz && \
-    mv /usr/local/clang+llvm-3.8.1-x86_64-linux-gnu-ubuntu-16.04 /usr/local/clang+llvm && \
-    rm clang+llvm.tar.xz && \
-	rm -fr /usr/local/clang+llvm/include/llvm-c && \
-	rm -fr /usr/local/clang+llvm/include/clang-c && \
-	rm -fr /usr/local/clang+llvm/include/c++ && \
-	rm -fr /usr/local/clang+llvm/share && \
-	ls -d /usr/local/clang+llvm/lib/* | grep -vE clang$ | xargs rm -r && \
-	ls -d /usr/local/clang+llvm/bin/* | grep -vE "clang$|clang-3.8$|llc$" | xargs rm -r
-# clang-3.8.1-end
+RUN apt-get install -y llvm-4.0 && ln -s /usr/bin/llc-4.0 /usr/bin/llc
+RUN apt-get install -y clang-4.0 && ln /usr/bin/clang-4.0 /usr/bin/clang
 
-# iproute2-begin
+# iproute2-next
 RUN cd /tmp && \
-    git clone -b v4.9.0 git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/iproute2.git && \
- 	cd /tmp/iproute2 && \
+    git clone -b v4.14.0 https://git.kernel.org/pub/scm/linux/kernel/git/dsahern/iproute2-next.git/ && \
+	cd /tmp/iproute2-next && git checkout -b v414 && \
 	./configure && \
 	make -j `getconf _NPROCESSORS_ONLN` && \
 	make install
@@ -101,6 +87,7 @@ ENV PATH="/usr/local/clang+llvm/bin:$PATH"
 
 # Setup new kernel headers
 # P4XDP begin
+RUN apt-get install -y sudo
 RUN cd /home/p4c/extensions/p4c-xdp/ && git pull && \
 	ln -s /home/p4c/build/p4c-xdp p4c-xdp && \
 	cd tests && \
