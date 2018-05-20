@@ -21,16 +21,21 @@ typedef unsigned int u32;
 typedef signed long long s64;
 typedef unsigned long long u64;
 
+#ifndef ___constant_swab16
 #define ___constant_swab16(x) ((__u16)(             \
     (((__u16)(x) & (__u16)0x00ffU) << 8) |          \
     (((__u16)(x) & (__u16)0xff00U) >> 8)))
+#endif
 
+#ifndef ___constant_swab32
 #define ___constant_swab32(x) ((__u32)(             \
     (((__u32)(x) & (__u32)0x000000ffUL) << 24) |        \
     (((__u32)(x) & (__u32)0x0000ff00UL) <<  8) |        \
     (((__u32)(x) & (__u32)0x00ff0000UL) >>  8) |        \
     (((__u32)(x) & (__u32)0xff000000UL) >> 24)))
+#endif
 
+#ifndef ___constant_swab64
 #define ___constant_swab64(x) ((__u64)(             \
     (((__u64)(x) & (__u64)0x00000000000000ffULL) << 56) |   \
     (((__u64)(x) & (__u64)0x000000000000ff00ULL) << 40) |   \
@@ -40,12 +45,34 @@ typedef unsigned long long u64;
     (((__u64)(x) & (__u64)0x0000ff0000000000ULL) >> 24) |   \
     (((__u64)(x) & (__u64)0x00ff000000000000ULL) >> 40) |   \
     (((__u64)(x) & (__u64)0xff00000000000000ULL) >> 56)))
+#endif
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#ifndef __constant_htonll
+#define __constant_htonll(x) (___constant_swab64((x)))
+#endif
+
+#ifndef __constnat_ntohll
+#define __constant_ntohll(x) (___constant_swab64((x)))
+#endif
 
 #define __constant_htonl(x) (___constant_swab32((x)))
 #define __constant_ntohl(x) (___constant_swab32(x))
 #define __constant_htons(x) (___constant_swab16((x)))
 #define __constant_ntohs(x) ___constant_swab16((x))
 
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+# warning "I never tested BIG_ENDIAN machine!"
+#define __constant_htonll(x) (x)
+#define __constant_ntohll(X) (x)
+#define __constant_htonl(x) (x)
+#define __constant_ntohl(x) (x)
+#define __constant_htons(x) (x)
+#define __constant_ntohs(x) (x)
+
+#else
+# error "Fix your compiler's __BYTE_ORDER__?!"
+#endif
 /* END */
 
 /* helper macro to place programs, maps, license in
