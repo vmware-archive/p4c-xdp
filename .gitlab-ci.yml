@@ -1,0 +1,19 @@
+before_script:
+    - cat /etc/*release*
+    - uname -a
+
+after_script:
+    - sudo pip install pyftpdlib tftpy sphinx
+
+prepare:
+    script:
+        - sudo apt-get update
+	- sudo apt-get install -y docker.io
+        - sudo apt-get -y install wget python-pip build-essential libtool autoconf pkg-config ethtool python-flake8 libssl-dev vim
+        - pip install --upgrade pip
+
+test:
+    script:
+        - docker build -t p4c-xdp .
+	- docker run --privileged p4c-xdp uname -a
+	- docker run --privileged -w /tmp/p4c-xdp/tests p4c-xdp ./test_iproute.sh
