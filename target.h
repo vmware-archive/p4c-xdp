@@ -31,9 +31,9 @@ class XdpTarget : public EBPF::KernelSamplesTarget {
                   cstring argName) const override;
     cstring dataOffset(cstring base) const override
     { return cstring("((void*)(long)")+ base + "->data)"; }
-    void emitTableDecl(Util::SourceCodeBuilder* builder,
-                       cstring tblName, bool isHash,
-                       cstring keyType, cstring valueType, unsigned size) const override;
+    //void emitTableDecl(Util::SourceCodeBuilder* builder,
+     //                  cstring tblName, bool isHash,
+     //                  cstring keyType, cstring valueType, unsigned size) const override;
     cstring dataEnd(cstring base) const override
     { return cstring("((void*)(long)")+ base + "->data_end)"; }
     void emitCodeSection(Util::SourceCodeBuilder* builder, cstring) const override
