@@ -12,8 +12,8 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-typedef signed char s8; 
-typedef unsigned char u8; 
+typedef signed char s8;
+typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 typedef signed int s32;
@@ -52,7 +52,7 @@ typedef unsigned long long u64;
 #define __constant_htonll(x) (___constant_swab64((x)))
 #endif
 
-#ifndef __constnat_ntohll
+#ifndef __constant_ntohll
 #define __constant_ntohll(x) (___constant_swab64((x)))
 #endif
 
@@ -69,7 +69,8 @@ typedef unsigned long long u64;
 #define __constant_ntohl(x) (x)
 #define __constant_htons(x) (x)
 #define __constant_ntohs(x) (x)
-
+#define htonl(d) __constant_htonl(d)
+#define htons(d) __constant_htons(d)
 #else
 # error "Fix your compiler's __BYTE_ORDER__?!"
 #endif
@@ -135,16 +136,12 @@ static int (*bpf_xdp_adjust_head)(void *ctx, int offset) =
 	(void *) BPF_FUNC_xdp_adjust_head;
 
 
-/* llvm builtin functions that eBPF C program may use to
- * emit BPF_LD_ABS and BPF_LD_IND instructions
- */
-struct sk_buff;
-unsigned long long load_byte(void *skb,
-			     unsigned long long off) asm("llvm.bpf.load.byte");
-unsigned long long load_half(void *skb,
-			     unsigned long long off) asm("llvm.bpf.load.half");
-unsigned long long load_word(void *skb,
-			     unsigned long long off) asm("llvm.bpf.load.word");
+#define load_byte(data, b)  (*(((u8*)(data)) + (b)))
+#define load_half(data, b) __constant_ntohs(*(u16 *)((u8*)(data) + (b)))
+#define load_word(data, b) __constant_ntohl(*(u32 *)((u8*)(data) + (b)))
+#define load_dword(data, b) __constant_ntohl(*(u64 *)((u8*)(data) + (b)))
+#define htonl(d) __constant_htonl(d)
+#define htons(d) __constant_htons(d)
 
 /* a helper structure used by eBPF C program
  * to describe map attributes to elf_bpf loader
@@ -169,6 +166,21 @@ struct bpf_elf_map {
         __u32 id;
         __u32 pinning;
 };
+
+#define REGISTER_START()
+#define REGISTER_TABLE(NAME, TYPE, KEY_SIZE, VALUE_SIZE, MAX_ENTRIES) \
+struct bpf_map_def SEC("maps") NAME = {          \
+    .type       = TYPE,             \
+    .key_size   = KEY_SIZE,         \
+    .value_size = VALUE_SIZE,       \
+    .max_entries    = MAX_ENTRIES,  \
+    .map_flags = 0,                 \
+    .pinning = 2,                   \
+};
+#define REGISTER_END()
+
+#define BPF_MAP_LOOKUP_ELEM(table, key) bpf_map_lookup_elem(&table, key)
+#define BPF_MAP_UPDATE_ELEM(table, key, value, flags) bpf_map_update_elem(&table, key, value, flags)
 
 static int (*bpf_skb_load_bytes)(void *ctx, int off, void *to, int len) =
 	(void *) BPF_FUNC_skb_load_bytes;

@@ -22,54 +22,14 @@ void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
         "#define KBUILD_MODNAME \"xdptest\"\n"
         "#include <linux/bpf.h>\n"
-        "#include \"bpf_helpers.h\"\n"
-        "\n"
-        "#define load_byte(data, b)  (*(((u8*)(data)) + (b)))\n"
-        "#define load_half(data, b) __constant_ntohs(*(u16 *)((u8*)(data) + (b)))\n"
-        "#define load_word(data, b) __constant_ntohl(*(u32 *)((u8*)(data) + (b)))\n"
-	"#define load_dword(data, b) __constant_ntohl(*(u64 *)((u8*)(data) + (b)))\n"
-        "#define htonl(d) __constant_htonl(d)\n"
-        "#define htons(d) __constant_htons(d)\n");
+        "#include \"ebpf_xdp.h\"\n"
+        "\n");
 }
 
 void XdpTarget::emitMain(Util::SourceCodeBuilder* builder,
                          cstring functionName,
                          cstring argName) const {
     builder->appendFormat("int %s(struct xdp_md* %s)", functionName, argName);
-}
-
-void XdpTarget::emitTableDecl(Util::SourceCodeBuilder* builder,
-                              cstring tblName, bool isHash,
-                              cstring keyType, cstring valueType,
-                              unsigned size) const {
-    builder->emitIndent();
-    builder->appendFormat("struct bpf_map_def SEC(\"maps\") %s = ", tblName);
-    builder->blockStart();
-    builder->emitIndent();
-    builder->append(".type = ");
-    if (isHash)
-        builder->appendLine("BPF_MAP_TYPE_HASH,");
-    else
-        builder->appendLine("BPF_MAP_TYPE_ARRAY,");
-
-    builder->emitIndent();
-    builder->appendFormat(".key_size = sizeof(%s), ", keyType);
-    builder->newline();
-
-    builder->emitIndent();
-    builder->appendFormat(".value_size = sizeof(%s), ", valueType);
-    builder->newline();
-
-    builder->emitIndent();
-    builder->appendFormat(".pinning = 2, /* PIN_GLOBAL_NS */");
-    builder->newline();
-
-    builder->emitIndent();
-    builder->appendFormat(".max_entries = %d, ", size);
-    builder->newline();
-
-    builder->blockEnd(false);
-    builder->endOfStatement(true);
 }
 
 }  // namespace XDP
