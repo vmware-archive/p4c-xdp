@@ -27,9 +27,8 @@ ENV PROTOBUF_DEPS autoconf \
 		  libprotoc-dev \
 		  libprotobuf-c1
 
-RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev
+RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev bridge-utils iputils-ping
 
-# curl ca issue
 RUN curl http://curl.haxx.se/ca/cacert.pem | awk '{print > "cert" (1+n) ".pem"} /-----END CERTIFICATE-----/ {n++}' && c_rehash
 
 RUN apt-get install -y --no-install-recommends $P4C_DEPS
