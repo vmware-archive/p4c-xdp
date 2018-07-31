@@ -47,8 +47,7 @@ add_custom_target(linkp4cxdp
 
 add_dependencies(p4c_driver linkp4cxdp)
 
-set(XDP_DRIVER ${CMAKE_CURRENT_SOURCE_DIR}/run-p4c-xdp.sh)
-
+set(XDP_DRIVER "${CMAKE_CURRENT_SOURCE_DIR}/run-ebpf-test.py -t xdp")
 # This file will not run the full tests, but it will attempt to compile the p4 files down to C
 set (XDP_TEST_SUITES
   "${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp*.p4"
