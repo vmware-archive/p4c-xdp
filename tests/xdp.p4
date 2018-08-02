@@ -9,11 +9,16 @@ parser Parser(packet_in packet, out ovs_packet hdr) {
 }
 
 control Ingress(inout ovs_packet hdr, in xdp_input xin, out xdp_output xout) {
-    apply {}
+    apply {
+        xout.output_port = xin.input_port;
+        xout.output_action = xdp_action.XDP_PASS;
+    }
 }
 
-control Deparser(in ovs_packet hdr, packet_out packet) {
-    apply {}
+control Deparser(in ovs_packet hdrs, packet_out packet) {
+    apply {
+        ;
+    }
 }
 
 xdp(Parser(), Ingress(), Deparser()) main;
