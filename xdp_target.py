@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# Copyright 2013-present Barefoot Networks, Inc.
 # Copyright 2018 VMware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +28,7 @@ from testutils import *
 class Target(EBPFKernelTarget):
     def __init__(self, tmpdir, options, template, outputs):
         EBPFKernelTarget.__init__(self, tmpdir, options, template, outputs)
+        # We use a different compiler, override the inherited default
         self.compiler = self.options.compilerdir + "/build/p4c-xdp"
 
     def create_filter(self):
@@ -80,11 +80,6 @@ class Target(EBPFKernelTarget):
             result = self._ip_load_cmd(bridge, proc, bridge.br_name)
             bridge.ns_proc_append(proc, "")
 
-        if result != SUCCESS:
-            return result
-        # Check if eBPF maps have actually been created
-        result = bridge.ns_proc_write(proc,
-                                      "ls -1 /sys/fs/bpf/tc/globals")
         if result != SUCCESS:
             return result
         # Finally, append the actual runtime command to the process
