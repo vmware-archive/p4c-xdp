@@ -61,9 +61,9 @@ class Target(EBPFKernelTarget):
     def _ip_load_cmd(self, bridge, proc, port_name):
         # Load the specified eBPF object to "port_name" ingress and egress
         # As a side-effect, this may create maps in /sys/fs/bpf/tc/globals
-        cmd = ("ip link set dev %s xdp obj %s verb " %
+        cmd = ("ip link set dev %s xdp obj %s verb" %
                (port_name, self.template + ".o"))
-        return bridge.ns_proc_write(proc, cmd)
+        return bridge.ns_exec(cmd)
 
     def _run_in_namespace(self, bridge):
         # Open a process in the new namespace
@@ -74,16 +74,13 @@ class Target(EBPFKernelTarget):
         if len(bridge.br_ports) > 0:
             for port in bridge.br_ports:
                 result = self._ip_load_cmd(bridge, proc, port)
-                bridge.ns_proc_append(proc, "")
         else:
             # No ports attached (no pcap files), load to bridge instead
             result = self._ip_load_cmd(bridge, proc, bridge.br_name)
-            bridge.ns_proc_append(proc, "")
-
         if result != SUCCESS:
             return result
         # Finally, append the actual runtime command to the process
-        result = bridge.ns_proc_append(proc, self._get_run_cmd())
+        result = bridge.ns_proc_write(proc, self._get_run_cmd())
         if result != SUCCESS:
             return result
         # Execute the command queue and close the process, retrieve result
