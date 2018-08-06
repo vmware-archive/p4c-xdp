@@ -63,7 +63,7 @@ class Target(EBPFKernelTarget):
         # As a side-effect, this may create maps in /sys/fs/bpf/tc/globals
         cmd = ("ip link set dev %s xdp obj %s verb" %
                (port_name, self.template + ".o"))
-        return bridge.ns_exec(cmd)
+        return bridge.ns_proc_write(proc, cmd)
 
     def _run_in_namespace(self, bridge):
         # Open a process in the new namespace
@@ -80,7 +80,7 @@ class Target(EBPFKernelTarget):
         if result != SUCCESS:
             return result
         # Finally, append the actual runtime command to the process
-        result = bridge.ns_proc_write(proc, self._get_run_cmd())
+        result = bridge.ns_proc_append(proc, self._get_run_cmd())
         if result != SUCCESS:
             return result
         # Execute the command queue and close the process, retrieve result

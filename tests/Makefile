@@ -8,7 +8,7 @@ BPFLOADER=bpfloader
 BPFLIB=../lib/
 #IFACE=enp0s16
 SRC=/root/p4c
-INCLUDE=-I ../p4include
+INCLUDE=-I ../p4include -I../../../backends/ebpf/runtime/
 P4C=p4c-xdp
 
 all: bpfloader $(BPFOBJ) verify_target_bpf
@@ -52,13 +52,13 @@ verify_target_bpf: verify_cmds
 # BPF program
 # do extra CLANG so first pass can return non-zero to shell and stop make
 %.o: %.c
-	@$(CLANG) \
+	@$(CLANG) $(INCLUDE) \
 		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
 		-Wno-tautological-compare \
 		-O2 -emit-llvm -g -c $< -o - > /dev/null
-	$(CLANG) \
+	$(CLANG) $(INCLUDE)\
 		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
 		-Wno-compare-distinct-pointer-types \
 		-Wno-gnu-variable-sized-type-not-at-end \
