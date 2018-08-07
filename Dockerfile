@@ -1,44 +1,54 @@
-FROM ubuntu:artful
+FROM ubuntu:bionic
 
 WORKDIR /home/
-ENV P4C_DEPS automake \
+ENV P4C_DEPS bison \
              build-essential \
-             bison \
-             build-essential \
+             cmake \
+             git \
              flex \
-             libfl-dev \
              g++ \
              libboost-dev \
+             libboost-graph-dev \
              libboost-iostreams-dev \
+             libfl-dev \
              libgc-dev \
              libgmp-dev \
-             libtool \
              pkg-config \
-             python \
              python-ipaddr \
-             python-scapy \
-             cmake \
-             tcpdump \
-             git
+             python-pip \
+             python-setuptools \
+             tcpdump
+
+ENV P4C_EBPF_DEPS libpcap-dev \
+             libelf-dev \
+             llvm \
+             llvm-dev \
+             clang \
+             iproute2 \
+             net-tools
+
+ENV P4C_PIP_PACKAGES tenjin \
+                     pyroute2 \
+                     ply \
+                     scapy
 
 ENV PROTOBUF_DEPS autoconf \
+                  automake \
                   curl \
+                  gawk \
                   unzip \
-		  libprotoc-dev \
-		  libprotobuf-c1
+                  libtool \
+                  libprotoc-dev \
+                  libprotobuf-c1
 
-RUN apt-get update && apt-get install -y git curl unzip gawk libelf-dev
-
-# curl ca issue
-RUN curl http://curl.haxx.se/ca/cacert.pem | awk '{print > "cert" (1+n) ".pem"} /-----END CERTIFICATE-----/ {n++}' && c_rehash
-
+RUN apt-get update
 RUN apt-get install -y --no-install-recommends $P4C_DEPS
+RUN apt-get install -y --no-install-recommends $P4C_EBPF_DEPS
+RUN pip install wheel
+RUN pip install $P4C_PIP_PACKAGES
 RUN apt-get install -y --no-install-recommends $PROTOBUF_DEPS
 
-RUN ldconfig
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-
-# Protocol buf
+# Install protobuf
 RUN git clone https://github.com/google/protobuf.git && \
     cd protobuf && \
     git checkout -b p4c v3.0.2 && \
@@ -46,21 +56,19 @@ RUN git clone https://github.com/google/protobuf.git && \
     echo PROTOBUF-OK && \
     cd ../
 
-# P4C and P4C-XDP
-COPY . /tmp/p4c-xdp
 
+# p4c download begin
 RUN git clone https://github.com/p4lang/p4c.git && \
     cd p4c && \
     git submodule update --init --recursive && \
     git submodule update --recursive && \
-# p4xdp download begin
-    mkdir extensions && \
-    cd extensions && \
-#   git clone https://github.com/williamtu/p4c-xdp.git && \
-    ln -s /tmp/p4c-xdp p4c-xdp
+    mkdir extensions
+# p4c download end
 
-# p4xdp download end
-# build p4c-xdp
+# copy xdp into the extension folder
+COPY . /home/p4c/extensions/p4c-xdp
+
+# build p4c and p4c-xdp
 RUN cd /home/p4c/ && \
     mkdir -p build && \
     cd build && \
@@ -69,27 +77,11 @@ RUN cd /home/p4c/ && \
     make install && \
     cd ..
 
-# COPY from cilium
-# clang-3.8.1-begin
-RUN apt-get install -y llvm-4.0 && ln -s /usr/bin/llc-4.0 /usr/bin/llc
-RUN apt-get install -y clang-4.0 && ln /usr/bin/clang-4.0 /usr/bin/clang
-
-# iproute2-next
-RUN cd /tmp && \
-    git clone -b v4.14.0 https://git.kernel.org/pub/scm/linux/kernel/git/dsahern/iproute2-next.git/ && \
-	cd /tmp/iproute2-next && git checkout -b v414 && \
-	./configure && \
-	make -j `getconf _NPROCESSORS_ONLN` && \
-	make install
-# iproute2-end
-ENV PATH="/usr/local/clang+llvm/bin:$PATH"
-
-# Setup new kernel headers
-# P4XDP begin
+# p4c-xdp setup begin
 RUN apt-get install -y sudo
-RUN cd /home/p4c/extensions/p4c-xdp/ && git pull && \
-	ln -s /home/p4c/build/p4c-xdp p4c-xdp && \
-	cd tests && \
-	make
-
-# P4XDP end
+RUN cd /home/p4c/extensions/p4c-xdp/ && \
+    # link the compiler
+    ln -s /home/p4c/build/p4c-xdp p4c-xdp && \
+    # add xdp to the ebpf backend target folder
+    ln -s /home/p4c/extensions/p4c-xdp/xdp_target.py /home/p4c/backends/ebpf/targets/xdp_target.py
+# p4c-xdp setup end

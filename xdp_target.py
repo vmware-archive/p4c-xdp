@@ -81,8 +81,13 @@ class Target(EBPFKernelTarget):
             bridge.ns_proc_append(proc, "")
         if result != SUCCESS:
             return result
+        # Check if eBPF maps have actually been created
+        result = bridge.ns_proc_write(proc,
+                                      "ls -1 /sys/fs/bpf/xdp/globals")
+        if result != SUCCESS:
+            return result
         # Finally, append the actual runtime command to the process
-        result = bridge.ns_proc_write(proc, self._get_run_cmd())
+        result = bridge.ns_proc_append(proc, self._get_run_cmd())
         if result != SUCCESS:
             return result
         # Execute the command queue and close the process, retrieve result

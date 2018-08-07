@@ -7,7 +7,8 @@ install:
   - docker build -t p4c-xdp .
 
 script:
-  - docker run -w /home/p4c/extensions/p4c-xdp/tests p4c-xdp make
+  - docker run --privileged -w /home/p4c/build -e CTEST_PARALLEL_LEVEL p4c-xdp ctest -R xdp --output-on-failure --schedule-random
+  - ls $HOME/.ccache
 
 notifications:
   email:
