@@ -21,15 +21,7 @@ namespace XDP {
 void XdpTarget::emitIncludes(Util::SourceCodeBuilder* builder) const {
     builder->append(
         "#define KBUILD_MODNAME \"xdptest\"\n"
-        "#include <linux/bpf.h>\n"
         "#include \"ebpf_xdp.h\"\n"
         "\n");
 }
-
-void XdpTarget::emitMain(Util::SourceCodeBuilder* builder,
-                         cstring functionName,
-                         cstring argName) const {
-    builder->appendFormat("int %s(struct xdp_md* %s)", functionName, argName);
-}
-
 }  // namespace XDP

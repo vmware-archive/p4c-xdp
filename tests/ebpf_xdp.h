@@ -78,11 +78,14 @@ limitations under the License.
 #endif
 /* END */
 
-#define load_byte(data, b)  (*(((u8*)(data)) + (b)))
-#define load_half(data, b) __constant_ntohs(*(u16 *)((u8*)(data) + (b)))
-#define load_word(data, b) __constant_ntohl(*(u32 *)((u8*)(data) + (b)))
-#define load_dword(data, b) __constant_ntohl(*(u64 *)((u8*)(data) + (b)))
+/* xdp descriptor similar to sk_buff */
+#define SK_BUFF struct xdp_md
+
 #define htonl(d) __constant_htonl(d)
 #define htons(d) __constant_htons(d)
+
+#define load_dword(data, b) (*(u64 *)((u8*)(data) + (b))) << 16
+
+
 
 #endif
