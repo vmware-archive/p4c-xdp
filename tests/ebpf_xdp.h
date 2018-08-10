@@ -79,10 +79,16 @@ limitations under the License.
 /* END */
 
 /* xdp descriptor similar to sk_buff */
+#ifdef SK_BUFF
+#undef SK_BUFF
+#endif
 #define SK_BUFF struct xdp_md
 
 #define htonl(d) __constant_htonl(d)
 #define htons(d) __constant_htons(d)
+#ifdef load_dword
+#undef load_dword
+#endif
 
 #define load_dword(data, b) (*(u64 *)((u8*)(data) + (b))) << 16
 
