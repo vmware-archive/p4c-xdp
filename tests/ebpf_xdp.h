@@ -23,69 +23,12 @@ limitations under the License.
 
 #include "ebpf_kernel.h"
 
-#ifndef ___constant_swab16
-#define ___constant_swab16(x) ((__u16)(             \
-    (((__u16)(x) & (__u16)0x00ffU) << 8) |          \
-    (((__u16)(x) & (__u16)0xff00U) >> 8)))
-#endif
-
-#ifndef ___constant_swab32
-#define ___constant_swab32(x) ((__u32)(             \
-    (((__u32)(x) & (__u32)0x000000ffUL) << 24) |        \
-    (((__u32)(x) & (__u32)0x0000ff00UL) <<  8) |        \
-    (((__u32)(x) & (__u32)0x00ff0000UL) >>  8) |        \
-    (((__u32)(x) & (__u32)0xff000000UL) >> 24)))
-#endif
-
-#ifndef ___constant_swab64
-#define ___constant_swab64(x) ((__u64)(             \
-    (((__u64)(x) & (__u64)0x00000000000000ffULL) << 56) |   \
-    (((__u64)(x) & (__u64)0x000000000000ff00ULL) << 40) |   \
-    (((__u64)(x) & (__u64)0x0000000000ff0000ULL) << 24) |   \
-    (((__u64)(x) & (__u64)0x00000000ff000000ULL) <<  8) |   \
-    (((__u64)(x) & (__u64)0x000000ff00000000ULL) >>  8) |   \
-    (((__u64)(x) & (__u64)0x0000ff0000000000ULL) >> 24) |   \
-    (((__u64)(x) & (__u64)0x00ff000000000000ULL) >> 40) |   \
-    (((__u64)(x) & (__u64)0xff00000000000000ULL) >> 56)))
-#endif
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#ifndef __constant_htonll
-#define __constant_htonll(x) (___constant_swab64((x)))
-#endif
-
-#ifndef __constant_ntohll
-#define __constant_ntohll(x) (___constant_swab64((x)))
-#endif
-
-#define __constant_htonl(x) (___constant_swab32((x)))
-#define __constant_ntohl(x) (___constant_swab32(x))
-#define __constant_htons(x) (___constant_swab16((x)))
-#define __constant_ntohs(x) ___constant_swab16((x))
-
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-# warning "I never tested BIG_ENDIAN machine!"
-#define __constant_htonll(x) (x)
-#define __constant_ntohll(X) (x)
-#define __constant_htonl(x) (x)
-#define __constant_ntohl(x) (x)
-#define __constant_htons(x) (x)
-#define __constant_ntohs(x) (x)
-#define htonl(d) __constant_htonl(d)
-#define htons(d) __constant_htons(d)
-#else
-# error "Fix your compiler's __BYTE_ORDER__?!"
-#endif
-/* END */
-
 /* xdp descriptor similar to sk_buff */
 #ifdef SK_BUFF
 #undef SK_BUFF
 #endif
 #define SK_BUFF struct xdp_md
 
-#define htonl(d) __constant_htonl(d)
-#define htons(d) __constant_htons(d)
 #ifdef load_dword
 #undef load_dword
 #endif

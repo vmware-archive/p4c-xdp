@@ -15,6 +15,7 @@
 
 import os
 import sys
+import time
 # path to the tools folder of the compiler
 sys.path.insert(0, os.path.dirname(
     os.path.abspath(__file__)) + '/../../tools')
@@ -26,6 +27,8 @@ from testutils import *
 
 
 class Target(EBPFKernelTarget):
+    EBPF_MAP_PATH = "/sys/fs/bpf/xdp/globals"
+
     def __init__(self, tmpdir, options, template, outputs):
         EBPFKernelTarget.__init__(self, tmpdir, options, template, outputs)
         # We use a different compiler, override the inherited default
@@ -58,40 +61,27 @@ class Target(EBPFKernelTarget):
         return run_timeout(self.options.verbose, args, TIMEOUT,
                            self.outputs, errmsg)
 
-    def _ip_load_cmd(self, bridge, proc, port_name):
+    def _load_filter(self, bridge, proc, port_name):
         # Load the specified eBPF object to "port_name" ingress and egress
-        # As a side-effect, this may create maps in /sys/fs/bpf/tc/globals
+        # As a side-effect, this may create maps in /sys/fs/bpf/
         cmd = ("ip link set dev %s xdp obj %s verb" %
                (port_name, self.template + ".o"))
         return bridge.ns_proc_write(proc, cmd)
 
-    def _run_in_namespace(self, bridge):
-        # Open a process in the new namespace
-        proc = bridge.ns_proc_open()
-        if not proc:
-            return FAILURE
-        # Get the command to load eBPF code to all the attached ports
+    def _attach_filters(self, bridge, proc):
+        # Get the command to load XDP code to all the attached ports
+        # We load XDP directly to the bridge ports instead of the edges as with tc
         if len(bridge.br_ports) > 0:
             for port in bridge.br_ports:
-                result = self._ip_load_cmd(bridge, proc, port)
+                result = self._load_filter(bridge, proc, port)
                 bridge.ns_proc_append(proc, "")
         else:
             # No ports attached (no pcap files), load to bridge instead
-            result = self._ip_load_cmd(bridge, proc, bridge.br_name)
+            result = self._load_filter(bridge, proc, bridge.br_name)
             bridge.ns_proc_append(proc, "")
         if result != SUCCESS:
             return result
-        # Check if eBPF maps have actually been created
-        result = bridge.ns_proc_write(proc,
-                                      "ls -1 /sys/fs/bpf/xdp/globals")
-        if result != SUCCESS:
-            return result
-        # Finally, append the actual runtime command to the process
-        result = bridge.ns_proc_append(proc, self._get_run_cmd())
-        if result != SUCCESS:
-            return result
-        # Execute the command queue and close the process, retrieve result
-        return bridge.ns_proc_close(proc)
+        return SUCCESS
 
     def run(self):
         # Root is necessary to load ebpf into the kernel
