@@ -1,13 +1,26 @@
 # Travis CI integration for p4c using Docker.
 
+branches:
+  only:
+  - master
+  - stable
+
 services:
   - docker
 
+cache:
+  directories:
+  - $HOME/.ccache
+
+env:
+  - CTEST_PARALLEL_LEVEL=4
+
 install:
-  - docker build -t p4c-xdp .
+  - sudo ../../tools/start_ccache
+  - sudo docker build --network ccache_network -t p4c-xdp --build-arg IMAGE_TYPE=test .
 
 script:
-  - docker run --privileged -w /home/p4c/build -e CTEST_PARALLEL_LEVEL p4c-xdp ctest -R xdp --output-on-failure --schedule-random
+  - sudo docker run --privileged -w /home/p4c/build -e CTEST_PARALLEL_LEVEL p4c-xdp ctest -R xdp --output-on-failure --schedule-random
   - ls $HOME/.ccache
 
 notifications:
