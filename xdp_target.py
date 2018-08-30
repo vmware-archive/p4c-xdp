@@ -82,18 +82,3 @@ class Target(EBPFKernelTarget):
         if result != SUCCESS:
             return result
         return SUCCESS
-
-    def run(self):
-        # Root is necessary to load ebpf into the kernel
-        require_root(self.outputs)
-        result = self._create_runtime()
-        if result != SUCCESS:
-            return result
-        # Create the namespace and the central testing bridge
-        bridge = self._create_bridge()
-        if not bridge:
-            return FAILURE
-        # Run the program in the generated namespace
-        result = self._run_in_namespace(bridge)
-        bridge.ns_del()
-        return result
