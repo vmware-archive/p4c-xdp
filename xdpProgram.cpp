@@ -79,7 +79,7 @@ bool XDPProgram::build() {
 }
 
 void XDPProgram::emitTypes(EBPF::CodeBuilder* builder) {
-    for (auto d : program->declarations) {
+    for (auto d : program->objects) {
         if (!d->is<IR::Type>()) continue;
 
         if (d->is<IR::IContainer>() || d->is<IR::Type_Extern>() ||

@@ -32,7 +32,7 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
 
     auto main = toplevel->getMain();
     if (main == nullptr) {
-        ::error("Could not locate top-level block; is there a %1% module?", IR::P4Program::main);
+        ::warning("Could not locate top-level block; is there a %1% module?", IR::P4Program::main);
         return;
     }
 
