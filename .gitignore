@@ -1,6 +1,10 @@
 lib/*.o
 tests/*.c
-tests/xdp*.h
+tests/*.h
 tests/*.o
 tests/bpfloader
 p4c-xdp
+*.aux
+*.log
+doc/lpc18/top.pdf
+doc/lpc18/top.out
