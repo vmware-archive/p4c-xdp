@@ -62,7 +62,7 @@ parser Parser(packet_in packet, out Headers hd) {
         packet.extract(hd.ipv4);
 	transition select(hd.ipv4.protocol) {
 		8w0x1: parse_icmp;
-		default: accept;
+		default: reject;
 	}
     }
 
@@ -83,7 +83,7 @@ control Deparser(in Headers hdrs, packet_out packet) {
     apply {
         packet.emit(hdrs.ethernet);
         packet.emit(hdrs.ipv4);
-	packet.emit(hdrs.icmp);
+        packet.emit(hdrs.icmp);
     }
 }
 
