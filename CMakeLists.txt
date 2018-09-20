@@ -46,8 +46,6 @@ add_custom_target(linkp4cxdp
   )
 
 set (XFAIL_TESTS_XDP
-  # Fails because of faulty syntax
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp.p4
   # Fails because of stack size
   ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp7.p4
   ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp12.p4
@@ -59,5 +57,5 @@ set(XDP_DRIVER "${CMAKE_CURRENT_SOURCE_DIR}/run-ebpf-test.py -t xdp")
 
 
 # This file will not run the full tests, but it will attempt to compile the p4 files down to C
-set (XDP_TEST_SUITES "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.p4")
+set (XDP_TEST_SUITES "${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp*.p4")
 p4c_add_tests("xdp" ${XDP_DRIVER} ${XDP_TEST_SUITES} "${XFAIL_TESTS_XDP}")
