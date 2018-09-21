@@ -2,4 +2,125 @@
 
 \subsection{Packet filters with eBPF}
 
+\cite{p4-ebpf-backend}
+
+The following is the architectural model of an eBPF packet filter
+expressed in P4.
+
+\begin{lstlisting}
+#include <core.p4>
+
+extern CounterArray {
+    CounterArray(bit<32> max_index, bool sparse);
+    void increment(in bit<32> index);
+}
+
+extern array_table {
+    array_table(bit<32> size);
+}
+
+extern hash_table {
+    hash_table(bit<32> size);
+}
+
+parser parse<H>(packet_in packet, out H headers);
+control filter<H>(inout H headers, out bool accept);
+
+package ebpfFilter<H>(parse<H> prs,
+                      filter<H> filt);
+\end{lstlisting}
+
+The following program shows a P4 program that counts the number of
+IPv4 packets that are processed.
+
+\begin{lstlisting}
+#include <core.p4>
+#include <ebpf_model.p4>
+
+typedef bit<48> EthernetAddress;
+typedef bit<32> IPv4Address;
+
+header Ethernet_h {
+    EthernetAddress dstAddr;
+    EthernetAddress srcAddr;
+    bit<16> etherType;
+}
+
+// IPv4 header without options
+header IPv4_h {
+    bit<4>       version;
+    bit<4>       ihl;
+    bit<8>       diffserv;
+    bit<16>      totalLen;
+    bit<16>      identification;
+    bit<3>       flags;
+    bit<13>      fragOffset;
+    bit<8>       ttl;
+    bit<8>       protocol;
+    bit<16>      hdrChecksum;
+    IPv4Address  srcAddr;
+    IPv4Address  dstAddr;
+}
+
+struct Headers_t {
+    Ethernet_h ethernet;
+    IPv4_h     ipv4;
+}
+
+parser prs(packet_in p, out Headers_t headers) {
+    state start {
+        p.extract(headers.ethernet);
+        transition select(headers.ethernet.etherType) {
+            16w0x800 : ip;
+            default : reject;
+        }
+    }
+
+    state ip {
+        p.extract(headers.ipv4);
+        transition accept;
+    }
+}
+
+control pipe(inout Headers_t headers, out bool pass) {
+    CounterArray(32w10, true) counters;
+
+    apply {
+        if (headers.ipv4.isValid()) {
+            counters.increment((bit<32>)headers.ipv4.dstAddr);
+            pass = true;
+        } else
+            pass = false;
+    }
+}
+
+ebpfFilter(prs(), pipe()) main;
+\end{lstlisting}
+
 \subsection{Packet forwarding with XDP}
+
+The following is the architectural model of an XDP-based packet switch
+expressed in P4.
+
+\cite{p4-xdp-backend}
+
+\begin{lstlisting}
+#include <ebpf_model.p4>
+enum xdp_action {
+  XDP_ABORTED,
+  XDP_DROP,
+  XDP_PASS,
+  XDP_TX
+}
+struct xdp_input { bit<32> input_port }
+
+struct xdp_output {
+  xdp_action output_action;
+  bit<32> output_port;
+}
+parser xdp_parse<H>(packet_in packet, out H headers);
+control xdp_switch<H>(inout H hdrs, in xdp_input i, out xdp_output o);
+control xdp_deparse<H>(in H headers, packet_out packet);
+
+package xdp<H>(xdp_parse<H> p, xdp_switch<H> s, xdp_deparse<H> d);
+\end{lstlisting}

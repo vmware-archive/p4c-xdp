@@ -1,12 +1,15 @@
 \documentclass[10pt]{article}
 
+\usepackage{color}
 \usepackage{caption}
 \usepackage{float}
 \usepackage{courier}
 \usepackage{xspace}
+\usepackage{url}
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage{mdframed}
+\usepackage[letterpaper, margin=1in]{geometry}
 
 \lstset{%basicstyle=\ttfamily
   language=C,
@@ -25,12 +28,12 @@ typedef,varbit,verify,void,%
 abstract,interface,class,virtual% used for IR
 }
 }
-\newcommand{\PFOUR}{P4\xspace}
+
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\keyword}[1]{{\bf \texttt{#1}}}
 \newcommand{\vonemodel}{\code{v1model}\xspace}
 
-\title{Linux network programming with \PFOUR}
+\title{Linux network programming with P4}
 \author{William Tu\\
   VMware Inc.\\
   \texttt{tuc@vmware.com}
@@ -49,7 +52,11 @@ abstract,interface,class,virtual% used for IR
 \maketitle
 
 \begin{abstract}
-  \PFOUR is a programming language for implementing network dataplanes.
+  P4 is a programming language for implementing network dataplanes.
+  eBPF is a safe virtual machine for executing sandboxed programs in
+  the Linux kernel.  This document describes how P4 programs can be
+  translated into eBPF programs.  We also discuss the limitations of
+  both technologies for packet processing.
 \end{abstract}
 
 \input{introduction}
@@ -58,5 +65,8 @@ abstract,interface,class,virtual% used for IR
 \input{testing}
 \input{results}
 \input{conclusions}
+
+\bibliography{top}
+\bibliographystyle{acm}
 
 \end{document}
