@@ -1,5 +1,7 @@
 # Travis CI integration for p4c using Docker.
 
+sudo: required
+
 services:
   - docker
 
