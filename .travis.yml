@@ -13,7 +13,7 @@ install:
   - sudo docker build -t p4c-xdp .
 
 script:
-  - sudo -E docker run --privileged -w /home/p4c/build -e CTEST_PARALLEL_LEVEL -e TRAVIS p4c-xdp ctest -R xdp --output-on-failure --schedule-random
+  - sudo docker run --privileged -w /home/p4c/build -e CTEST_PARALLEL_LEVEL p4c-xdp ctest -R xdp --output-on-failure --schedule-random
 
 notifications:
   email:
