@@ -76,11 +76,13 @@ Next create a soft link to the binary:
 cd ~/p4c/extensions/p4c-xdp
 ln -s ~/p4c/build/p4c-xdp p4c-xdp
 ```
-And a soft link to the xdp test target:
+And a soft link to the xdp test target and the test runtime:
 
 ```bash
 cd ~/p4c/extensions/p4c-xdp
 ln -s ~/p4c/backends/ebpf/targets/xdp_target.py xdp_target.py
+ln -s ~/p4c/backends/ebpf/run-ebpf-test.py run-ebpf-test.py
+
 ```
 
 Now you can run the p4c-xdp tests:

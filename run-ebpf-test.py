@@ -1,1 +1,0 @@
-../../backends/ebpf/run-ebpf-test.py
