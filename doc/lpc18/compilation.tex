@@ -1,11 +1,18 @@
 \section{Compiling P4 to eBPF}\label{sec:compilation}
 
-\subsection{Packet filters with eBPF}
+In this section we describe two open-source compilers that translate
+P4 programs in stylized C programs, that can in turn be compiled into
+eBPF programs using the LLVM eBPF back-end.
 
-\cite{p4-ebpf-backend}
+\subsection{Packet filters with eBPF}\label{sec:ebpf}
 
-The following is the architectural model of an eBPF packet filter
-expressed in P4.
+The eBPF back-end is part of the P4 reference compiler
+implementation~\cite{p4-ebpf-backend}.  This back-end targets a
+relatively simple packet filter architecture.  The following is the
+architectural model of an eBPF packet filter expressed in P4.  This
+architecture comprises a parser and a control block; the control block
+must produce a Boolean value which indicates whether the packet is
+accepted or not.
 
 \begin{lstlisting}
 #include <core.p4>
@@ -24,14 +31,14 @@ extern hash_table {
 }
 
 parser parse<H>(packet_in packet, out H headers);
-control filter<H>(inout H headers, out bool accept);
+control filter<H>(in H headers, out bool accept);
 
 package ebpfFilter<H>(parse<H> prs,
                       filter<H> filt);
 \end{lstlisting}
 
-The following program shows a P4 program that counts the number of
-IPv4 packets that are processed.
+The following listing shows a P4 program written for this architecture
+that counts the number of IPv4 packets that are processed.
 
 \begin{lstlisting}
 #include <core.p4>
@@ -40,14 +47,14 @@ IPv4 packets that are processed.
 typedef bit<48> EthernetAddress;
 typedef bit<32> IPv4Address;
 
-header Ethernet_h {
+header Ethernet {
     EthernetAddress dstAddr;
     EthernetAddress srcAddr;
     bit<16> etherType;
 }
 
 // IPv4 header without options
-header IPv4_h {
+header IPv4 {
     bit<4>       version;
     bit<4>       ihl;
     bit<8>       diffserv;
@@ -62,16 +69,16 @@ header IPv4_h {
     IPv4Address  dstAddr;
 }
 
-struct Headers_t {
-    Ethernet_h ethernet;
-    IPv4_h     ipv4;
+struct Headers {
+    Ethernet eth;
+    IPv4     ipv4;
 }
 
-parser prs(packet_in p, out Headers_t headers) {
+parser prs(packet_in p, out Headers headers) {
     state start {
-        p.extract(headers.ethernet);
-        transition select(headers.ethernet.etherType) {
-            16w0x800 : ip;
+        p.extract(headers.eth);
+        transition select(headers.eth.etherType) {
+            0x800 : ip;
             default : reject;
         }
     }
@@ -82,12 +89,12 @@ parser prs(packet_in p, out Headers_t headers) {
     }
 }
 
-control pipe(inout Headers_t headers, out bool pass) {
-    CounterArray(32w10, true) counters;
+control pipe(in Headers headers, out bool pass) {
+    CounterArray(32w10, true) ctr;
 
     apply {
         if (headers.ipv4.isValid()) {
-            counters.increment((bit<32>)headers.ipv4.dstAddr);
+            ctr.increment(headers.ipv4.dstAddr);
             pass = true;
         } else
             pass = false;
@@ -97,12 +104,42 @@ control pipe(inout Headers_t headers, out bool pass) {
 ebpfFilter(prs(), pipe()) main;
 \end{lstlisting}
 
-\subsection{Packet forwarding with XDP}
+Compilation to C is fairly straightforward.  For the entire P4 program
+a single C function is generated which returns a Boolean value.
+Table~\ref{table:translation} shows how each P4 construct is converted
+to a C construct.  Currently programs with parser loops are rejected,
+but a parser loop unrolling pass (under development) will allow such
+programs to be compiled.
 
-The following is the architectural model of an XDP-based packet switch
-expressed in P4.
+\begin{table}[h]
+  \footnotesize
+  \begin{center}
+  \begin{tabular}{|l|p{5cm}|} \hline
+    \textbf{P4 construct} & \textbf{C Translation} \\ \hline \hline
+    \texttt{header} & \texttt{struct} with an additional \texttt{valid} bit \\ \hline
+    \texttt{struct} & \texttt{struct} \\ \hline
+    parser state    & block statement \\ \hline
+    state transition & \texttt{goto} statement \\ \hline
+    \texttt{extract} call & load/shift/mask data from packet buffer \\ \hline
+    table & 2 eBPF maps --- one for actions, one for the default action \\ \hline
+    table key type & \texttt{struct} type \\ \hline
+    table \texttt{actions} & tagged \texttt{union} with action parameters \\ \hline
+    \texttt{action} arguments & \texttt{struct} \\ \hline
+    \texttt{action} body & block statement \\ \hline
+    table \texttt{apply} & lookup in eBFP map; \texttt{switch} statement with all actions \\ \hline
+    counters & eBPF map modified by the dataplane directly \\ \hline
+  \end{tabular}
+  \end{center}
+  \caption{Compiling P4 constructs to C.}\label{table:translation}
+\end{table}
 
-\cite{p4-xdp-backend}
+\subsection{Packet forwarding with XDP}\label{sec:xdp}
+
+A second P4 to C compiler is available as an open-source
+project:~\cite{p4-xdp-backend}.  This compiler extends the eBPF
+compiler from Section~\ref{sec:ebpf}.  This compiler can target either
+a packet filter, or a packet switch.  The following shows the XDP
+architectural model targeted by this compiler.
 
 \begin{lstlisting}
 #include <ebpf_model.p4>
@@ -118,9 +155,16 @@ struct xdp_output {
   xdp_action output_action;
   bit<32> output_port;
 }
-parser xdp_parse<H>(packet_in packet, out H headers);
-control xdp_switch<H>(inout H hdrs, in xdp_input i, out xdp_output o);
-control xdp_deparse<H>(in H headers, packet_out packet);
 
-package xdp<H>(xdp_parse<H> p, xdp_switch<H> s, xdp_deparse<H> d);
+parser xdp_parse<H>(packet_in packet,
+                    out H headers);
+control xdp_switch<H>(inout H hdrs,
+                      in xdp_input i,
+                      out xdp_output o);
+control xdp_deparse<H>(in H headers,
+                       packet_out packet);
+
+package xdp<H>(xdp_parse<H> p,
+               xdp_switch<H> s,
+               xdp_deparse<H> d);
 \end{lstlisting}

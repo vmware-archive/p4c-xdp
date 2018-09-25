@@ -2,10 +2,9 @@
 
 \subsection{P4}
 
-This section is adapted from~\cite{budiu-osr17}.
-P4 is a relatively simple, statically-typed programming language, with
-a syntax based on C, designed to express transformations of network
-packets.  q
+(This section is adapted from~\cite{budiu-osr17}.)  P4 is a relatively
+simple, statically-typed programming language, with a syntax based on
+C, designed to express transformations of network packets.
 
 The core abstractions provided by the P4 language are listed in
 Figure~\ref{fig:abstractions}.  P4 provides no support for pointers,
@@ -66,15 +65,14 @@ innerleftmargin=.3cm,rightmargin=.3cm,backgroundcolor=grey}
 
 \subsection{P4 Architectures}
 
-P4 allows programs to execute on arbitrary targets.  Targets differ in
-the kind of processing they perform, (e.g., a switch has to forward
-packets, a network card has to receive or transmit packets, and a
-firewall has to block or allow packets), and also in their custom
-capabilities (e.g., ASICs may provide associative TCAM memories or
-custom checksum computation hardware units, while an FPGA switch may
-allow users to implement custom queueing disciplines).  P4
-embraces this diversity of targets and provides some language
-mechanisms to express it.
+P4 allows programs to execute on arbitrary \emph{targets}.  Targets
+differ in their functionality, (e.g., a switch has to forward packets,
+a network card has to receive or transmit packets, and a firewall has
+to block or allow packets), and also in their custom capabilities
+(e.g., ASICs may provide associative TCAM memories or custom checksum
+computation hardware units, while an FPGA switch may allow users to
+implement custom queueing disciplines).  P4 embraces this diversity of
+targets and provides some language mechanisms to express it.
 
 \begin{figure}[h]
   \centerline{\includegraphics[width=.5\textwidth,clip,trim=1in 0.9in
@@ -95,29 +93,28 @@ fixed-function blocks.  These interfaces are target-specific.  Note
 that the fixed-function part can be software, hardware, firmware, or a
 mixture.
 
-A P4 architecture file is expected to contain declarations of
-types, constants, and a description of the control and parser blocks
-that the users need to implement.  Here is a possible contents of the
-an architecture file:
+A P4 architecture file is expected to contain declarations of types,
+constants, and a description of the control and parser blocks that the
+users need to implement.  Section~\ref{sec:ebpf} contains an example
+P4 architecture description file.
 
 \subsection{eBPF for network processing}
 
-Adapted from~\cite{p4-ebpf-backend}.
-
-eBPF is a acronym that stands for Extended Berkeley Packet Filters. In
-essence eBPF is a low-level programming language (similar to machine
-code); eBPF programs are traditionally executed by a virtual machine
-that resides in the Linux kernel. eBPF programs can be inserted and
-removed from a live kernel using dynamic code instrumentation. The
-main feature of eBPF programs is their static safety: prior to
-execution all eBPF programs have to be validated as being safe, and
-unsafe programs cannot be executed. A safe program provably cannot
-compromise the machine it is running on:
-
+(This section is adapted from~\cite{p4-ebpf-backend}.)  eBPF is a
+acronym that stands for Extended Berkeley Packet Filters. In essence
+eBPF is a low-level programming language (similar to machine code);
+eBPF programs are traditionally executed by a virtual machine that
+resides in the Linux kernel. eBPF programs can be inserted and removed
+from a live kernel using dynamic code instrumentation. The main
+feature of eBPF programs is their static safety: prior to execution
+all eBPF programs have to be validated as being safe, and unsafe
+programs cannot be executed. A safe program provably cannot compromise
+the machine it is running on:
 \begin{itemize}
-\item it can only access a restricted memory region (on the local stack)
+\item it can only access a restricted memory region (on the local
+  stack),
 \item it can run only for a limited amount of time; during execution
-  it cannot block, sleep or take any locks
+  it cannot block, sleep or take any locks,
 \item it cannot use any kernel resources with the exception of a
   limited set of kernel services which have been specifically
   whitelisted, including operations to manipulate tables (described
@@ -130,9 +127,9 @@ eBPF programs are inserted into the kernel using hooks. There are
 several types of hooks available:
 
 \begin{itemize}
-\item any function entry point in the kernel can act as a hook;
-  attaching an eBPF program to a function foo() will cause the eBPF
-  program to execute every time some kernel thread executes foo().
+\item function entry points can act as hooks; attaching an eBPF
+  program to a function foo() will cause the eBPF program to execute
+  every time some kernel thread executes foo().
 
 \item eBPF programs can also be attached using the Linux Traffic
   Control (TC) subsystem, in the network packet processing
@@ -143,25 +140,21 @@ several types of hooks available:
   that flow through the socket/interface.
 \end{itemize}
 
-eBPF programs can be used for many purposes; the main use cases are
-dynamic tracing and monitoring, and packet processing.  We are mostly
-interested in the latter use case in this document.
-
-\subsubsection{eBPF Tables}
+\subsubsection{eBPF Maps}
 
 The eBPF runtime exposes a bi-directional kernel-userspace data
-communication channel, called tables (also called maps in some eBPF
-documents and code samples). eBPF tables are essentially key-value
-stores, where keys and values are arbitrary fixed-size bitstrings. The
-key width, value width and table size (maximum number of entries that
-can be stored) are declared statically, at table creation time.
+communication channel, called maps.  eBPF maps are essentially
+key-value tables, where keys and values are arbitrary fixed-size
+bitstrings. The key width, value width and the maximum number of
+entries that can be stored in a map are declared statically, at the
+map creation time.
 
-In user-space tables handles are exposed as file descriptors. Both
-user- and kernel-space programs can manipulate tables, by inserting,
-deleting, looking up, modifying, and enumerating entries in a table.
+In user-space maps are are exposed as file descriptors. Both user- and
+kernel-space programs can manipulate maps by inserting, deleting,
+looking up, modifying, and enumerating entries.
 
 In kernel space the keys and values are exposed as pointers to the raw
-underlying data stored in the table, whereas in user-space the
+underlying data stored in the map, whereas in user-space the
 pointers point to copies of the data.
 
 \subsubsection{Concurrency}
@@ -171,28 +164,29 @@ model. An eBPF program is triggered by a kernel hook; multiple
 instances of the same kernel hook can be running simultaneously on
 different cores.
 
-Each table however has a single instances across all the cores. A
-single table may be accessed simultaneously by multiple instances of
-the same eBPF program running as separate kernel threads on different
-cores. eBPF tables are native kernel objects, and access to the table
-contents is protected using the kernel RCU mechanism. This makes
-access to table entries safe under concurrent execution; for example,
-the memory associated to a value cannot be accidentally freed while an
-eBPF program holds a pointer to the respective value. However,
-accessing tables is prone to data races; since eBPF programs cannot
-use locks, some of these races often cannot be avoided.
-
-eBPF and the associated tools are also under active development, and
-new capabilities are added frequently.
+A map may be accessed simultaneously by multiple instances of the same
+eBPF program running as separate kernel threads on different cores.
+eBPF maps are native kernel objects, and access to the map contents is
+protected using the kernel RCU mechanism. This makes access to table
+entries safe under concurrent execution; for example, the memory
+associated to a value cannot be accidentally freed while an eBPF
+program holds a pointer to the respective value.  However, accessing
+maps is prone to data races; since eBPF programs cannot use locks,
+some of these races often cannot be avoided.
 
 \subsection{XDP: eXpress data path}
 
+TODO.
+
 \subsection{Comparison of P4 and eBPF}
 
-Data adapted from~\cite{minao-hspr18}.  See Tables~\ref{table:compare}
-and~\ref{table:limitations}.
+A very thorough evaluation of eBPF for writing networking programs can
+be found in~\cite{minao-hspr18}.  P4 and eBPF share many features.
+Table~\ref{table:compare} shows a comparison of the high-level
+features of both languages.
 
-\begin{table}[h]
+\begin{table*}[h]
+  \footnotesize
   \begin{center}
   \begin{tabular}{|l|l|l|} \hline
     \textbf{Feature} & \textbf{P4} & \textbf{eBPF} \\ \hline \hline
@@ -210,9 +204,22 @@ and~\ref{table:limitations}.
   \end{tabular}
   \caption{Feature comparison between P4 and eBPF.}\label{table:compare}
   \end{center}
-\end{table}
+\end{table*}
 
-\begin{table}[h]
+Table~\ref{table:limitations} compares the limitations of P4 and eBPF.
+P4 was designed as a language for programming switching devices,
+working mostly at levels L2 and L3 of the networking stack; while P4
+is finding a use for programming network end-points, e.g., smart NICs,
+some end-point functionality cannot be naturally expressed in P4
+(e.g., TSO, encryption, deep packet inspection).
+
+Many limitations are shared with eBPF.  We conclude that eBPF is a
+suitable language for performing relatively simple packet
+filtering/rewriting.  Neither language is good enough to implement a
+full end-point networking stack.
+
+\begin{table*}[h]
+  \footnotesize
   \begin{center}
   \begin{tabular}{|l|l|l|} \hline
     \textbf{Limitation} & \textbf{P4} & \textbf{eBPF} \\ \hline \hline
@@ -227,8 +234,10 @@ and~\ref{table:limitations}.
     Data structures & No & No \\ \hline
     Payload processing & No & No \\ \hline
     State & Registers/counters & Maps \\ \hline
-    Linear scans & No & No \\ \hline
-    Network levels & L2, L3 & L2, L3 \\ \hline
+    Iterating over packet payload & No & No \\ \hline
+    Wildcard matches & Yes & No \\ \hline
+    Map writes & Control-plane only & Data-plane and control-plane \\ \hline
+    Iteration over map values & Control-plane only & Control-plane only \\ \hline
     Synchronization & No & No \\
     (data/data, data/control) & & \\ \hline
     Execution model & Event-driven & Event-driven \\ \hline
@@ -239,8 +248,4 @@ and~\ref{table:limitations}.
   \end{tabular}
   \caption{Limitations comparison between P4 and eBPF.}\label{table:limitations}
   \end{center}
-\end{table}
-
-P4: suitable for switching, not for end-points.
-eBPF: simple packet filtering/rewriting.
-Neither language is good enough to implement a full end-point networking stack.
+\end{table*}
