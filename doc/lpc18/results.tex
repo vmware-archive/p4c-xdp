@@ -1,1 +1,22 @@
 \section{Experimental results}\label{sec:results}
+\subsection{Test-bed}
+All of our performance results use a hardware testbed that consists of
+two Intel Xeon E5 2440 servers, each with an Intel 10GbE X540-AT2 dual
+port NIC, with the two ports of the Intel NIC on one server connected
+to the two ports on the identical NIC on the other server.  We
+installed p4c-xdp on one server, the {\em target server}, and
+attached the XDP program to the port that receives the packets
+
+The other server, the {\em source server}, generates packets
+at the maximum 10~Gbps packet rate of 14.88~Mpps using the DPDK-based
+TRex~\cite{trex} traffic generator.  The source server sends minimum
+length 64-byte packets in various traffic patterns to one port of the
+target server, and receives the forwarded packets on the other port.
+At the target server, every packet received goes through the
+classifier.  We measure the forwarding speed to evaluate the
+effectiveness of the classifier.  For all the experiments, we use two
+cores and install 10,000 OpenFlow rules into OVS, with each rule's
+matching field size range from 32 bytes to 240 bytes.
+
+\subsection{Performance}
+

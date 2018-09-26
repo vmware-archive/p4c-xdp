@@ -176,7 +176,21 @@ some of these races often cannot be avoided.
 
 \subsection{XDP: eXpress data path}
 
-TODO.
+The core idea behind XDP is optimizing cases where relatively simple
+decisions can be made about incoming packets. It allows the loading
+of a BPF program into the kernel; that program gets an opportunity
+to inspect packets before they enter the networking stack itself.
+The initial use case for XDP was to enable the quick dropping of
+unwanted packets, but it has since expanded to cover simple routing
+decisions and packet modifications; see this in-progress documentation
+for some more information on how it works.
+
+The benefit of XDP is that the system can make quick decisions
+about packets without the need to involve the rest of the networking
+code. Performance could possibly be further improved in some settings
+by loading XDP programs directly into the network interface,
+perhaps after a translation step.
+
 
 \subsection{Comparison of P4 and eBPF}
 
