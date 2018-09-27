@@ -24,7 +24,6 @@ ENV P4C_EBPF_DEPS libpcap-dev \
              llvm \
              llvm-dev \
              clang \
-             iproute2 \
              net-tools
 
 ENV P4C_PIP_PACKAGES tenjin \
@@ -76,6 +75,15 @@ RUN cd /home/p4c/ && \
     make -j `getconf _NPROCESSORS_ONLN` && \
     make install && \
     cd ..
+
+# iproute2-next
+RUN cd /tmp && \
+    git clone -b v4.18.0 https://git.kernel.org/pub/scm/network/iproute2/iproute2.git && \
+    cd /tmp/iproute2 && git checkout -b v418 && \
+    ./configure && \
+    make -j `getconf _NPROCESSORS_ONLN` && \
+    make install
+# iproute2-end
 
 # p4c-xdp setup begin
 RUN apt-get install -y sudo
