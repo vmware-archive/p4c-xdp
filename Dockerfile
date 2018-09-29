@@ -46,6 +46,9 @@ RUN apt-get install -y --no-install-recommends $P4C_EBPF_DEPS
 RUN pip install wheel
 RUN pip install $P4C_PIP_PACKAGES
 RUN apt-get install -y --no-install-recommends $PROTOBUF_DEPS
+RUN sudo modprobe sch_netem
+RUN sudo modprobe sch_htb
+RUN sudo modprobe sch_ingress
 
 # Install protobuf
 RUN git clone https://github.com/google/protobuf.git && \
