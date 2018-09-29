@@ -15,7 +15,7 @@ install:
   - sudo docker build -t p4c-xdp .
 
 script:
-  - sudo docker run --privileged -w /home/p4c/build --cap-add ALL -v /lib/modules:/lib/modules -e CTEST_PARALLEL_LEVEL p4c-xdp /bin/bash -c "sudo modprobe sch_netem && sudo modprobe sch_htb && sudo modprobe sch_ingress && ctest -R xdp --output-on-failure --schedule-random"
+  - sudo docker run --privileged -w /home/p4c/build --cap-add ALL -v /lib/modules:/lib/modules -e CTEST_PARALLEL_LEVEL p4c-xdp ctest -R xdp --output-on-failure --schedule-random
 
 notifications:
   email:
