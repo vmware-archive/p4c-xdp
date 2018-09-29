@@ -9,11 +9,10 @@ env:
   - CTEST_PARALLEL_LEVEL=4
 
 install:
-  - sudo modprobe sch_netem
   - sudo docker build -t p4c-xdp .
 
 script:
-  - sudo docker run --privileged -w /home/p4c/build -e CTEST_PARALLEL_LEVEL p4c-xdp sudo ctest -R xdp --output-on-failure --schedule-random
+  - sudo docker run --privileged -w /home/p4c/build -e CTEST_PARALLEL_LEVEL p4c-xdp sudo ctest -R xdp --verbose --schedule-random
 
 notifications:
   email:

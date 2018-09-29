@@ -59,3 +59,5 @@ set(XDP_DRIVER "${CMAKE_CURRENT_SOURCE_DIR}/run-ebpf-test.py -t xdp")
 # This file will not run the full tests, but it will attempt to compile the p4 files down to C
 set (XDP_TEST_SUITES "${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp*.p4")
 p4c_add_tests("xdp" ${XDP_DRIVER} ${XDP_TEST_SUITES} "${XFAIL_TESTS_XDP}")
+p4c_add_test_with_args ("xdp" ${XDP_DRIVER} FALSE "extensions/p4c-xdp/tests/verbose.p4" "extensions/p4c-xdp/tests/verbose.p4" "-v" "")
+

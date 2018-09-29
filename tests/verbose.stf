@@ -1,0 +1,15 @@
+# bit<32> A bit<32> B
+# In the output B = (A + 10)
+
+
+packet 0 00000000 00000000 00000000 00000000 00000000 ABCDEF01
+
+
+#       | ethernet header              | IPv4 header                                     | TCP header
+#        dstAddr      srcAddr      type| VL   len  id        ttl   csum src      dst     | sp   dp  len                         csum
+packet 0 001b17000130 b88198b7aeb7 0800 45 00 0034 4a6f 4000 40 06 5392 0a019845 3212c86a cf2c 01bb d0fa 585c4ccc b2ac8010 0353 c314 00000101 080a0192 463911a0 c06f
+expect 0 001b17000130 b88198b7aeb7 0800 45 00 0034 4a6f 4000 40 06 5392 0a019845 3212c86a cf2c 01bbd0fa 585c4ccc b2ac8010 0353c314 00000101 080a0192 463911a0 c06f
+
+packet 0 00000000 00000000 00000000 00000000 00000000 00010000
+
+packet 0 00000000 00000000 00000000 00000000 00000000 000110000
