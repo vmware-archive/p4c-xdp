@@ -24,6 +24,7 @@ ENV P4C_EBPF_DEPS libpcap-dev \
              llvm \
              llvm-dev \
              clang \
+             iproute2 \
              net-tools
 
 ENV P4C_PIP_PACKAGES tenjin \
@@ -46,7 +47,6 @@ RUN apt-get install -y --no-install-recommends $P4C_EBPF_DEPS
 RUN pip install wheel
 RUN pip install $P4C_PIP_PACKAGES
 RUN apt-get install -y --no-install-recommends $PROTOBUF_DEPS
-RUN apt-get install -y kmod
 
 # Install protobuf
 RUN git clone https://github.com/google/protobuf.git && \
@@ -58,7 +58,7 @@ RUN git clone https://github.com/google/protobuf.git && \
 
 
 # p4c download begin
-RUN git clone https://github.com/fruffy/p4c.git && \
+RUN git clone https://github.com/p4lang/p4c.git && \
     cd p4c && \
     git submodule update --init --recursive && \
     git submodule update --recursive && \
@@ -76,15 +76,6 @@ RUN cd /home/p4c/ && \
     make -j `getconf _NPROCESSORS_ONLN` && \
     make install && \
     cd ..
-
-# iproute2-next
-RUN cd /tmp && \
-    git clone -b v4.18.0 https://git.kernel.org/pub/scm/network/iproute2/iproute2.git && \
-    cd /tmp/iproute2 && git checkout -b v418 && \
-    ./configure && \
-    make -j `getconf _NPROCESSORS_ONLN` && \
-    make install
-# iproute2-end
 
 # p4c-xdp setup begin
 RUN apt-get install -y sudo
