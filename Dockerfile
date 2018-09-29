@@ -57,7 +57,7 @@ RUN git clone https://github.com/google/protobuf.git && \
 
 
 # p4c download begin
-RUN git clone https://github.com/p4lang/p4c.git && \
+RUN git clone https://github.com/fruffy/p4c.git && \
     cd p4c && \
     git submodule update --init --recursive && \
     git submodule update --recursive && \
