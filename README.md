@@ -9,7 +9,7 @@ data plane of a programmable network elements, including network interface
 cards, appliances, and virtual switches.  With P4, programmers focus on
 defining the protocol parsing, matching, and action executions, instead
 of the platform-specific language or implementation details.
- 
+
 XDP is designed for users who want programmability as well as performance.
 XDP allows users to write a C-like  packet processing program and loads into
 the device driver's receiving queue.  When the device observes an incoming
@@ -38,7 +38,7 @@ Please see Dockerfile. There is also a public docker image available as u9012063
 $ docker pull u9012063/p4xdp
 ```
 will pull the latest image. However, the XDP BPF code has dependency on your kernel version.
-Currently for some complicated cases we require kernel >= 4.10.0-rc7.  So a vagrant box is 
+Currently for some complicated cases we require kernel >= 4.10.0-rc7.  So a vagrant box is
 also provided with kernel 4.10.0-rc8.
 ```bash
 $ vagrant up
@@ -76,11 +76,19 @@ Next create a soft link to the binary:
 cd ~/p4c/extensions/p4c-xdp
 ln -s ~/p4c/build/p4c-xdp p4c-xdp
 ```
+And a soft link to the xdp test target and the test runtime:
+
+```bash
+cd ~/p4c/extensions/p4c-xdp
+ln -s ~/p4c/backends/ebpf/targets/xdp_target.py xdp_target.py
+ln -s ~/p4c/backends/ebpf/run-ebpf-test.py run-ebpf-test.py
+
+```
 
 Now you can run the p4c-xdp tests:
 ```
-cd tests
-make
+cd ~/p4c/build/
+make check-xdp
 ```
 
 This will check your llvm and clang version,
@@ -92,7 +100,7 @@ XDP is a packet processing mechanism implemented within the device driver with e
 Currently to compile a P4 to C program, uses
 ```bash
 	# ./p4c-xdp --target xdp -o <output_c_file> <input_p4>
-	./p4c-xdp --target xdp -o /tmp/xdp1.c xdp1.p4 
+	./p4c-xdp --target xdp -o /tmp/xdp1.c xdp1.p4
 ```
 then you need to compile the xdp1.c to eBPF bytecode, xdp1.o, then loaded
 into your driver. To compile a single .c file
