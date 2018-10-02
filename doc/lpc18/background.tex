@@ -175,8 +175,25 @@ maps is prone to data races; since eBPF programs cannot use locks,
 some of these races often cannot be avoided.
 
 \subsection{XDP: eXpress data path}
+An XDP program is similar to other form of eBPF programs, but it attaches
+to the very lower networking stack, i.e., the driver layer.
+The core idea behind XDP is optimizing cases where relatively simple
+decisions can be made about incoming packets. It allows the loading
+of a eBPF program into the kernel; that program gets an opportunity
+to inspect packets at very low layer before they enter the networking
+stack itself. With driver's support, an XDP program can inspect a packet
+right after the DMA engine places the packet buffer into main memory.
+The initial use case for XDP was to enable the quick dropping of
+unwanted packets, but it has been expanded to cover more complicated
+packet modifications and packet forwarding.
 
-TODO.
+Similar to other eBPF hook point, XDP program can access maps, and 
+it can return one of the following actions;
+1) XDP\_DROP simply drop the packet, 2) XDP\_TX results in bouncing
+the received packet back out to the same port itt arrived on,
+3) XDP\_PASS means the XDP program decides to pass the packet to
+the normal network stack, and 4) XDP\_REDIRECT forwards the packet
+to another network device.
 
 \subsection{Comparison of P4 and eBPF}
 
