@@ -34,7 +34,7 @@ class Target(EBPFKernelTarget):
         # We use a different compiler, override the inherited default
         self.compiler = self.options.compilerdir + "/build/p4c-xdp"
 
-    def create_filter(self):
+    def compile_dataplane(self):
         # Use clang to compile the generated C code to a LLVM IR
         args = "make "
         # target makefile
