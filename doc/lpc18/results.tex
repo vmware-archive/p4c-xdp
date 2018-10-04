@@ -1,35 +1,166 @@
 \section{Experimental results}\label{sec:results}
-
 \subsection{Testbed}
 All of our performance results use a hardware testbed that consists of
-two Intel Xeon E5 2440 servers, each with an Intel 10GbE X540-AT2 dual
+two Intel Xeon E5 2440 v2 1.9GHz servers, each with 1 CPU socket installed,
+8 physical cores with hyperthreading enabled. 
+Each target server has an Intel 10GbE X540-AT2 dual
 port NIC, with the two ports of the Intel NIC on one server connected
-to the two ports on the identical NIC on the other server.i
+to the two ports on the identical NIC on the other server.
 We installed p4c-xdp on one server, the {\em target server}, and
 attached the XDP program to the port that receives the packets
 The other server, the {\em source server}, generates packets
 at the maximum 10~Gbps packet rate of 14.88~Mpps using the DPDK-based
 TRex~\cite{trex} traffic generator.  The source server sends minimum
-length 64-byte packets in various traffic patterns to one port of the
-target server, and receives the forwarded packets on the other port.
-At the target server, every packet received goes through the
-pipeline specified in P4.
-We measure the forwarding speed to evaluate the effectiveness of the
-generated XDP program.
+length 64-byte packets in {\em single} UDP flow to one port of the
+target server, and receives the forwarded packets on the same port.
+At the target server, we use only one core to process all packets and
+every packet received goes through the pipeline specified in P4.
 
-\subsection{Performance}
-We measured the sample programs under the tests directory.
+We use sample p4 programs under the tests directory and the following
+metrics to understand the performance impact of the P4-generated XDP
+program:
+\begin{itemize}
+\item Packet Processing Rate (Mpps): Once XDP program finishes processing
+the packet, it returns one of the actions mentioned in section~\ref{background}.
+We made a small modification to all p4 program to always return XDP\_DROP,
+so that we can count the number of packets being drop per second as a
+indication of how fast the XDP can process.
+\item CPU Utilization: Every packets processed by XDP program is run
+under the per-core software IRQ daemon, named ksoftirqd/<core id>.
+All packets are processed by only one core with one kthread, the
+ksoftirqd, and we measure the CPU utilization of the ksoftirqd on
+the core.
+\item Number of BPF instructions verified: For each program, we list
+the its max complexity; the total number of BPF instructions the
+verifier has to go through, as an indication of how complicated the
+program is.
+\end{itemize}
+
+The target server is running Linux kernel 4.19-rc5 and for all our
+tests, the BPF JIT (Just-In-Time) compiler is enabled and JIT harden
+is disabled. All programs are compiled with clang 3.8 with llvm 5.0.
+For For each test program, we use the following
+command from iproute2 tool to load it into kernel:
+%\begin{verbatim}
+\texttt{ip link set dev eth0 xdp obj xdp1.o verb}.
+%\end{verbatim}
+
+The Intel 10GbE X540 NIC is running ixgbe driver with 16 RX queues
+set-up. Since the source server is sending single UDP flow, packets
+always arrive at a single ring ID.  As a result, we collect the number
+of packets being dropped at this ring.
+
+\subsection{Results}
+To compare the performance, we first started by manually writing two
+XDP programs. The first one, SimpleDrop, does nothing but drop all packets by
+returning XDP\_DROP. The second program also does nothing but returns
+XDP\_TX, which forwards the packet to the receiving port.  Both programs
+consists of only two BPF instructions.
+
+{\small
+\begin{verbatim}
+    /* SimpleDrop */
+    0: (b7) r0 = 1 // XDP_DROP
+    1: (95) exit
+
+    /* SimpleTX */
+    0: (b7) r0 = 3 // XDP_TX
+    1: (95) exit
+\end{verbatim}
+}
+Then we attached the following P4 programs to the device receiving the
+rate of 14.88~Mpps to evaluate the overhead introduce by the P4C-XDP
+compiler.
+\begin{itemize}
+\item xdp1.p4: Parse Ethernet/IPv4 header, deparse it, and drop.
+\item xdp3.p4: Parse Ethernet/IPv4 header, lookup an mac address
+table, deparse it, and drop.
+\item xdp6.p4: Parse Ethernet/IPv4 header, lookup and get a new TTL value
+from eBPF map, set to IPv4 header, deparse it, and drop.
+\item xdp7.p4: Parse Ethernet/IPv4/UDP header, write a pre-defined source port
+and source IP, recalculate checksum, deparse, and drop.
+\item xdp11.p4: Parse Ethernet/IPv4 header, swap src/dst mac address,
+deparse it, and send back to the same port (XDP\_TX).
+\item xdp15.p4: Parse Ethernet header, insert a customized 8-byte header,
+deparse it, and send back to the same port (XDP\_TX).
+\end{itemize}
 
 \begin{table}
 \centering
 \small
-\begin{tabular}{lll}
-  \underline{P4 program} & \underline{Description} & \underline{Performance} \\
-  xdp1.p4 & parse L2/L3, drop if non-IP packet &  Mpps \\
-  xdp2.p4 & parse L2/L3/L4, drop if non-IP packet &  Mpps \\
-  xdp3.p4 & parse L2/L3, lookup &  Mpps \\
+\begin{tabular}{llll}
+  \underline{P4 program} & \underline{CPU Util.} & \underline{Mpps} & \underline{Insns./Stack}\\
+  SimpleDROP & 75\% & 14.4 & 2/0 \\
+  SimpleTX & 100\% & 7.2 & 2/0 \\
+  xdp1.p4 &  100\% &  8.1 & 277/256 \\
+  xdp3.p4 &  100\% &  7.1 & 326/256 \\
+  xdp6.p4 &  100\% &  2.5 & 335/272 \\
+  xdp7.p4 &  100\% &  5.7 & 5821/336 \\
+  xdp11.p4 &  100\% &  4.7  & 335/216 \\
+  xdp15.p4 &  100\% &  5.5 & 96/56\\
 \end{tabular}
-\caption{\footnotesize performance of XDP program generated by
+\caption{\footnotesize Performance of XDP program generated by
   p4c-xdp compiler.}
-\label{table:treebuild}
+\label{tab:perf}
 \end{table}
+
+As shown in Table~\ref{tab:perf}, the xdp1.p4 shows the baseline overhead
+introduced by adding the parser and deparser, dropping the rate from 14.4~Mpps to
+8.1~Mpps. The xdp3.p4 drops another million packet per second due to
+calling the eBPF map lookup function to do a lookup, the lookup is designed
+to always return NULL so no value from the map is accessed.
+The xdp6.p4 shows significant overhead because it is designed to lookup
+a table, find a new TTL value, and write to the IPv4 header. 
+Surprisingly, the xdp7.p4 does extra parsing to the UDP header and
+checksum recalculation, but the overhead is moderate due to not accessing
+the table.
+
+Finally, the xdp11.p4 and xdp15.p4 shows the transmit (XDP\_TX) performance.
+Compared with xdp11 and xdp15, the xdp15.p4 involves the extra bpf\_adjust\_head helper
+function to reset the pointer for extra bytes.  
+Interestingly, it does not incur much over head because there is
+already a reserved space in front of every XDP packet frame.
+
+\subsection{Microbenchmark}
+To further understand the performance overhead of programs generated by p4c-xdp,
+we started by breakdown the CPU utilization using Linux perf tool on
+the process ID of the ksoftirqd which shows 100\%, using command line:
+\texttt{perf record -p <pid of ksoftirqd> sleep 10}.
+Below shows the result of xdp1.p4:
+{\scriptsize
+\begin{verbatim}
+83.19% ksoftirqd/3 [kernel.kallsyms] [k] ___bpf_prog_run
+ 8.14% ksoftirqd/3 [ixgbe]           [k] ixgbe_clean_rx_irq
+ 4.82% ksoftirqd/3 [kernel.kallsyms] [k] nmi
+ 1.48% ksoftirqd/3 [kernel.kallsyms] [k] bpf_xdp_adjust_head
+ 1.07% ksoftirqd/3 [kernel.kallsyms] [k] __rcu_read_unlock
+ 0.40% ksoftirqd/3 [ixgbe]           [k] ixgbe_alloc_rx_buffers
+\end{verbatim}
+}
+We confirmed that most of the CPU cycles are spent on executing the
+XDP program, \_\_\_bpf\_prog\_run, so we started investigate the
+eBPF C code of xdp1.p4.
+We manually {\emph comments out} the entire deparser portion of the C code, so that
+we can identify which stage of our XDP program (parser, lookup, and deparser) incurs
+the performance overhead.
+
+\begin{table}
+\centering
+\small
+\begin{tabular}{llll}
+  \underline{P4 program} & \underline{CPU Util.} & \underline{Mpps} & \underline{Insns./Stack}\\
+  xdp1.p4 &  77\% &  14.8 & 26/0 \\
+  xdp3.p4 &  100\% &  13 & 100/16 \\
+  xdp6.p4 &  100\% &  12 & 98/40 \\
+\end{tabular}
+\caption{\footnotesize Performance of XDP program without deparser.}
+\label{tab:perf2}
+\end{table}
+
+As shown in Table~\ref{tab:perf2}, the performance increases significantly.
+By investigating our p4c-xdp compiler implementation and the generated C
+code, we figured out that the deparser is unconditionally writing back
+the entire packet content even when the P4 program does not modify any.
+In addition, the deparser incurs lots of byte-order translation, e.g.,
+htonl, ntohl. This could be avoided by always using network byte-order
+in P4 and XDP. We leave this for future optimization.
