@@ -9,14 +9,16 @@ Testing in user space isolates the specification of the eBPF/XDP program from
 the
 implementation. It is primarily intended to test the correctness of the
 compiler and the generated C code without interference of the kernel verifier
-and tooling. The user space testing framework does not depend on the LLVM
-compiler or a particular kernel version. It also does not require usage of 
-\texttt{iproute2} tooling such as \texttt{tc} or \texttt{ip}. Our goal is to 
-ensure that a P4 program is functionally equivalent to its corresponding XDP 
-C-code.
+and tooling. The user space testing framework does not depend on the 
+LLVM~\cite{llvm} or any particular kernel version. It also does not require 
+usage 
+of \texttt{iproute2}~\cite{iproute} tooling such as \texttt{tc} or \texttt{ip}. 
+Our goal is to ensure that a P4 program is functionally equivalent to its 
+corresponding XDP C-code.
 
 User space testing also guarantees debugging simplicity for the average
-user. Tools such as GDB, Valgrind, Wireshark, or output statements
+user. Tools such as GDB~\cite{gdb}, Valgrind~\cite{valgrind}, 
+Wireshark~\cite{wireshark}, or plain statements
 are readily available.
 
 \subsection{The Simple Test Framework}
@@ -29,6 +31,8 @@ are readily available.
 The simple test framework (STF) is a descriptive dataplane verification 
 language. STF files define a set of actions which are intended to be 
 sequentially executed on the dataplane.
+While its original purpose is to assess switching and forwarding behavior, STF 
+templates can also be used to test eBPF/XDP programs in isolation. 
 
 An example STF action is \texttt{packet}. \texttt{packet} contains information 
 about the byte content of an inbound Ethernet frame and the port to receive the 
@@ -40,12 +44,10 @@ An other common action is \texttt{add}, a simple PUT operation
 on dataplane tables. It describes the table to update and the key-value pair 
 to insert.
 
-While its original purpose is to assess switching and forwarding behavior, STF 
-templates can also be used to test eBPF/XDP programs in isolation. The P4 
-compiler features a parser, which pre-processes the templates and generates an 
-ordered command list. This list is interpreted by the eBPF testing framework, 
-which produces capture files from the \texttt{packet} commands and converts 
-\texttt{add} operations into eBPF map system calls.
+The P4 compiler features a parser, which pre-processes the templates and 
+generates an ordered command list. This list is interpreted by the eBPF testing 
+framework, which produces capture files from the \texttt{packet} commands and 
+converts \texttt{add} operations into eBPF map system calls.
 Table \ref{table:stf} describes the full list of currently 
 supported STF operations.
 
@@ -108,15 +110,16 @@ Currently, both kernel and user space eBPF/XDP targets are supported.
 
 The user space testing framework defines a set of eBPF wrappers to approximate 
 the kernel implementation. eBPF maps are implemented as hash maps, the 
-userspace file descriptor operations are emulated by a common registry. 
+userspace file descriptor operations are emulated by a shared in-memory 
+registry. 
 The functionality of the wrapper library is limited and only extends to the 
 minimal eBPF map operations necessary for filtering and classifying.
 
 Every target in the eBPF compiler is required to implement a custom 
 \textit{target header}. This target header specifies how macros in the eBPF 
-source file are expanded. For example, \texttt{ebpf\_test.h} defines 
-\texttt{BPF\_MAP\_LOOKUP\_ELEM} to call into the userspace registry whereas 
-\texttt{ebpf\_kernel.h} defines the function as the default eBPF system call.
+source file are expanded. For example, the header file \texttt{ebpf\_test.h} 
+defines \texttt{BPF\_MAP\_LOOKUP\_ELEM} to call into the userspace registry 
+whereas \texttt{ebpf\_kernel.h} defines it as the default eBPF system call.
 
 \subsubsection{Running a Test}
 A test requires only an STF template and a P4 program as input. The 
@@ -124,7 +127,7 @@ remaining files are generated or imported. The five testing stages are
 implemented as follows:\\
 
 \noindent\textbf{compile-p4}\\
-Depending on the target backend, the P4 program is compiled to either eBPF or 
+Contingent on the target backend, the P4 program is compiled to either eBPF or 
 to XDP C-Code. A header file containing all necessary includes accompanies the 
 generated program. This stage confirms that the P4 file matches the expected 
 syntax and describes valid P4 code.\\ 
@@ -142,12 +145,12 @@ This runtime initializes all eBPF tables with entries specified by the STF
 file, then "runs" the dataplane by processing a set of input packets.
 As input, the runtime takes a set of pcap files, which are spliced into 
 per-port lists and individually inserted into the datapath.
-As the PcapNg format, which contains port metadata, is 
+As the PcapNg~\cite{pcapng} format, which also contains port metadata, is 
 not yet supported by libpcap, we associate the input port of a capture file with
 its file name.
 
 In addition to creating the runtime, the kernel version compiles the eBPF/XDP 
-program to an eBPF object using Clang and LLVM.\\
+program to an eBPF object using Clang/LLVM.\\
 \textbf{run}\\
 At this point, the user and kernel frameworks diverge in behavior.
 
@@ -163,8 +166,8 @@ Before the eBPF/XDP program is loaded, the framework creates a bridge running
 in an 
 network namespace. Isolation via a namespace ensures that existing 
 virtual interfaces and eBPF maps do not conflict with the test in question.
-\texttt{n} virtual interfaces, corresponding to 
-the highest port identifier defined in the STF file, are then attached to the 
+A number of virtual interfaces, corresponding to 
+the highest port identifier in the STF file, are then attached to the 
 bridge. If no STF file is present, the eBPF/XDP program is loaded directly into 
 the bridge and the test completes.
 
@@ -172,7 +175,7 @@ After the virtual environment has been created, the compiled eBPF object is
 loaded into all ports using \texttt{tc} (eBPF) or \texttt{ip} (XDP). Instead of 
 directly calling into the eBPF program, the kernel 
 runtime writes a packet to the associated port using raw sockets. The output 
-results are recorded by attaching Tcpdump to each interface.\\
+results are recorded by attaching Tcpdump~\cite{tcpdump} to each interface.\\
 \textbf{check-results}\\
 After the program has completed, the results are assembled and compared with 
 the expected packets defined in the STF template. If the number of output 
