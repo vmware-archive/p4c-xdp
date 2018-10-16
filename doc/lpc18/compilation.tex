@@ -38,7 +38,7 @@ package ebpfFilter<H>(parse<H> prs,
 \end{lstlisting}
 
 The following listing shows a P4 program written for this architecture
-that counts the number of IPv4 packets that are processed.
+that counts the number of IPv4 packets that are encountered.
 
 \begin{lstlisting}
 #include <core.p4>
@@ -104,12 +104,13 @@ control pipe(in Headers headers, out bool pass) {
 ebpfFilter(prs(), pipe()) main;
 \end{lstlisting}
 
-Compilation to C is fairly straightforward.  For the entire P4 program
-a single C function is generated which returns a Boolean value.
-Table~\ref{table:translation} shows how each P4 construct is converted
-to a C construct.  Currently programs with parser loops are rejected,
-but a parser loop unrolling pass (under development) will allow such
-programs to be compiled.
+Compilation to C is fairly straightforward; the generated C program is
+always memory-safe, using bounds-checks for all packet accesses.  For
+the entire P4 program a single C function is generated which returns a
+Boolean value.  Table~\ref{table:translation} shows how each P4
+construct is converted to a C construct.  Currently programs with
+parser loops are rejected, but a parser loop unrolling pass (under
+development) will allow such programs to be compiled.
 
 \begin{table}[h]
   \footnotesize
@@ -120,14 +121,14 @@ programs to be compiled.
     \texttt{struct} & \texttt{struct} \\ \hline
     parser state    & block statement \\ \hline
     state transition & \texttt{goto} statement \\ \hline
-    \texttt{extract} call & load/shift/mask data from packet buffer \\ \hline
+    \texttt{extract} call & load/shift/mask data from packet \\ \hline
     table & 2 eBPF maps --- one for actions, one for the default action \\ \hline
     table key type & \texttt{struct} type \\ \hline
-    table \texttt{actions} & tagged \texttt{union} with action parameters \\ \hline
-    \texttt{action} arguments & \texttt{struct} \\ \hline
+    \texttt{action} & tagged \texttt{union} with action parameters \\ \hline
+    \texttt{action} parameters & \texttt{struct} \\ \hline
     \texttt{action} body & block statement \\ \hline
-    table \texttt{apply} & lookup in eBFP map; \texttt{switch} statement with all actions \\ \hline
-    counters & eBPF map modified by the dataplane directly \\ \hline
+    table \texttt{apply} & lookup in eBFP map + \texttt{switch} statement with all actions \\ \hline
+    counters & eBPF map \\ \hline
   \end{tabular}
   \end{center}
   \caption{Compiling P4 constructs to C.}\label{table:translation}
@@ -138,8 +139,11 @@ programs to be compiled.
 A second P4 to C compiler is available as an open-source
 project:~\cite{p4-xdp-backend}.  This compiler extends the eBPF
 compiler from Section~\ref{sec:ebpf}.  This compiler can target either
-a packet filter, or a packet switch.  The following shows the XDP
-architectural model targeted by this compiler.
+a packet filter, or a packet switch.  The following listing shows the
+XDP architectural model targeted by this compiler.  You can see that a
+P4 XDP program can (1) return to the kernel one of the 4 outcomes
+described in Section~\ref{sec:xdp-background}, and (2) it can also
+modify the packet itself, by inserting, modifying or deleting headers.
 
 \begin{lstlisting}
 #include <ebpf_model.p4>
