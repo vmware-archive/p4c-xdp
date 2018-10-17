@@ -10,6 +10,13 @@
 \usepackage{graphicx}
 \usepackage{mdframed}
 \usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage[compact]{titlesec}
+
+\setitemize{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt,leftmargin=.5cm}
+\setlist[itemize]{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt,leftmargin=.5cm}
+\setlist[enumerate]{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt,leftmargin=.5cm}
+\setlist[description]{noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt,leftmargin=.5cm}
 
 \lstset{
   language=C,
@@ -56,7 +63,8 @@ abstract,interface,class,virtual% used for IR
   eBPF is a safe virtual machine for executing sandboxed programs in
   the Linux kernel.  This document describes how P4 programs can be
   translated into eBPF programs.  We also discuss the limitations of
-  both technologies for packet processing.
+  both technologies for packet processing and show some performance
+  measurements.
 \end{abstract}
 
 \input{introduction}

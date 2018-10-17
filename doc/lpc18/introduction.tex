@@ -1,18 +1,13 @@
  \section{Introduction}\label{sec:introduction}
 
-(This section is adapted from~\cite{budiu-osr17}.)  One of the most
- active areas in computer networking is Software Defined Networking
- (SDN)~\cite{rfc7426}.  SDN separates the two core functions of a
- network element (e.g., router): the control-plane and the data-plane.
- Traditionally both these functions were implemented on the same
- device; SDN decouples them, and allows multiple control-plane
- implementations for managing each data-plane.  The Open Flow
- protocol~\cite{mckeown-ccr08} is a standard SDN tool.  However, SDN
- still assumes that the behavior of the network \emph{data-plane} is
- fixed.  This is a significant impediment to innovation; for example,
- the deployment of the VXLAN protocol~\cite{rfc7348} took 4 years
- between the initial proposal and its commercial availability in
- high-speed devices.
+Software Defined Networking (SDN)~\cite{rfc7426} decouples the network
+control-plane from the data-plane.  Open Flow~\cite{mckeown-ccr08} is
+a typical incarnation of SDN.  Even though SDN makes the control-plane
+programmable, it still assumes that the {data-plane} is fixed.  The
+inability to program data-planes is a significant impediment to
+innovation: for example, the deployment of the VxLAN
+protocol~\cite{rfc7348} took 4 years between the initial proposal and
+its commercial availability in high-speed devices.
 
 \cite{bosshart-ccr14} proposed the P4 language: Programming
 Protocol-independent Packet Processors, which is designed to make the

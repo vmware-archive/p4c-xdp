@@ -1,15 +1,21 @@
-\section{Background}\label{sec:bacground}
+\section{Background concepts}\label{sec:background}
 
-\subsection{P4}
+\subsection{The P4 programming language}
 
 (This section is adapted from~\cite{budiu-osr17}.)  P4 is a relatively
 simple, statically-typed programming language, with a syntax based on
 C, designed to express transformations of network packets.
 
 The core abstractions provided by the P4 language are listed in
-Figure~\ref{fig:abstractions}.  P4 provides no support for pointers,
-dynamic memory allocation, floating-point numbers, or recursive
-functions; looping constructs are only allowed within parsers.
+Figure~\ref{fig:abstractions}.  P4 lacks many common features found in
+other programming languages: for example, P4 has \textbf{no} support
+for pointers, dynamic memory allocation, floating-point numbers, or
+recursive functions; looping constructs are only allowed within
+parsers.
+
+P4 emphasizes static resource allocation; unlike systems such as the
+Linux TC subsystem, in P4 all packet processing rules and all tables
+must be declared when the P4 program is created.
 
 \definecolor{grey}{rgb}{0.9, 0.9, 0.9}
 \global\mdfdefinestyle{mdstyle}{%
@@ -19,8 +25,8 @@ innerleftmargin=.3cm,rightmargin=.3cm,backgroundcolor=grey}
     \begin{description}
 \item[Headers] describe the format (the set of fields, their ordering
   and sizes) of each header within a network packet.
-\item[User-defined metadata] are user-defined data structures
-  associated with each packet.
+\item[User-defined metadata] are data structures associated with each
+  packet.
 \item[Intrinsic metadata] is information provided or consumed by the
   target, associated with each packet (e.g., the input port where a
   packet has been received, or the output port where a packet has to
@@ -111,8 +117,9 @@ all eBPF programs have to be validated as being safe, and unsafe
 programs cannot be executed. A safe program provably cannot compromise
 the machine it is running on:
 \begin{itemize}
-\item it can only access a restricted memory region (on the local
-  stack),
+\item it can only access a restricted set of memory regions (verified
+  either statically or through inline bounds checks using
+  software-fault isolation techniques~\cite{wahbe:93}),
 \item it can run only for a limited amount of time; during execution
   it cannot block, sleep or take any locks,
 \item it cannot use any kernel resources with the exception of a
@@ -123,8 +130,8 @@ the machine it is running on:
 
 \subsubsection{Kernel hooks}
 
-eBPF programs are inserted into the kernel using hooks. There are
-several types of hooks available:
+eBPF programs are inserted into the kernel using hooks; their
+execution is triggered when the flow of control reaches these hooks:
 
 \begin{itemize}
 \item function entry points can act as hooks; attaching an eBPF
@@ -145,9 +152,8 @@ several types of hooks available:
 The eBPF runtime exposes a bi-directional kernel-userspace data
 communication channel, called maps.  eBPF maps are essentially
 key-value tables, where keys and values are arbitrary fixed-size
-bitstrings. The key width, value width and the maximum number of
-entries that can be stored in a map are declared statically, at the
-map creation time.
+bitstrings.  The key width, value width and the maximum number of
+entries that can be stored in a map are declared at map creation time.
 
 In user-space maps are are exposed as file descriptors. Both user- and
 kernel-space programs can manipulate maps by inserting, deleting,
@@ -159,10 +165,9 @@ pointers point to copies of the data.
 
 \subsubsection{Concurrency}
 
-An important aspect to understand related to eBPF is the execution
-model. An eBPF program is triggered by a kernel hook; multiple
-instances of the same kernel hook can be running simultaneously on
-different cores.
+The execution of an eBPF program is triggered by the corresponding
+kernel hook; multiple instances of the same kernel hook can be running
+simultaneously on different cores.
 
 A map may be accessed simultaneously by multiple instances of the same
 eBPF program running as separate kernel threads on different cores.
@@ -174,26 +179,27 @@ program holds a pointer to the respective value.  However, accessing
 maps is prone to data races; since eBPF programs cannot use locks,
 some of these races often cannot be avoided.
 
-\subsection{XDP: eXpress data path}
-An XDP program is similar to other form of eBPF programs, but it attaches
-to the very lower networking stack, i.e., the driver layer.
-The core idea behind XDP is optimizing cases where relatively simple
-decisions can be made about incoming packets. It allows the loading
-of a eBPF program into the kernel; that program gets an opportunity
-to inspect packets at very low layer before they enter the networking
-stack itself. With driver's support, an XDP program can inspect a packet
-right after the DMA engine places the packet buffer into main memory.
-The initial use case for XDP was to enable the quick dropping of
-unwanted packets, but it has been expanded to cover more complicated
-packet modifications and packet forwarding.
+\subsection{XDP: eXpress data path}\label{sec:xdp-background}
 
-Similar to other eBPF hook point, XDP program can access maps, and 
-it can return one of the following actions;
-1) XDP\_DROP simply drop the packet, 2) XDP\_TX results in bouncing
-the received packet back out to the same port itt arrived on,
-3) XDP\_PASS means the XDP program decides to pass the packet to
-the normal network stack, and 4) XDP\_REDIRECT forwards the packet
-to another network device.
+An XDP program is special case of an eBPF program for processing
+network packets, which attaches to the lowest levels of the networking
+stack.  XDP was designed initially for quickly computing whether a
+packet should be dropped, before too many kernel resources have been
+allocated, to prevent denial-of-service attacks.  An XDP program can
+inspect a network packet right after the DMA engine copies the packet
+from the network card.
+
+XDP program can access eBPF maps.  The kernel expects an XDP program
+to return the decision taken about the processed packet, one of the
+following values:
+
+\begin{description}
+\item[XDP\_DROP] the packet should be immediately dropped,
+\item[XDP\_TX] bounce the received packet back on the same port it arrived on,
+\item[XDP\_PASS] continue to process the packet using,
+  the normal kernel network stack,
+\item[XDP\_REDIRECT] forward the packet to another port.
+\end{description}
 
 \subsection{Comparison of P4 and eBPF}
 
@@ -214,8 +220,9 @@ features of both languages.
     Safe  & Yes & Yes \\ \hline
     Safety & Type system & Verifier \\ \hline
     Resources & Statically allocated & Statically allocated \\ \hline
-    Policies & Match-action tables & Key-value eBPF maps (tables) \\ \hline
+    Policies & Match-action tables & Key-value eBPF maps \\ \hline
     Extern helpers & Target-specific & Hook-specific \\ \hline
+    Execution model & Event-driven & Event-driven \\ \hline
     Control-plane API & Synthesized by compiler & eBPF maps \\ \hline
     Concurrency & No shared R/W state & Maps are thread-safe \\ \hline
   \end{tabular}
@@ -223,22 +230,16 @@ features of both languages.
   \end{center}
 \end{table*}
 
-Table~\ref{table:limitations} compares the limitations of P4 and eBPF.
 P4 was designed as a language for programming switching devices,
-working mostly at levels L2 and L3 of the networking stack; while P4
-is finding a use for programming network end-points, e.g., smart NICs,
+working mostly at levels L2 and L3 of the networking stack.  While P4
+is being used for programming network end-points, e.g., smart NICs,
 some end-point functionality cannot be naturally expressed in P4
 (e.g., TSO, encryption, deep packet inspection).
-
-Many limitations are shared with eBPF.  We conclude that eBPF is a
-suitable language for performing relatively simple packet
-filtering/rewriting.  Neither language is good enough to implement a
-full end-point networking stack.
 
 \begin{table*}[h]
   \footnotesize
   \begin{center}
-  \begin{tabular}{|l|l|l|} \hline
+  \begin{tabular}{|p{5cm}|l|l|} \hline
     \textbf{Limitation} & \textbf{P4} & \textbf{eBPF} \\ \hline \hline
     Loops & Parsers & Tail call \\ \hline
     Nested headers & Bounded depth & Bounded depth \\ \hline
@@ -253,16 +254,20 @@ full end-point networking stack.
     State & Registers/counters & Maps \\ \hline
     Iterating over packet payload & No & No \\ \hline
     Wildcard matches & Yes & No \\ \hline
-    Map writes & Control-plane only & Data-plane and control-plane \\ \hline
-    Iteration over map values & Control-plane only & Control-plane only \\ \hline
-    Synchronization & No & No \\
-    (data/data, data/control) & & \\ \hline
-    Execution model & Event-driven & Event-driven \\ \hline
+    Table/map writes & Control-plane only & Data-plane and control-plane \\ \hline
+    Iteration over table/map values & Control-plane only & Control-plane only \\ \hline
+    Synchronization (data/data, data/control)  & No & No \\
     Resources & Statically allocated & Limited stack and buffer \\ \hline
     Control-plane support & Complex, including remote & Simple \\ \hline
     Safety & Safe & Verifier limited to small programs \\ \hline
-    Compiler & Target-dependent & LLVM code not always efficient \\ \hline
+    Compiler & Target-dependent & LLVM back-end \\ \hline
   \end{tabular}
   \caption{Limitations comparison between P4 and eBPF.}\label{table:limitations}
   \end{center}
 \end{table*}
+
+Many of these P4 limitations are shared with eBPF.  In general, while
+P4 and eBPF are good for performing relatively simple packet
+filtering/rewriting, neither language is good enough to implement a
+full end-point networking stack.  Table~\ref{table:limitations}
+compares the limitations of P4 and eBPF.
