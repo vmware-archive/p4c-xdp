@@ -2,7 +2,8 @@
 
 \subsection{The P4 programming language}
 
-(This section is adapted from~\cite{budiu-osr17}.)  P4 is a relatively
+\mycomment{(This section is adapted from~\cite{budiu-osr17}.)}
+P4 is a relatively
 simple, statically-typed programming language, with a syntax based on
 C, designed to express transformations of network packets.
 
@@ -106,7 +107,8 @@ P4 architecture description file.
 
 \subsection{eBPF for network processing}
 
-(This section is adapted from~\cite{p4-ebpf-backend}.)  eBPF is a
+\mycomment{(This section is adapted from~\cite{p4-ebpf-backend}.) }
+eBPF is a
 acronym that stands for Extended Berkeley Packet Filters. In essence
 eBPF is a low-level programming language (similar to machine code);
 eBPF programs are traditionally executed by a virtual machine that
@@ -179,7 +181,7 @@ program holds a pointer to the respective value.  However, accessing
 maps is prone to data races; since eBPF programs cannot use locks,
 some of these races often cannot be avoided.
 
-\subsection{XDP: eXpress data path}\label{sec:xdp-background}
+\subsection{XDP: eXpress Data Path}\label{sec:xdp-background}
 
 An XDP program is special case of an eBPF program for processing
 network packets, which attaches to the lowest levels of the networking
