@@ -4,33 +4,44 @@ in~\cite{minao-hspr18} and ~\cite{bertin-netdev17}.
 
 \paragraph{No multi-/broadcast support}
 While XDP is able to redirect single frames it does not have the ability to 
-clone and redirect packets similar to \texttt{bpf\_clone\_redirect}. This makes 
-development of more sophisticated P4 forwarding programs problematic.
+clone and redirect multiple packets similar to \texttt{bpf\_clone\_redirect}. 
+This makes development of more sophisticated P4 forwarding programs problematic.
 
 \paragraph{The stack size is too small}
-More complex XDP programs are rejected by the verifier despite their safeness. 
+More complex generated XDP programs are rejected by the verifier despite their 
+safeness. 
 This is a particular challenge when attempting to implement network function 
-chaining or more advanced pipelined packet processing in a single XDP program.
+chaining or advanced pipelined packet processing in a single XDP program. 
 
 \paragraph{Generic XDP and TCP}
-Our testing framework uses virtual Linux interfaces and generic XDP~\cite{genericxdp}
-to verify XDP programs. 
+Our testing framework uses virtual Linux interfaces and generic 
+XDP~\cite{genericxdp} to verify XDP programs. 
 Unfortunately, we are unable to test TCP streams as the protocol is not 
 supported by this driver~\cite{xdptcp}.
 Any program loaded by generic XDP operates after the creation of
 the \texttt{skb} and requires the original packet data. Since TCP clones every 
-packet and passes the unmodifiable \texttt{skb} clone,  generic XDP is
+packet and passes the unmodifiable \texttt{skb} clone, generic XDP is
 bypassed and never receives the datagram.
 
-\paragraph{Using libbpf userspace library}
-Creating of compilation of eBPF programs in userspace requires substantial 
+\paragraph{Using the libbpf userspace library}
+Compilation of eBPF programs in user-space requires substantial 
 effort. Many function calls and variables available in sample programs are not 
-available as C library and currently the p4c-xdp project copied these utilities
-from kernel code or assembled from various online sources. We plan to switch to
-use libbpf to control and manage the eBPF programs and maps.
+available as general C library. Any user trying to interact with the 
+generated C code has to provide their own sources. Currently, P4C-XDP maintains 
+copies of utilities from kernel code or various online sources. This is not a 
+sustainable approach. We plan to integrate \texttt{libbpf} with our repository 
+to control and manage the eBPF programs and maps.
 
-\paragraph{Persistent eBPF maps in namespaces}
-[need to verify] When using eBPF programs in namespaces, maps exported via tc 
-do not persist across \texttt{ip netns exec} calls. The consequence is that any 
-program has to be run in a single shell command, otherwise the eBPF map becomes 
-unusable despite the continued existence of the namespace.
+\paragraph{Pinned eBPF maps in network namespaces}
+When using eBPF programs in namespaces, maps that were pinned via \texttt{tc} 
+do not persist across \texttt{ip netns exec} calls. As consequence, any 
+program has to be run in a single continuous shell command. Example:
+{\scriptsize
+	\begin{verbatim}
+bash -c "tc filter add ...; ls  /sys/fs/bpf/tc/globals"
+	\end{verbatim}
+}
+Once \texttt{ip netns exec} has finished, the reference to the eBPF 
+map and all its associated state disappear. The eBPF program, however, remains 
+attached to the virtual interface, leading to inconsistent packet processing 
+behavior.

@@ -60,13 +60,26 @@ abstract,interface,class,virtual% used for IR
 \maketitle
 
 \begin{abstract}
-  P4 is a programming language for implementing network dataplanes.
-  eBPF is a safe virtual machine for executing sandboxed programs in
-  the Linux kernel.  This document describes how P4 programs can be
-  translated into eBPF programs.  We also discuss the limitations of
-  both technologies for packet processing and show some performance
-  measurements.
+  P4 is a domain-specific language for implementing network data-planes.
+  The P4 abstraction allows programmers to write network protocols in a 
+  generalized fashion, without needing to know the configuration specifics
+  of the targeted data-plane.
+  
+  The extended Berkely Packet Filter (eBPF) is a safe virtual machine for 
+  executing sand-boxed programs in the Linux kernel. eBPF, and its extension 
+  the eXpress Data Path (XDP), effectively serve as programmable data-planes of 
+  the kernel. This property makes them suitable targets for the P4 language.
+
+  P4C-XDP is a project combining the performance of XDP with the generality and 
+  usability of P4. In this document, we describe how P4 can be 
+  translated into eBPF/XDP. We review the fundamental limitations of both 
+  technologies, analyze the performance of several generated XDP programs, and 
+  discuss problems we have faced while working on this new technology.
+  
+  P4C-XDP is licensed under the GPL and Apache and hosted at 
+  https://github.com/vmware/p4c-xdp/.
 \end{abstract}
+
 
 \input{introduction}
 \input{background}
