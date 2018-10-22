@@ -1,8 +1,13 @@
 \section{Background concepts}\label{sec:background}
 
+This section describes briefly the P4 programming language and
+eBPF. Some of the text is adapted from~\cite{budiu-osr17}
+and~\cite{p4-ebpf-backend}.
+
 \subsection{The P4 programming language}
 
-(This section is adapted from~\cite{budiu-osr17}.)  P4 is a relatively
+\mycomment{(This section is adapted from~\cite{budiu-osr17}.)}
+P4 is a relatively
 simple, statically-typed programming language, with a syntax based on
 C, designed to express transformations of network packets.
 
@@ -84,29 +89,29 @@ targets and provides some language mechanisms to express it.
   \centerline{\includegraphics[width=.5\textwidth,clip,trim=1in 0.9in
       .8in 1.8in]{architecture.pdf}}
   \caption{\sl Generic abstract packet-processing engine programmable
-    in P4.  The blocks labeled with P4 are programmable in P4; the
-    surrounding block is fixed-function
+    in P4.  The blue blocks labeled with P4 are programmable in P4; the
+    surrounding red block is fixed-function
     logic.\label{fig:architecture}}
 \end{figure}
 
 Figure~\ref{fig:architecture} is an abstract view of how a P4 program
 interacts with the data-plane of a packet-processing engine.  The
 data-plane is a fixed-function device that provides several
-programmable ``holes''.  The user writes a P4 program to specify the
-behavior of each hole.  The target manufacturer describes the
-interfaces between the programmable blocks and the surrounding
-fixed-function blocks.  These interfaces are target-specific.  Note
-that the fixed-function part can be software, hardware, firmware, or a
-mixture.
+programmable ``holes''.  The user writes a P4 program to ``fill'' each
+hole.  The target manufacturer describes the interfaces between the
+programmable blocks and the surrounding fixed-function blocks.  These
+interfaces are target-specific.  Note that the fixed-function part can
+be software, hardware, firmware, or a mixture.
 
 A P4 architecture file is expected to contain declarations of types,
 constants, and a description of the control and parser blocks that the
-users need to implement.  Section~\ref{sec:ebpf} contains an example
-P4 architecture description file.
+users need to implement.  Sections~\ref{sec:ebpf} and~\ref{sec:xdp}
+contain examples P4 architecture description files.
 
 \subsection{eBPF for network processing}
 
-(This section is adapted from~\cite{p4-ebpf-backend}.)  eBPF is a
+\mycomment{(This section is adapted from~\cite{p4-ebpf-backend}.) }
+eBPF is a
 acronym that stands for Extended Berkeley Packet Filters. In essence
 eBPF is a low-level programming language (similar to machine code);
 eBPF programs are traditionally executed by a virtual machine that
@@ -179,7 +184,7 @@ program holds a pointer to the respective value.  However, accessing
 maps is prone to data races; since eBPF programs cannot use locks,
 some of these races often cannot be avoided.
 
-\subsection{XDP: eXpress data path}\label{sec:xdp-background}
+\subsection{XDP: eXpress Data Path}\label{sec:xdp-background}
 
 An XDP program is special case of an eBPF program for processing
 network packets, which attaches to the lowest levels of the networking
@@ -208,10 +213,10 @@ be found in~\cite{minao-hspr18}.  P4 and eBPF share many features.
 Table~\ref{table:compare} shows a comparison of the high-level
 features of both languages.
 
-\begin{table*}[h]
+\begin{table}[t]
   \footnotesize
   \begin{center}
-  \begin{tabular}{|l|l|l|} \hline
+  \begin{tabular}{|p{1.5cm}|p{2.7cm}|p{2.7cm}|} \hline
     \textbf{Feature} & \textbf{P4} & \textbf{eBPF} \\ \hline \hline
     Targets & ASIC, software, FPGA, NIC & Linux kernel \\ \hline
     Licensing & Apache & GPL \\ \hline
@@ -228,7 +233,7 @@ features of both languages.
   \end{tabular}
   \caption{Feature comparison between P4 and eBPF.}\label{table:compare}
   \end{center}
-\end{table*}
+\end{table}
 
 P4 was designed as a language for programming switching devices,
 working mostly at levels L2 and L3 of the networking stack.  While P4
@@ -236,10 +241,10 @@ is being used for programming network end-points, e.g., smart NICs,
 some end-point functionality cannot be naturally expressed in P4
 (e.g., TSO, encryption, deep packet inspection).
 
-\begin{table*}[h]
+\begin{table*}[t]
   \footnotesize
   \begin{center}
-  \begin{tabular}{|p{5cm}|l|l|} \hline
+  \begin{tabular}{|l|l|l|} \hline
     \textbf{Limitation} & \textbf{P4} & \textbf{eBPF} \\ \hline \hline
     Loops & Parsers & Tail call \\ \hline
     Nested headers & Bounded depth & Bounded depth \\ \hline
@@ -256,13 +261,14 @@ some end-point functionality cannot be naturally expressed in P4
     Wildcard matches & Yes & No \\ \hline
     Table/map writes & Control-plane only & Data-plane and control-plane \\ \hline
     Iteration over table/map values & Control-plane only & Control-plane only \\ \hline
-    Synchronization (data/data, data/control)  & No & No \\
+    Synchronization (data/data, data/control)  & No & No \\ \hline
     Resources & Statically allocated & Limited stack and buffer \\ \hline
     Control-plane support & Complex, including remote & Simple \\ \hline
     Safety & Safe & Verifier limited to small programs \\ \hline
     Compiler & Target-dependent & LLVM back-end \\ \hline
   \end{tabular}
-  \caption{Limitations comparison between P4 and eBPF.}\label{table:limitations}
+  \caption{Comparison of the limitations of P4 and
+    eBPF.}\label{table:limitations}
   \end{center}
 \end{table*}
 

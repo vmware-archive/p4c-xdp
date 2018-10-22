@@ -1,3 +1,41 @@
 \section{Lessons learned}\label{sec:conclusions}
 
-TODO: describe here the lessons we have learned.
+In general, our development experience is mirrored by the lessons described
+in~\cite{minao-hspr18} and ~\cite{bertin-netdev17}.
+
+\paragraph{No multi-/broadcast support}
+While XDP is able to redirect single frames it does not have the ability to
+clone and redirect packets similar to \texttt{bpf\_clone\_redirect}. This makes
+development of more sophisticated P4 forwarding programs problematic.
+
+\paragraph{The stack size is too small}
+More complex XDP programs are rejected by the verifier despite being
+safe.  This is a particular challenge when attempting to implement
+network function chaining or more advanced pipelined packet processing
+in a single XDP program.  The LLVM eBPF code generator allocates 8
+stack bytes even for 1 byte variables, increasing the stack usage
+significantly.
+
+\paragraph{Generic XDP and TCP}
+Our testing framework uses virtual Linux interfaces and generic XDP~\cite{genericxdp}
+to verify XDP programs.
+Unfortunately, we are unable to test TCP streams as the protocol is not
+supported by this driver~\cite{xdptcp}.
+Any program loaded by generic XDP operates after the creation of
+the \texttt{skb} and requires the original packet data. Since TCP clones every
+packet and passes the unmodifiable \texttt{skb} clone,  generic XDP is
+bypassed and never receives the datagram.
+
+\paragraph{Using libbpf userspace library}
+Creating of compilation of eBPF programs in userspace requires substantial
+effort. Many function calls and variables available in sample programs are not
+available as C library and currently the p4c-xdp project copied these utilities
+from kernel code or assembled from various online sources. We plan to switch to
+use libbpf to control and manage the eBPF programs and maps.
+
+\paragraph{Persistent eBPF maps in namespaces}
+When using eBPF programs in namespaces, maps exported via tc do not
+persist across \texttt{ip netns exec} calls. The consequence is that
+any program has to be run in a single shell command, otherwise the
+eBPF map becomes unusable despite the continued existence of the
+namespace.
