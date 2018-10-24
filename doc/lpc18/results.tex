@@ -46,8 +46,8 @@ ip link set dev eth0 xdp obj xdp1.o verb
 
 The Intel 10GbE X540 NIC is running the \texttt{ixgbe} driver with 16 RX queues
 set-up. Since the source server is sending single UDP flow, packets
-always arrive at a single ring ID.  As a result, we collect the number
-of packets being dropped at this ring.
+always arrive at a single queue ID.  As a result, we collect the number
+of packets being dropped at this queue.
 
 \subsection{Results}
 
