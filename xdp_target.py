@@ -17,11 +17,9 @@ import os
 import sys
 import time
 # path to the tools folder of the compiler
-sys.path.insert(0, os.path.dirname(
-    os.path.abspath(__file__)) + '/../../tools')
+sys.path.insert(0, 'p4c/tools')
 # path to the framework repository of the compiler
-sys.path.insert(0, os.path.dirname(
-    os.path.abspath(__file__)) + '/../../backends/ebpf/targets')
+sys.path.insert(0, 'p4c/backends/ebpf/targets')
 from kernel_target import Target as EBPFKernelTarget
 from testutils import *
 
@@ -32,7 +30,9 @@ class Target(EBPFKernelTarget):
     def __init__(self, tmpdir, options, template, outputs):
         EBPFKernelTarget.__init__(self, tmpdir, options, template, outputs)
         # We use a different compiler, override the inherited default
-        self.compiler = self.options.compilerdir + "/build/p4c-xdp"
+        components = options.compiler.split("/")[0:-1]
+        self.compiler = "/".join(components) + "/p4c-xdp"
+        print("Compiler is", self.compiler)
 
     def compile_dataplane(self):
         # Use clang to compile the generated C code to a LLVM IR

@@ -53,8 +53,7 @@ set (XFAIL_TESTS_XDP
 
 add_dependencies(p4c_driver linkp4cxdp)
 
-set(XDP_DRIVER "${CMAKE_CURRENT_SOURCE_DIR}/run-ebpf-test.py -t xdp")
-
+set(XDP_DRIVER "${P4C_SOURCE_DIR}/backends/ebpf/run-ebpf-test.py -t xdp -c \"${P4C_BINARY_DIR}/p4c-xdp\"")
 
 # This file will not run the full tests, but it will attempt to compile the p4 files down to C
 set (XDP_TEST_SUITES "${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp*.p4")
