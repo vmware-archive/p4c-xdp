@@ -144,12 +144,14 @@ development) will allow such programs to be compiled.
 
 \subsection{Packet forwarding with XDP}\label{sec:xdp}
 
-A second P4 to C compiler is available as an open-source
-project:~\cite{p4-xdp-backend}.  This compiler extends the eBPF
-compiler from Section~\ref{sec:ebpf}.  This compiler can target either
-a packet filter, or a packet switch.  Figure~\ref{fig:xdp-model} shows
-the XDP architectural model targeted by this compiler.  A P4 program
-for this target can (1) return to the kernel one of the 4 outcomes
+
+A second P4 to C compiler, P4C-XDP, is available as an open-source
+project hosted at~\cite{p4-xdp-backend}. P4C-XDP is licensed under the GNU 
+GPL and Apache License.
+This compiler extends the eBPF compiler from Section~\ref{sec:ebpf}. It can 
+target either a packet filter, or a packet switch.  The following listing shows 
+the XDP architectural model targeted by this compiler. You can see that a
+P4 XDP program can (1) return to the kernel one of the four outcomes
 described in Section~\ref{sec:xdp-background}, and (2) it can also
 modify the packet itself, by inserting, modifying or deleting headers.
 
