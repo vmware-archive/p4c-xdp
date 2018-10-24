@@ -60,6 +60,7 @@ cd ~/p4c/
 mkdir extensions
 cd extensions
 git clone https://github.com/vmware/p4c-xdp.git
+ln -s ~/p4c p4c-xdp/p4c
 ```
 Now that you have cloned p4c-xdp at ~/p4c/extensions/p4c-xdp, the next step is to
 recompile p4c:
@@ -80,7 +81,7 @@ And a soft link to the xdp test target and the test runtime:
 
 ```bash
 cd ~/p4c/extensions/p4c-xdp
-ln -s ~/p4c/backends/ebpf/targets/xdp_target.py xdp_target.py
+ln -s ~/p4c/extensions/p4c-xdp/xdp_target.py ~/p4c/backends/ebpf/targets/xdp_target.py
 ln -s ~/p4c/backends/ebpf/run-ebpf-test.py run-ebpf-test.py
 
 ```
@@ -135,4 +136,3 @@ The p4c-xdp/lib/\* contains BPF loader licensed under the [General Public Licens
 * Remove the private kernel patch requirement when latest kernel with BPF fixed is ready
 * Apply the workaround of BPF\_MAX\_STACK
 * Control plane example using perf\_event\_output
-

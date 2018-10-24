@@ -47,6 +47,7 @@ RUN git clone https://github.com/p4lang/p4c.git && \
 
 # copy xdp into the extension folder
 COPY . /home/p4c/extensions/p4c-xdp
+RUN ln -s /home/p4c /home/p4c/extensions/p4c-xdp
 
 # build p4c and p4c-xdp
 RUN cd /home/p4c/ && \
