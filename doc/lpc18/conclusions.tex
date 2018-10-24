@@ -1,5 +1,6 @@
-\section{Challenges and Future Work}\label{sec:conclusions}
-In general, our development experience is mirrored by the lessons described 
+\section{Lessons learned}\label{sec:conclusions}
+
+In general, our development experience is mirrored by the lessons described
 in~\cite{minao-hspr18} and ~\cite{bertin-netdev17}.
 
 \paragraph{No multi-/broadcast support}
@@ -45,3 +46,4 @@ Once \texttt{ip netns exec} has finished, the reference to the eBPF
 map and all its associated state disappear. The eBPF program, however, remains 
 attached to the virtual interface, leading to inconsistent packet processing 
 behavior.
+

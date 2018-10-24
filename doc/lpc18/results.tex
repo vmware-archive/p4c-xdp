@@ -1,6 +1,6 @@
 \section{Experimental results}\label{sec:results}
 \subsection{Testbed}
-All of our performance results use a hardware test bed that consists of
+All of our performance results use a hardware testbed that consists of
 two Intel Xeon E5 2440 v2 1.9GHz servers, each with 1 CPU socket and
 8 physical cores with hyperthreading enabled.
 Each target server has an Intel 10GbE X540-AT2 dual
@@ -104,7 +104,7 @@ deparse it, and send back to the same port (XDP\_TX).
 As shown in Table~\ref{tab:perf}, xdp1.p4 allows us to measure the
 overhead introduced by parsing and deparsing: a drop from 14.4~Mpps to
 8.1~Mpps.  xdp3.p4 reduces the rate by another million PPS due to the
-eBPF map lookup (this operation always return NULL, no value from the
+eBPF map lookup (this operation always returns NULL, no value from the
 map is accessed).  xdp6.p4 has significant overhead because it
 accesses a map, finds a new TTL value, and writes to the IPv4 header.
 Interestingly, although xdp7.p4 does extra parsing to the UDP header
@@ -113,7 +113,7 @@ the lack of map accesses.
 
 Finally, xdp11.p4 and xdp15.p4 show the transmit (XDP\_TX)
 performance.  Compared with xdp11, xdp15.p4 invokes the
-bpf\_adjust\_head helper function to reset the pointer for extra
+\texttt{bpf\_adjust\_head} helper function to reset the pointer for extra
 bytes.  It does not incur much overhead because there
 is already a reserved space in front of every XDP packet frame.
 
@@ -140,7 +140,7 @@ perf record -p <pid of ksoftirqd> sleep 10
 }
 
 This confirms that most of the CPU cycles are spent on executing the
-XDP program, \texttt{\_\_\_bpf\_prog\_run}, which caused us to investigate the 
+XDP program, \texttt{\_\_\_bpf\_prog\_run}, which caused us to investigate the
 eBPF C code of xdp1.p4.
 
 \begin{table}

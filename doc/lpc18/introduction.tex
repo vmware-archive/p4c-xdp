@@ -1,24 +1,25 @@
  \section{Introduction}\label{sec:introduction}
 
-Software Defined Networking (SDN)~\cite{rfc7426} decouples the network
-control-plane from the data-plane.  Open Flow~\cite{mckeown-ccr08} is
-a typical incarnation of SDN.  Even though SDN makes the control-plane
-programmable, it still assumes that the {data-plane} is fixed.  The
-inability to program data-planes is a significant impediment to
-innovation: for example, the deployment of the VxLAN
-protocol~\cite{rfc7348} took 4 years between the initial proposal and
-its commercial availability in high-speed devices.
+The introduction of Software Defined Networking (SDN)~\cite{rfc7426}
+has decoupled the network control-plane from the data-plane.  The Open
+Flow Protocol~\cite{mckeown-ccr08} is a typical incarnation of SDN.
+Even though SDN makes the control-plane programmable, it still assumes
+that the {data-plane} is fixed.  The inability to program data-planes
+is a significant impediment to innovation: for example, the deployment
+of the VxLAN protocol~\cite{rfc7348} took 4 years between the initial
+proposal and its commercial availability in high-speed devices.
 
-\cite{bosshart-ccr14} proposed the P4 language: Programming
-Protocol-independent Packet Processors, which is designed to make the
-behavior of \emph{data-planes} expressible as software.  P4 has gained
-rapid adoption.  The p4.org consortium~\cite{p4org} was created to
-steward the language evolution; p4.org currently includes more than
-100 organizations in the areas of networking, cloud systems, network
-chip design, and academic institutions.  The P4 specification is open
-and public~\cite{p416-spec17}.  Reference implementations for
-compilers, simulation and debugging tools are available with a
-permissive license at the GitHub P4 repository~\cite{p4lang}.  While
-initially P4 was designed for programming network switches, its scope
-has been broadened to cover a large variety of packet-processing
-systems (e.g., network cards, FPGAs, etc.).
+To address this state of affairs, \cite{bosshart-ccr14} introduced the
+P4 language: Programming Protocol-independent Packet Processors, which
+is designed to make the behavior of \emph{data-planes} expressible as
+software.  P4 has gained rapid adoption.  The p4.org
+consortium~\cite{p4org} was created to steward the language evolution;
+p4.org currently includes more than 100 organizations in the areas of
+networking, cloud systems, network chip design, and academic
+institutions.  The P4 specification is open and
+public~\cite{p416-spec17}.  Reference implementations for compilers,
+simulation and debugging tools are available with a permissive license
+at the GitHub P4 repository~\cite{p4lang}.  While initially P4 was
+designed for programming network switches, its scope has been
+broadened to cover a large variety of packet-processing systems (e.g.,
+network cards, FPGAs, etc.).

@@ -1,9 +1,9 @@
 \section{Testing eBPF programs}\label{sec:testing}
 
-We have built an elaborated testing infrastructure to test the P4 to C
-compilers.  The infrastructure can perform both functional correctness
-testing at the user level, and complete end-to-end testing by running
-in the kernel.
+To test the P4 to C compilers we have adapted and extended the
+existing P4 testing infrastructure.  The infrastructure can perform
+both functional correctness testing at the user level, and complete
+end-to-end testing running programs in the kernel.
 
 \subsection{User-Space Testing}
 
@@ -19,7 +19,7 @@ Valgrind~\cite{valgrind}, or Wireshark~\cite{wireshark}.
 \begin{table}[h]
   \footnotesize
   \begin{center}
-    \begin{tabular}{|p{3cm}|p{4.5cm}|} \hline
+    \begin{tabular}{|p{2.8cm}|p{4.3cm}|} \hline
       \textbf{Command} & \textbf{Description} \\ \hline \hline
       \textbf{packet} port data & Insert a frame of bytes
       \textit{data} into port \textit{port}.    \\ \hline
@@ -45,7 +45,8 @@ Valgrind~\cite{valgrind}, or Wireshark~\cite{wireshark}.
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{stf}
-  \caption{Annotated example of a basic STF file.}
+  \caption{Annotated example of a Simple Testing Framework (STF)
+    program for testing the P4 compiler.}
   \label{fig:stf}
 \end{figure}
 
@@ -68,9 +69,9 @@ values for the action parameters.  Currently we assume that all
 \texttt{add} statements are executed prior to all the packet
 manipulation statements.
 
-Our testing framework converts \texttt{packet} statements into Pcap
-files, one for each input port tested.  \texttt{add} statements are
-converted into C programs that populate eBPF maps.
+Our testing framework converts \texttt{packet} statements into PCAP
+(Packet CAPture) files, one for each input port tested.  \texttt{add}
+statements are converted into C programs that populate eBPF maps.
 
 Although STF supports testing counters as well, our eBPF testing
 framework does not yet support this feature.
@@ -89,8 +90,7 @@ Executing a P4 eBPF test is done in five stages (Figure
 \ref{fig:p4_testflow}):
 
 \begin{enumerate}
-\item\textbf{compile-p4:} Compile the P4 file to C program.  This
-  validates the P4 compiler.
+\item\textbf{compile-p4:} Compile the P4 file to C program.
 \item \textbf{parse-stf:} Convert the STF file to a C program and into
   input PCAP files.
 \item \textbf{compile-data-plane:} Compile and load the C programs
@@ -112,7 +112,7 @@ When testing in kernel-space we compile the eBPF/XDP programs to eBPF
 object files using LLVM.  Before the eBPF/XDP program is loaded, the
 framework creates a bridge running in a network namespace.
 Namespace-based isolation allows us to run multiple tests in parallel.
-Virtual interfaces are attached to the bridge.  The testing runtim
+Virtual interfaces are attached to the bridge.  The testing runtime
 injects packets into the associated ports using raw sockets. The
 output results are recorded by attaching Tcpdump~\cite{tcpdump} to
 each output virtual interface.
