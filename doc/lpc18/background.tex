@@ -188,7 +188,7 @@ some of these races often cannot be avoided.
 
 An XDP program is special case of an eBPF program for processing
 network packets, which attaches to the lowest levels of the networking
-stack.  XDP was designed initially for quickly computing whether a
+stack~\cite{xdpconext18}.  XDP was designed initially for quickly computing whether a
 packet should be dropped, before too many kernel resources have been
 allocated, to prevent denial-of-service attacks.  An XDP program can
 inspect a network packet right after the DMA engine copies the packet
