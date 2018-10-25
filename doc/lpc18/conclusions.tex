@@ -24,7 +24,7 @@ the \texttt{skb} and requires the original packet data. Since TCP clones every
 packet and passes the unmodifiable \texttt{skb} clone, generic XDP is
 bypassed and never receives the datagram.
 
-\paragraph{Using the libbpf userspace library}
+\paragraph{Using the libbpf user-space library}
 Compilation of eBPF programs in user-space requires substantial 
 effort. Many function calls and variables available in sample programs are not 
 available as general C library. Any user trying to interact with the 

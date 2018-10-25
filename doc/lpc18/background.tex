@@ -1,3 +1,65 @@
+\definecolor{grey}{rgb}{0.9, 0.9, 0.9}
+\global\mdfdefinestyle{mdstyle}{%
+	innerleftmargin=.3cm,rightmargin=.3cm,backgroundcolor=grey}
+\begin{figure*}[h]
+	\begin{mdframed}[style=mdstyle]
+		\begin{description}
+			\item[Headers] describe the format (the set of fields, their 
+			ordering
+			and sizes) of each header within a network packet.
+			\item[User-defined metadata] are data structures associated with 
+			each
+			packet.
+			\item[Intrinsic metadata] is information provided or consumed by the
+			target, associated with each packet (e.g., the input port where a
+			packet has been received, or the output port where a packet has to
+			be forwarded).
+			\item[Parsers] describe the permitted header sequences within 
+			received
+			packets, how to identify those header sequences, and the headers to
+			extract from packets.  Parsers are expressed as state-machines.
+			\item[Actions] are code fragments that describe how packet header
+			fields and metadata are manipulated. Actions may include parameters
+			supplied by the control-plane at run time (actions are closures
+			created by the control-plane and executed by the data-plane).
+			\item[Tables] associate user-defined keys with actions.  P4 tables
+			generalize traditional switch tables; they can be used to implement
+			routing tables, flow lookup tables, access-control lists, and other
+			user-defined table types, including complex decisions depending on
+			many fields.  At runtime tables behave as match-action
+			units~\cite{bosshart-sigcomm13}, processing data in three steps:
+			\begin{itemize}
+				\item Construct lookup keys from packet fields or computed
+				metadata,
+				\item Perform lookup in a table populated by the control-plane,
+				using the constructed key, and retrieving an action (including
+				the associated parameters),
+				\item Finally, execute the obtained action, which can modify the
+				headers or metadata.
+			\end{itemize}
+			\item[Control] blocks are imperative programs describing the
+			data-dependent packet processing including the data-dependent
+			sequence of table invocations.
+			\item[Deparsing] is the construction of outgoing packets from the
+			computed headers.
+			\item[Extern objects] are library constructs that can be manipulated
+			by a P4 program through well-defined APIs, but whose internal
+			behavior is hardwired (e.g., checksum units) and hence not
+			programmable using P4.
+			\item[Architecture definition:] a set of declarations that describes
+			the programmable parts of a network processing device.
+		\end{description}
+	\end{mdframed}
+	\caption{\sl Core abstractions of the P4 programming 
+	language.\label{fig:abstractions}}
+\end{figure*}
+
+\begin{figure}[ht]
+	\centerline{\includegraphics[width=.5\textwidth,clip,trim=1in 0.9in
+		.8in 1.8in]{architecture.pdf}}
+	\caption{\sl Generic abstract packet-processing engine programmable
+		in P4.\label{fig:architecture}}
+\end{figure}
 \section{Background concepts}\label{sec:background}
 
 This section describes briefly the P4 programming language and
@@ -19,60 +81,9 @@ recursive functions; looping constructs are only allowed within
 parsers.
 
 P4 emphasizes static resource allocation; unlike systems such as the
-Linux TC subsystem, in P4 all packet processing rules and all tables
+Linux \texttt{tc} subsystem, in P4 all packet processing rules and all tables
 must be declared when the P4 program is created.
 
-\definecolor{grey}{rgb}{0.9, 0.9, 0.9}
-\global\mdfdefinestyle{mdstyle}{%
-innerleftmargin=.3cm,rightmargin=.3cm,backgroundcolor=grey}
-\begin{figure*}[h]
-  \begin{mdframed}[style=mdstyle]
-    \begin{description}
-\item[Headers] describe the format (the set of fields, their ordering
-  and sizes) of each header within a network packet.
-\item[User-defined metadata] are data structures associated with each
-  packet.
-\item[Intrinsic metadata] is information provided or consumed by the
-  target, associated with each packet (e.g., the input port where a
-  packet has been received, or the output port where a packet has to
-  be forwarded).
-\item[Parsers] describe the permitted header sequences within received
-  packets, how to identify those header sequences, and the headers to
-  extract from packets.  Parsers are expressed as state-machines.
-\item[Actions] are code fragments that describe how packet header
-  fields and metadata are manipulated. Actions may include parameters
-  supplied by the control-plane at run time (actions are closures
-  created by the control-plane and executed by the data-plane).
-\item[Tables] associate user-defined keys with actions.  P4 tables
-  generalize traditional switch tables; they can be used to implement
-  routing tables, flow lookup tables, access-control lists, and other
-  user-defined table types, including complex decisions depending on
-  many fields.  At runtime tables behave as match-action
-  units~\cite{bosshart-sigcomm13}, processing data in three steps:
-  \begin{itemize}
-    \item Construct lookup keys from packet fields or computed
-      metadata,
-    \item Perform lookup in a table populated by the control-plane,
-      using the constructed key, and retrieving an action (including
-      the associated parameters),
-    \item Finally, execute the obtained action, which can modify the
-      headers or metadata.
-  \end{itemize}
-\item[Control] blocks are imperative programs describing the
-  data-dependent packet processing including the data-dependent
-  sequence of table invocations.
-\item[Deparsing] is the construction of outgoing packets from the
-  computed headers.
-\item[Extern objects] are library constructs that can be manipulated
-  by a P4 program through well-defined APIs, but whose internal
-  behavior is hardwired (e.g., checksum units) and hence not
-  programmable using P4.
-\item[Architecture definition:] a set of declarations that describes
-  the programmable parts of a network processing device.
-    \end{description}
-  \end{mdframed}
-  \caption{\sl Core abstractions of the P4 programming language.\label{fig:abstractions}}
-\end{figure*}
 
 \subsection{P4 Architectures}
 
@@ -85,19 +96,11 @@ computation hardware units, while an FPGA switch may allow users to
 implement custom queueing disciplines).  P4 embraces this diversity of
 targets and provides some language mechanisms to express it.
 
-\begin{figure}[h]
-  \centerline{\includegraphics[width=.5\textwidth,clip,trim=1in 0.9in
-      .8in 1.8in]{architecture.pdf}}
-  \caption{\sl Generic abstract packet-processing engine programmable
-    in P4.  The blue blocks labeled with P4 are programmable in P4; the
-    surrounding red block is fixed-function
-    logic.\label{fig:architecture}}
-\end{figure}
 
 Figure~\ref{fig:architecture} is an abstract view of how a P4 program
 interacts with the data-plane of a packet-processing engine.  The
 data-plane is a fixed-function device that provides several
-programmable ``holes''.  The user writes a P4 program to ``fill'' each
+programmable ``holes''. The user writes a P4 program to ``fill'' each
 hole.  The target manufacturer describes the interfaces between the
 programmable blocks and the surrounding fixed-function blocks.  These
 interfaces are target-specific.  Note that the fixed-function part can
@@ -112,7 +115,7 @@ contain examples P4 architecture description files.
 
 \mycomment{(This section is adapted from~\cite{p4-ebpf-backend}.) }
 eBPF is a
-acronym that stands for Extended Berkeley Packet Filters. In essence
+acronym that stands for Extended Berkeley Packet Filters. In essence,
 eBPF is a low-level programming language (similar to machine code);
 eBPF programs are traditionally executed by a virtual machine that
 resides in the Linux kernel. eBPF programs can be inserted and removed
@@ -133,10 +136,45 @@ the machine it is running on:
   below)
 \end{itemize}
 
+\begin{table*}[t]
+	\footnotesize
+	\begin{center}
+		\begin{tabular}{|l|l|l|} \hline
+			\textbf{Limitation} & \textbf{P4} & \textbf{eBPF} \\ \hline \hline
+			Loops & Parsers & Tail call \\ \hline
+			Nested headers & Bounded depth & Bounded depth \\ \hline
+			Multicast/broadcast & External & Helpers \\ \hline
+			Packet segmentation & No & No \\ \hline
+			Packet reassembly &	No & No \\ \hline
+			Timers/timeouts/aging & External & No \\ \hline
+			Queues & No & No \\ \hline
+			Scheduling & No & No \\ \hline
+			Data structures & No & No \\ \hline
+			Payload processing & No & No \\ \hline
+			State & Registers/counters & Maps \\ \hline
+			Iterating over packet payload & No & No \\ \hline
+			Wildcard matches & Yes & No \\ \hline
+			Table/map writes & Control-plane only & Data-plane and 
+			control-plane \\ \hline
+			Iteration over table/map values & Control-plane only & 
+			Control-plane only \\ \hline
+			Synchronization (data/data, data/control)  & No & No \\ \hline
+			Resources & Statically allocated & Limited stack and buffer \\ 
+			\hline
+			Control-plane support & Complex, including remote & Simple \\ \hline
+			Safety & Safe & Verifier limited to small programs \\ \hline
+			Compiler & Target-dependent & LLVM back-end \\ \hline
+		\end{tabular}
+		\caption{Comparison of the limitations of P4 and
+			eBPF.}\label{table:limitations}
+	\end{center}
+\end{table*}
+
 \subsubsection{Kernel hooks}
 
 eBPF programs are inserted into the kernel using hooks; their
 execution is triggered when the flow of control reaches these hooks:
+
 
 \begin{itemize}
 \item function entry points can act as hooks; attaching an eBPF
@@ -154,17 +192,17 @@ execution is triggered when the flow of control reaches these hooks:
 
 \subsubsection{eBPF Maps}
 
-The eBPF runtime exposes a bi-directional kernel-userspace data
+The eBPF runtime exposes a bi-directional kernel- to user-space data
 communication channel, called maps.  eBPF maps are essentially
 key-value tables, where keys and values are arbitrary fixed-size
 bitstrings.  The key width, value width and the maximum number of
 entries that can be stored in a map are declared at map creation time.
 
-In user-space maps are are exposed as file descriptors. Both user- and
+In user-space, maps are are exposed as file descriptors. Both user- and
 kernel-space programs can manipulate maps by inserting, deleting,
 looking up, modifying, and enumerating entries.
 
-In kernel space the keys and values are exposed as pointers to the raw
+In kernel-space, the keys and values are exposed as pointers to the raw
 underlying data stored in the map, whereas in user-space the
 pointers point to copies of the data.
 
@@ -192,10 +230,10 @@ stack~\cite{xdpconext18}.  XDP was designed initially for quickly computing whet
 packet should be dropped, before too many kernel resources have been
 allocated, to prevent denial-of-service attacks.  An XDP program can
 inspect a network packet right after the DMA engine copies the packet
-from the network card.
+from the network card and can also access eBPF maps.
 
-XDP program can access eBPF maps.  The kernel expects an XDP program
-to return the decision taken about the processed packet, one of the
+The kernel expects an XDP program to return the decision taken about the 
+processed packet, one of the
 following values:
 
 \begin{description}
@@ -241,36 +279,6 @@ is being used for programming network end-points, e.g., smart NICs,
 some end-point functionality cannot be naturally expressed in P4
 (e.g., TSO, encryption, deep packet inspection).
 
-\begin{table*}[t]
-  \footnotesize
-  \begin{center}
-  \begin{tabular}{|l|l|l|} \hline
-    \textbf{Limitation} & \textbf{P4} & \textbf{eBPF} \\ \hline \hline
-    Loops & Parsers & Tail call \\ \hline
-    Nested headers & Bounded depth & Bounded depth \\ \hline
-    Multicast/broadcast & External & Helpers \\ \hline
-    Packet segmentation & No & No \\ \hline
-    Packet reassembly &	No & No \\ \hline
-    Timers/timeouts/aging & External & No \\ \hline
-    Queues & No & No \\ \hline
-    Scheduling & No & No \\ \hline
-    Data structures & No & No \\ \hline
-    Payload processing & No & No \\ \hline
-    State & Registers/counters & Maps \\ \hline
-    Iterating over packet payload & No & No \\ \hline
-    Wildcard matches & Yes & No \\ \hline
-    Table/map writes & Control-plane only & Data-plane and control-plane \\ \hline
-    Iteration over table/map values & Control-plane only & Control-plane only \\ \hline
-    Synchronization (data/data, data/control)  & No & No \\ \hline
-    Resources & Statically allocated & Limited stack and buffer \\ \hline
-    Control-plane support & Complex, including remote & Simple \\ \hline
-    Safety & Safe & Verifier limited to small programs \\ \hline
-    Compiler & Target-dependent & LLVM back-end \\ \hline
-  \end{tabular}
-  \caption{Comparison of the limitations of P4 and
-    eBPF.}\label{table:limitations}
-  \end{center}
-\end{table*}
 
 Many of these P4 limitations are shared with eBPF.  In general, while
 P4 and eBPF are good for performing relatively simple packet

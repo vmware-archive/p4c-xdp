@@ -7,7 +7,7 @@ Each target server has an Intel 10GbE X540-AT2 dual
 port NIC, with the two ports of the Intel NIC on one server connected
 to the two ports on the identical NIC on the other server.
 We installed p4c-xdp on one server, the {\em target server}, and
-attached the XDP program to the port that receives the packets
+attached the XDP program to the port that receives the packets.
 The other server, the {\em source server}, generates packets
 at the maximum 10~Gbps packet rate of 14.88~Mpps using the DPDK-based
 TRex~\cite{trex} traffic generator.  The source server sends minimum
@@ -16,14 +16,14 @@ target server, and receives the forwarded packets on the same port.
 At the target server, we use only one core to process all packets.
 Every packet received goes through the pipeline specified in P4.
 
-We use the sample p4 programs in the tests directory and the following
+We use the sample P4 programs in the tests directory and the following
 metrics to understand the performance impact of the P4-generated XDP
 program:
 \begin{itemize}
 \item Packet Processing Rate (Mpps): Once the XDP program finishes
   processing the packet, it returns one of the actions mentioned in
   section~\ref{sec:background}.  When we want to count the number of
-  packets that can be dropped per second, we modify each p4 program to
+  packets that can be dropped per second, we modify each P4 program to
   always return XDP\_DROP.
 \item CPU Utilization: Every packet processed by the XDP program is run
   under the per-core software IRQ daemon, named
@@ -120,7 +120,7 @@ is already a reserved space in front of every XDP packet frame.
 \subsection{Performance Analysis}
 
 To further understand the performance overhead of programs generated
-by p4c-xdp, we started broke down the CPU utilization. We used the Linux
+by p4c-xdp, we started to brake down the CPU utilization. We used the Linux
 perf tool on the process ID of the ksoftirqd that shows 100\%:
 \begin{lstlisting}[frame=none]
 perf record -p <pid of ksoftirqd> sleep 10

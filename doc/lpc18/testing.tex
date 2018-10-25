@@ -16,33 +16,9 @@ not require usage of \texttt{iproute2}~\cite{iproute} tooling such as
 in user-space, by using tools such as GDB~\cite{gdb},
 Valgrind~\cite{valgrind}, or Wireshark~\cite{wireshark}.
 
-\begin{table}[h]
-  \footnotesize
-  \begin{center}
-    \begin{tabular}{|p{2.8cm}|p{4.3cm}|} \hline
-      \textbf{Command} & \textbf{Description} \\ \hline \hline
-      \textbf{packet} port data & Insert a frame of bytes
-      \textit{data} into port \textit{port}.    \\ \hline
-      \textbf{expect} port data & Expect a frame of bytes
-      \textit{data} on port \textit{port}.  \\ \hline
-      \textbf{add} tbl priority match action & Insert a
-      match-action entry with key \textit{match} and action
-      \textit{action} into table \textit{tbl}. \\ \hline
-      \textbf{setdefault} tbl action & Set the default action for table
-      \textit{tbl}. \\
-      \hline
-      \textbf{check\_counter} tbl key==n & Check if the value on
-      the entry \textit{key} in counter table \textit{tbl} matches
-      \textit{n}.  \\
-      \hline
-      \textbf{wait} & Pause for a second. \\ \hline
-    \end{tabular}
-    \caption{The STF command palette.}\label{table:stf}
-  \end{center}
-\end{table}
 
 \subsection{The Simple Test Framework}
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{stf}
   \caption{Annotated example of a Simple Testing Framework (STF)
@@ -86,6 +62,31 @@ framework does not yet support this feature.
 
 \subsection{The Test Runtime}
 
+\begin{table}[h]
+	\footnotesize
+	\begin{center}
+		\begin{tabular}{|p{2.8cm}|p{4.3cm}|} \hline
+			\textbf{Command} & \textbf{Description} \\ \hline \hline
+			\textbf{packet} port data & Insert a frame of bytes
+			\textit{data} into port \textit{port}.    \\ \hline
+			\textbf{expect} port data & Expect a frame of bytes
+			\textit{data} on port \textit{port}.  \\ \hline
+			\textbf{add} tbl priority match action & Insert a
+			match-action entry with key \textit{match} and action
+			\textit{action} into table \textit{tbl}. \\ \hline
+			\textbf{setdefault} tbl action & Set the default action for table
+			\textit{tbl}. \\
+			\hline
+			\textbf{check\_counter} tbl key==n & Check if the value on
+			the entry \textit{key} in counter table \textit{tbl} matches
+			\textit{n}.  \\
+			\hline
+			\textbf{wait} & Pause for a second. \\ \hline
+		\end{tabular}
+		\caption{The STF command palette.}\label{table:stf}
+	\end{center}
+\end{table}
+
 Executing a P4 eBPF test is done in five stages (Figure
 \ref{fig:p4_testflow}):
 
@@ -106,7 +107,7 @@ Executing a P4 eBPF test is done in five stages (Figure
 \noindent These five stages look slightly differently when testing in
 user-space and in kernel-space.
 
-In user space we use a hash-table library to emulate eBPF maps.
+In user-space, we use a hash-table library to emulate eBPF maps.
 
 When testing in kernel-space we compile the eBPF/XDP programs to eBPF
 object files using LLVM.  Before the eBPF/XDP program is loaded, the
