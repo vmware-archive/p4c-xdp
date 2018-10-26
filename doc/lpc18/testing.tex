@@ -1,7 +1,7 @@
 \section{Testing eBPF programs}\label{sec:testing}
 
 To test the P4 to C compilers we have adapted and extended the
-existing P4 testing infrastructure.  The infrastructure can perform
+existing P4 testing infrastructure. The infrastructure can perform
 both functional correctness testing at the user level, and complete
 end-to-end testing running programs in the kernel.
 
@@ -16,13 +16,36 @@ not require usage of \texttt{iproute2}~\cite{iproute} tooling such as
 in user-space, by using tools such as GDB~\cite{gdb},
 Valgrind~\cite{valgrind}, or Wireshark~\cite{wireshark}.
 
+\begin{table*}[h]
+	\footnotesize
+	\begin{center}
+		\begin{tabular}{|p{5.8cm}|p{10.3cm}|} \hline
+			\textbf{Command} & \textbf{Description} \\ \hline \hline
+			\textbf{packet} port data & Insert a frame of bytes
+			\textit{data} into port \textit{port}.    \\ \hline
+			\textbf{expect} port data & Expect a frame of bytes
+			\textit{data} on port \textit{port}.  \\ \hline
+			\textbf{add} tbl priority match action & Insert a
+			match-action entry with key \textit{match} and action
+			\textit{action} into table \textit{tbl}. \\ \hline
+			\textbf{setdefault} tbl action & Set the default action for table
+			\textit{tbl}. \\
+			\hline
+			\textbf{check\_counter} tbl key==n & Check if the value on
+			the entry \textit{key} in counter table \textit{tbl} matches
+			\textit{n}.  \\
+			\hline
+			\textbf{wait} & Pause for a second. \\ \hline
+		\end{tabular}
+		\caption{The STF command palette.}\label{table:stf}
+	\end{center}
+\end{table*}
 
 \subsection{The Simple Test Framework}
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{stf}
-  \caption{Annotated example of a Simple Testing Framework (STF)
-    program for testing the P4 compiler.}
+  \caption{Annotated example of a STF program for testing the P4 compiler.}
   \label{fig:stf}
 \end{figure}
 
@@ -32,7 +55,7 @@ Initially STF was used with software simulators to validate P4
 programs, but we have adapted it for testing the eBPF and XDP
 back-ends.  The STF framework is written in Python.
 Figure~\ref{fig:stf} shows a small program written in the STF
-language.  Table \ref{table:stf} describes the list of currently
+language.  Table~\ref{table:stf} describes the list of currently
 supported STF operations in the eBPF testing backend.
 
 The STF \texttt{packet} statement describes an input port and the
@@ -62,30 +85,6 @@ framework does not yet support this feature.
 
 \subsection{The Test Runtime}
 
-\begin{table}[h]
-	\footnotesize
-	\begin{center}
-		\begin{tabular}{|p{2.8cm}|p{4.3cm}|} \hline
-			\textbf{Command} & \textbf{Description} \\ \hline \hline
-			\textbf{packet} port data & Insert a frame of bytes
-			\textit{data} into port \textit{port}.    \\ \hline
-			\textbf{expect} port data & Expect a frame of bytes
-			\textit{data} on port \textit{port}.  \\ \hline
-			\textbf{add} tbl priority match action & Insert a
-			match-action entry with key \textit{match} and action
-			\textit{action} into table \textit{tbl}. \\ \hline
-			\textbf{setdefault} tbl action & Set the default action for table
-			\textit{tbl}. \\
-			\hline
-			\textbf{check\_counter} tbl key==n & Check if the value on
-			the entry \textit{key} in counter table \textit{tbl} matches
-			\textit{n}.  \\
-			\hline
-			\textbf{wait} & Pause for a second. \\ \hline
-		\end{tabular}
-		\caption{The STF command palette.}\label{table:stf}
-	\end{center}
-\end{table}
 
 Executing a P4 eBPF test is done in five stages (Figure
 \ref{fig:p4_testflow}):
