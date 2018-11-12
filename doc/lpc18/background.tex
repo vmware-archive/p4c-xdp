@@ -62,7 +62,7 @@
 \end{figure}
 \section{Background concepts}\label{sec:background}
 
-This section describes briefly the P4 programming language and
+This section briefly describes the P4 programming language and
 eBPF. Some of the text is adapted from~\cite{budiu-osr17}
 and~\cite{p4-ebpf-backend}.
 
@@ -114,13 +114,12 @@ contain examples P4 architecture description files.
 \subsection{eBPF for network processing}
 
 \mycomment{(This section is adapted from~\cite{p4-ebpf-backend}.) }
-eBPF is a
-acronym that stands for Extended Berkeley Packet Filters. In essence,
+eBPF is an acronym that stands for Extended Berkeley Packet Filters. In essence,
 eBPF is a low-level programming language (similar to machine code);
 eBPF programs are traditionally executed by a virtual machine that
 resides in the Linux kernel. eBPF programs can be inserted and removed
 from a live kernel using dynamic code instrumentation. The main
-feature of eBPF programs is their static safety: prior to execution
+feature of eBPF programs is their static safety: prior to execution,
 all eBPF programs have to be validated as being safe, and unsafe
 programs cannot be executed. A safe program provably cannot compromise
 the machine it is running on:
@@ -186,7 +185,7 @@ execution is triggered when the flow of control reaches these hooks:
   datapath. Such programs can be used as TC classifiers and actions.
 
 \item eBPF programs can also be attached to sockets or network
-  interfaces. In this case they can be used for processing packets
+  interfaces. In this case, they can be used for processing packets
   that flow through the socket/interface.
 \end{itemize}
 
@@ -224,23 +223,22 @@ some of these races often cannot be avoided.
 
 \subsection{XDP: eXpress Data Path}\label{sec:xdp-background}
 
-An XDP program is special case of an eBPF program for processing
-network packets, which attaches to the lowest levels of the networking
-stack~\cite{xdpconext18}.  XDP was designed initially for quickly computing whether a
-packet should be dropped, before too many kernel resources have been
-allocated, to prevent denial-of-service attacks.  An XDP program can
-inspect a network packet right after the DMA engine copies the packet
+An XDP program is a specific class of eBPF packet processing program, which 
+attaches to the lowest levels of the networking
+stack~\cite{xdpconext18}. XDP was initially designed to prevent 
+denial-of-service attacks by quickly deciding whether a packet should be 
+dropped, before too many kernel resources have been allocated. An XDP program 
+can inspect a network packet right after the DMA engine copies the packet
 from the network card and can also access eBPF maps.
 
 The kernel expects an XDP program to return the decision taken about the 
-processed packet, one of the
-following values:
+processed packet. This may be one of the following values:
 
 \begin{description}
 \item[XDP\_DROP] the packet should be immediately dropped,
 \item[XDP\_TX] bounce the received packet back on the same port it arrived on,
-\item[XDP\_PASS] continue to process the packet using,
-  the normal kernel network stack,
+\item[XDP\_PASS] continue to process the packet using the normal kernel network 
+stack,
 \item[XDP\_REDIRECT] forward the packet to another port.
 \end{description}
 

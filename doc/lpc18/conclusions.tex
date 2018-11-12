@@ -1,15 +1,15 @@
 \section{Lessons learned}\label{sec:conclusions}
 
 In general, our development experience is mirrored by the lessons described
-in~\cite{minao-hspr18} and ~\cite{bertin-netdev17}.
+in \cite{minao-hspr18} and \cite{bertin-netdev17}.
 
 \paragraph{No multi-/broadcast support}
-While XDP is able to redirect single frames it does not have the ability to 
+While XDP is able to redirect single frames, it does not have the ability to 
 clone and redirect multiple packets similar to \texttt{bpf\_clone\_redirect}. 
 This makes development of more sophisticated P4 forwarding programs problematic.
 
 \paragraph{The stack size is too small}
-More complex generated XDP programs are rejected by the verifier despite their 
+More complex, generated XDP programs are rejected by the verifier despite their 
 safeness. 
 This is a particular challenge when attempting to implement network function 
 chaining or advanced pipelined packet processing in a single XDP program. 

@@ -1,7 +1,7 @@
 \section{Compiling P4 to eBPF}\label{sec:compilation}
 
-In this section we describe two open-source compilers that translate
-P4 programs in stylized C programs, that can in turn be compiled into
+In this section, we describe two open-source compilers that translate
+P4 programs into stylized C, which in turn can be compiled into
 eBPF programs using the LLVM eBPF back-end.
 
 
@@ -12,7 +12,7 @@ implementation~\cite{p4-ebpf-backend}.  This back-end targets a
 relatively simple packet filter architecture.
 Figure~\ref{fig:ebpf-model} shows the architectural model of an eBPF
 packet filter expressed in P4.  This architecture comprises a parser
-and a control block; the control block must produce a Boolean value
+and a control block; the control block must produce a Boolean value,
 which indicates whether the packet is accepted or not.
 
 \begin{figure}[h]
