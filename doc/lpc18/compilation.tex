@@ -1,6 +1,6 @@
 \section{Compiling P4 to eBPF}\label{sec:compilation}
 
-In this section, we describe two open-source compilers that translate
+In this section we describe two open-source compilers that translate
 P4 programs into stylized C, which in turn can be compiled into
 eBPF programs using the LLVM eBPF back-end.
 
@@ -158,3 +158,32 @@ the XDP architectural model targeted by this compiler. You can see that a
 P4 XDP program can (1) return to the kernel one of the four outcomes
 described in Section~\ref{sec:xdp-background}, and (2) it can also
 modify the packet itself, by inserting, modifying or deleting headers.
+
+\begin{figure}
+\begin{lstlisting}
+#include <ebpf_model.p4>
+enum xdp_action {
+  XDP_ABORTED,
+  XDP_DROP,
+  XDP_PASS,
+  XDP_TX
+}
+struct xdp_input { bit<32> input_port }
+struct xdp_output {
+  xdp_action output_action;
+  bit<32> output_port;
+}
+parser xdp_parse<H>(packet_in packet,
+                    out H headers);
+control xdp_switch<H>(inout H hdrs,
+                      in xdp_input i,
+                      out xdp_output o);
+control xdp_deparse<H>(in H headers,
+                       packet_out packet);
+package xdp<H>(xdp_parse<H> p,
+               xdp_switch<H> s,
+               xdp_deparse<H> d);
+\end{lstlisting}
+\caption{XDP packet switching architectural
+  model.}\label{fig:xdp-model}
+\end{figure}

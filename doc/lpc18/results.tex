@@ -120,7 +120,7 @@ is already a reserved space in front of every XDP packet frame.
 \subsection{Performance Analysis}
 
 To further understand the performance overhead of programs generated
-by p4c-xdp, we started to brake down the CPU utilization. We used the Linux
+by p4c-xdp, we started to break down the CPU utilization. We used the Linux
 perf tool on the process ID of the ksoftirqd that shows 100\%:
 \begin{lstlisting}[frame=none]
 perf record -p <pid of ksoftirqd> sleep 10

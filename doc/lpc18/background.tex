@@ -1,6 +1,6 @@
 \definecolor{grey}{rgb}{0.9, 0.9, 0.9}
 \global\mdfdefinestyle{mdstyle}{%
-	innerleftmargin=.3cm,rightmargin=.3cm,backgroundcolor=grey}
+    innerleftmargin=.3cm,rightmargin=.3cm,backgroundcolor=grey}
 \begin{figure*}[h]
 	\begin{mdframed}[style=mdstyle]
 		\begin{description}
@@ -100,7 +100,7 @@ targets and provides some language mechanisms to express it.
 Figure~\ref{fig:architecture} is an abstract view of how a P4 program
 interacts with the data-plane of a packet-processing engine.  The
 data-plane is a fixed-function device that provides several
-programmable ``holes''. The user writes a P4 program to ``fill'' each
+programmable ``holes''.  The user writes a P4 program to ``fill'' each
 hole.  The target manufacturer describes the interfaces between the
 programmable blocks and the surrounding fixed-function blocks.  These
 interfaces are target-specific.  Note that the fixed-function part can
@@ -225,7 +225,7 @@ some of these races often cannot be avoided.
 
 An XDP program is a specific class of eBPF packet processing program, which 
 attaches to the lowest levels of the networking
-stack~\cite{xdpconext18}. XDP was initially designed to prevent 
+stack~\cite{xdpconext18}.  XDP was initially designed to prevent 
 denial-of-service attacks by quickly deciding whether a packet should be 
 dropped, before too many kernel resources have been allocated. An XDP program 
 can inspect a network packet right after the DMA engine copies the packet
