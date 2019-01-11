@@ -28,7 +28,7 @@ ENV P4C_EBPF_DEPS libpcap-dev \
 
 ENV P4C_PIP_PACKAGES pyroute2 \
                      ply \
-                     scapy
+                     scapy==2.4.0
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends $P4C_DEPS
