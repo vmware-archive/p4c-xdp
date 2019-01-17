@@ -26,10 +26,13 @@ version >= 4.10.0-rc7+ due to some BPF verifier limitations
   <img src="doc/images/p4xdp-workflow.png" />
 </p>
 
-## Presentation
+## Presentations
 - IOVisor Summit 2017
 [slides](https://github.com/vmware/p4c-xdp/blob/master/doc/p4xdp-iovisor17.pdf),
 [demo1](https://youtu.be/On7hEJ6bPVU), [demo2](https://youtu.be/vlp1MzWVOc8), [demo3](https://youtu.be/TibGxCXPNVc)
+- Linux Plumbers' Conference 2018
+[slides](https://github.com/vmware/p4c-xdp/blob/master/doc/p4c-xdp-lpc18-presentation.pdf)
+[paper](https://github.com/vmware/p4c-xdp/blob/master/doc/lpc18.pdf)
 
 ## Installation
 ### Docker/Vagrant
