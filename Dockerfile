@@ -27,7 +27,7 @@ ENV P4C_EBPF_DEPS libpcap-dev \
              tcpdump
 
 ENV P4C_PIP_PACKAGES pyroute2 \
-                     ply \
+                     ply==3.8 \
                      scapy==2.4.0
 
 RUN apt-get update
