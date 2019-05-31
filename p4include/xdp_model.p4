@@ -35,7 +35,8 @@ enum xdp_action {
     XDP_ABORTED,  // some fatal error occurred during processing;
     XDP_DROP,     // packet should be dropped
     XDP_PASS,     // packet should be passed to the Linux kernel
-    XDP_TX        // packet should be resent out on the same interface
+    XDP_TX,       // packet should be resent out on the same interface
+    XDP_REDIRECT  // packet should be sent to a different interface
 }
 
 /* architectural model for a packet switch architecture */
