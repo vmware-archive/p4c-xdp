@@ -179,7 +179,7 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "   .type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,\n"
         "   .key_size = sizeof(u32),\n"
         "   .value_size = sizeof(u32),\n"
-        "   .pinning = 2,\n"
+        "   .pinning = 1,\n"
         "   .max_entries = 2,\n"
         "};\n"
         "#define BPF_PERF_EVENT_OUTPUT() do {\\\n"
@@ -210,7 +210,7 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat(".pinning = 2, /* PIN_GLOBAL_NS */");
+    builder->appendFormat(".pinning = 1, /* PIN_OBJECT_NS */");
     builder->newline();
 
     builder->emitIndent();
