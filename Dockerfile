@@ -24,7 +24,8 @@ ENV P4C_EBPF_DEPS libpcap-dev \
              libprotobuf-dev \
              protobuf-compiler \
              iproute2 \
-             tcpdump
+             tcpdump \
+             iptables
 
 ENV P4C_PIP_PACKAGES pyroute2 \
                      ply==3.8 \
