@@ -8,6 +8,7 @@ set (P4C_XDP_SOURCES
   target.cpp
   xdpBackend.cpp
   ../../backends/ebpf/ebpfProgram.cpp
+  ../../backends/ebpf/ebpfOptions.cpp
   ../../backends/ebpf/ebpfTable.cpp
   ../../backends/ebpf/ebpfControl.cpp
   ../../backends/ebpf/ebpfParser.cpp
