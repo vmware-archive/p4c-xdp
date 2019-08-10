@@ -20,6 +20,7 @@ set (P4C_XDP_SOURCES
   ../../backends/ebpf/lower.cpp
   )
 
+build_unified(P4C_XDP_SOURCES)
 set (P4C_XDP_HEADERS
   xdpModel.h
   xdpProgram.h
