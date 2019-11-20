@@ -35,8 +35,8 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends $P4C_DEPS
 RUN apt-get install -y --no-install-recommends $P4C_EBPF_DEPS
 # in some cases wheel is needed to install pip packages
-RUN pip install wheel
-RUN pip install $P4C_PIP_PACKAGES
+RUN pip3 install wheel
+RUN pip3 install $P4C_PIP_PACKAGES
 
 # p4c download begin
 RUN git clone https://github.com/p4lang/p4c.git && \

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2018 VMware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ import time
 sys.path.insert(0, 'p4c/tools')
 # path to the framework repository of the compiler
 sys.path.insert(0, 'p4c/backends/ebpf/targets')
-from kernel_target import Target as EBPFKernelTarget
+from .kernel_target import Target as EBPFKernelTarget
 from testutils import *
 
 
