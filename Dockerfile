@@ -14,7 +14,6 @@ ENV P4C_DEPS bison \
              libgmp-dev \
              pkg-config \
              python3 \
-             python3-ipaddr \
              python3-pip \
              python3-setuptools
 
