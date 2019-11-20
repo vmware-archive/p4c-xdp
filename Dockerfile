@@ -13,9 +13,10 @@ ENV P4C_DEPS bison \
              libgc-dev \
              libgmp-dev \
              pkg-config \
-             python-ipaddr \
-             python-pip \
-             python-setuptools
+             python3 \
+             python3-ipaddr \
+             python3-pip \
+             python3-setuptools
 
 ENV P4C_EBPF_DEPS libpcap-dev \
              libelf-dev \
