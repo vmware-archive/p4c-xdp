@@ -44,6 +44,7 @@ will pull the latest image. However, the XDP BPF code has dependency on your ker
 Currently for some complicated cases we require kernel >= 4.10.0-rc7.  So a vagrant box is
 also provided with kernel 4.10.0-rc8.
 ```bash
+$ vagrant init u9012063/p4xdp
 $ vagrant up
 $ vagrant ssh
 ubuntu@ubuntu-xenial:~$ sudo su
