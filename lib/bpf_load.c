@@ -434,6 +434,7 @@ int load_kallsyms(void)
 	}
 	sym_cnt = i;
 	qsort(syms, sym_cnt, sizeof(struct ksym), ksym_cmp);
+        fclose(f);
 	return 0;
 }
 
