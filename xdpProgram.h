@@ -23,6 +23,7 @@ limitations under the License.
 #include "frontends/p4/typeMap.h"
 #include "frontends/p4/evaluator/evaluator.h"
 #include "backends/ebpf/ebpfObject.h"
+#include "backends/ebpf/ebpfOptions.h"
 #include "backends/ebpf/ebpfProgram.h"
 
 namespace XDP {
@@ -39,7 +40,7 @@ class XDPProgram : public EBPF::EBPFProgram {
     cstring outHeaderLengthVar;
     cstring outTableName;
 
-    XDPProgram(const CompilerOptions& options, const IR::P4Program* program,
+    XDPProgram(const EbpfOptions& options, const IR::P4Program* program,
                P4::ReferenceMap* refMap, P4::TypeMap* typeMap,
                const IR::ToplevelBlock* toplevel) :
             EBPF::EBPFProgram(options, program, refMap, typeMap, toplevel),
