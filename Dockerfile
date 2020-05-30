@@ -58,12 +58,3 @@ RUN cd /home/p4c/ && \
     make -j `getconf _NPROCESSORS_ONLN` && \
     make install && \
     cd ..
-
-# p4c-xdp setup begin
-RUN cd /home/p4c/extensions/p4c-xdp/ && \
-    # link the compiler
-    ln -sf /home/p4c/build/p4c-xdp p4c-xdp && \
-    # add xdp to the ebpf backend target folder
-    ln -sf /home/p4c/extensions/p4c-xdp/xdp_target.py /home/p4c/backends/ebpf/targets/xdp_target.py && \
-    ln -sf /home/p4c/backends/ebpf/run-ebpf-test.py /home/p4c/extensions/p4c-xdp/run-ebpf-test.py
-# p4c-xdp setup end

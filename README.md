@@ -75,39 +75,36 @@ cd build/
 cmake ..
 make
 ```
-This generates a p4c-xdp binary in ~/p4c/build.
+This generates a p4c-xdp binary in ~/p4c/build. And install the xdp test target
+in `backends/ebpf/targets`.
 Next create a soft link to the binary:
 ```bash
 cd ~/p4c/extensions/p4c-xdp
 ln -s ~/p4c/build/p4c-xdp p4c-xdp
 ```
-And a soft link to the xdp test target and the test runtime:
-
+And a soft link to the test runtime:
 ```bash
 cd ~/p4c/extensions/p4c-xdp
-ln -s ~/p4c/extensions/p4c-xdp/xdp_target.py ~/p4c/backends/ebpf/targets/xdp_target.py
 ln -s ~/p4c/backends/ebpf/run-ebpf-test.py run-ebpf-test.py
 
 ```
-
 Now you can run the p4c-xdp tests:
 ```
 cd ~/p4c/build/
 make check-xdp
 ```
-
 This will check your llvm and clang version,
 compile all .p4 files, generate .c files, and load them into the kernel
 to be checked by the BPF verifier.
 
 ## XDP: eXpress Data Path
 XDP is a packet processing mechanism implemented within the device driver with eBPF.
-Currently to compile a P4 to C program, uses
+Currently to compile a P4 to C program, use
 ```bash
 	# ./p4c-xdp --target xdp -o <output_c_file> <input_p4>
 	./p4c-xdp --target xdp -o /tmp/xdp1.c xdp1.p4
 ```
-then you need to compile the xdp1.c to eBPF bytecode, xdp1.o, then loaded
+then you need to compile the xdp1.c to eBPF bytecode, xdp1.o, then load it
 into your driver. To compile a single .c file
 ```bash
 clang -Wno-unused-value -Wno-pointer-sign \
@@ -116,7 +113,7 @@ clang -Wno-unused-value -Wno-pointer-sign \
 		-Wno-tautological-compare \
 		-O2 -emit-llvm -g -c /tmp/xdp1.c -o -| llc -march=bpf -filetype=obj -o /tmp/xdp1.o
 ```
-Then loaded into driver with XDP support
+Then load it into the driver with XDP support
 ```bash
     ip link set dev $DEV xdp obj xdp1.o verb
 ```

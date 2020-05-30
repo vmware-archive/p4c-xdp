@@ -47,6 +47,14 @@ add_custom_target(linkp4cxdp
   COMMAND ${CMAKE_COMMAND} -E create_symlink ${P4C_BINARY_DIR}/p4include ${CMAKE_CURRENT_BINARY_DIR}/p4include
   )
 
+
+# Automatically insert the xdp_target in the targets folder
+if(CMAKE_HOST_UNIX)
+EXECUTE_PROCESS(COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/xdp_target.py ${P4C_SOURCE_DIR}/backends/ebpf/targets/xdp_target.py
+   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+   )
+endif(CMAKE_HOST_UNIX)
+
 set (XFAIL_TESTS_XDP
   # Fails because of stack size
   ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp7.p4
@@ -60,3 +68,4 @@ set(XDP_DRIVER "${P4C_SOURCE_DIR}/backends/ebpf/run-ebpf-test.py -t xdp -c \"${P
 # This file will not run the full tests, but it will attempt to compile the p4 files down to C
 set (XDP_TEST_SUITES "${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp*.p4")
 p4c_add_tests("xdp" ${XDP_DRIVER} ${XDP_TEST_SUITES} "${XFAIL_TESTS_XDP}")
+
