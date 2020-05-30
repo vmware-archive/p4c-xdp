@@ -124,18 +124,18 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "                  u16 totalLen, u16 identification, u8 flags,\n"
         "                  u16 fragOffset, u8 ttl, u8 protocol,\n"
         "                  u32 srcAddr, u32 dstAddr) {\n"
-        "    u32 checksum = htons(((u16)version << 12) | ((u16)ihl << 8) | (u16)diffserv);\n"
-        "    checksum += htons(totalLen);\n"
-        "    checksum += htons(identification);\n"
-        "    checksum += htons(((u16)flags << 13) | fragOffset);\n"
-        "    checksum += htons(((u16)ttl << 8) | (u16)protocol);\n"
-        "    srcAddr = htonl(srcAddr);\n"
-        "    dstAddr = htonl(dstAddr);\n"
+        "    u32 checksum = __bpf_htons(((u16)version << 12) | ((u16)ihl << 8) | (u16)diffserv);\n"
+        "    checksum += __bpf_htons(totalLen);\n"
+        "    checksum += __bpf_htons(identification);\n"
+        "    checksum += __bpf_htons(((u16)flags << 13) | fragOffset);\n"
+        "    checksum += __bpf_htons(((u16)ttl << 8) | (u16)protocol);\n"
+        "    srcAddr = __bpf_ntohl(srcAddr);\n"
+        "    dstAddr = __bpf_ntohl(dstAddr);\n"
         "    checksum += (srcAddr >> 16) + (u16)srcAddr;\n"
         "    checksum += (dstAddr >> 16) + (u16)dstAddr;\n"
         "    // Fields in 'struct Headers' are host byte order.\n"
         "    // Deparser converts to network byte-order\n"
-        "    return __constant_ntohs(~((checksum & 0xFFFF) + (checksum >> 16)));\n"
+        "    return bpf_ntohs(~((checksum & 0xFFFF) + (checksum >> 16)));\n"
         "}");
 
     builder->appendLine(
@@ -175,12 +175,12 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
         "}\n");
 
     builder->appendLine(
-        "struct bpf_map_def SEC(\"maps\") perf_event = {\n"
+        "struct bpf_elf_map SEC(\"maps\") perf_event = {\n"
         "   .type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,\n"
-        "   .key_size = sizeof(u32),\n"
-        "   .value_size = sizeof(u32),\n"
+        "   .size_key = sizeof(u32),\n"
+        "   .size_value = sizeof(u32),\n"
         "   .pinning = 1,\n"
-        "   .max_entries = 2,\n"
+        "   .max_elem = 2,\n"
         "};\n"
         "#define BPF_PERF_EVENT_OUTPUT() do {\\\n"
         "    int pktsize = (int)(skb->data_end - skb->data);\\\n"
@@ -195,26 +195,26 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
     // TODO: this should use target->emitTableDecl().
     // We can't do it today because it has a different map type PERCPU_ARRAY
     builder->emitIndent();
-    builder->appendFormat("struct bpf_map_def SEC(\"maps\") %s = ", outTableName.c_str());
+    builder->appendFormat("struct bpf_elf_map SEC(\"maps\") %s = ", outTableName.c_str());
     builder->blockStart();
     builder->emitIndent();
     builder->append(".type = ");
     builder->appendLine("BPF_MAP_TYPE_PERCPU_ARRAY,");
 
     builder->emitIndent();
-    builder->append(".key_size = sizeof(u32),");
+    builder->append(".size_key = sizeof(u32),");
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat(".value_size = sizeof(u32),");
+    builder->appendFormat(".size_value = sizeof(u32),");
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat(".pinning = 1, /* PIN_OBJECT_NS */");
+    builder->appendFormat(".pinning = 2, /* PIN_OBJECT_NS */");
     builder->newline();
 
     builder->emitIndent();
-    builder->appendFormat(".max_entries = 1 /* No multicast support */");
+    builder->appendFormat(".max_elem = 1 /* No multicast support */");
     builder->newline();
 
     builder->blockEnd(false);
