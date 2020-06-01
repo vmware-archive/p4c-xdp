@@ -33,16 +33,20 @@ class Target(EBPFKernelTarget):
         print("Compiler is", self.compiler)
 
     def compile_dataplane(self):
+        # Just call into the parent with the target set to kernel
         old_target = self.options.target
         self.options.target = "kernel"
-        super(Target, self).compile_dataplane()
+        result = super(Target, self).compile_dataplane()
         self.options.target = old_target
+        return result
 
     def _create_runtime(self):
+        # Just call into the parent with the target set to kernel
         old_target = self.options.target
         self.options.target = "kernel"
-        super(Target, self)._create_runtime()
+        result = super(Target, self)._create_runtime()
         self.options.target = old_target
+        return result
 
     def _load_filter(self, bridge, proc, port_name):
         # Load the specified eBPF object to "port_name" ingress and egress
