@@ -53,12 +53,10 @@ RUN git clone https://github.com/p4lang/p4c.git && \
 COPY . /home/p4c/extensions/p4c-xdp
 RUN ln -s /home/p4c /home/p4c/extensions/p4c-xdp
 
-# Build libbpf for eBPF and XDP tests.
-cd /home/p4c/
-python3 backends/ebpf/build_libbpf
 
 # build p4c and p4c-xdp
 RUN cd /home/p4c/ && \
+    python3 backends/ebpf/build_libbpf && \
     mkdir -p build && \
     cd build && \
     cmake .. && \

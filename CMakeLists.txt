@@ -1,5 +1,7 @@
 # CMakefile for the XDP P4-16 back-end.
 
+message(STATUS "Start configuring XDP back end")
+
 set (P4C_XDP_SOURCES
   p4c-xdp.cpp
   xdpModel.cpp
@@ -48,13 +50,13 @@ add_custom_target(linkp4cxdp
   )
 
 # check for the libbpf library, it is required for p4c-xdp to work
-find_library(LIBBPF NAMES bpf HINTS "${CMAKE_CURRENT_SOURCE_DIR}/runtime/usr/lib64/")
-if (LIBBPF)
+find_library(LIBBPF_XDP NAMES bpf HINTS "${P4C_SOURCE_DIR}/backends/ebpf/runtime/usr/lib64/")
+if (LIBBPF_XDP)
   message(STATUS "Found libbpf library")
 else()
   message(FATAL_ERROR "Missing the libbpf dependency, disabling kernel tests."
   " You can install libbpf by running './build_libbpf' in the "
-  "${CMAKE_CURRENT_SOURCE_DIR}/runtime folder.")
+  "$${P4C_SOURCE_DIR}/backends/ebpf/runtime folder.")
 endif()
 
 
@@ -79,4 +81,5 @@ set(XDP_DRIVER "${P4C_SOURCE_DIR}/backends/ebpf/run-ebpf-test.py -t xdp -c \"${P
 # This file will not run the full tests, but it will attempt to compile the p4 files down to C
 set (XDP_TEST_SUITES "${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp*.p4")
 p4c_add_tests("xdp" ${XDP_DRIVER} ${XDP_TEST_SUITES} "${XFAIL_TESTS_XDP}")
+message(STATUS "Done with configuring XDP back end")
 
