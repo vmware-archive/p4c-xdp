@@ -47,6 +47,17 @@ add_custom_target(linkp4cxdp
   COMMAND ${CMAKE_COMMAND} -E create_symlink ${P4C_BINARY_DIR}/p4include ${CMAKE_CURRENT_BINARY_DIR}/p4include
   )
 
+# check for the libbpf library, it is required for p4c-xdp to work
+find_library(LIBBPF NAMES bpf HINTS "${CMAKE_CURRENT_SOURCE_DIR}/runtime/usr/lib64/")
+if (LIBBPF)
+  message(STATUS "Found libbpf library")
+else()
+  message(FATAL_ERROR "Missing the libbpf dependency, disabling kernel tests."
+  " You can install libbpf by running './build_libbpf' in the "
+  "${CMAKE_CURRENT_SOURCE_DIR}/runtime folder.")
+endif()
+
+
 
 # Automatically insert the xdp_target in the targets folder
 if(CMAKE_HOST_UNIX)
