@@ -19,6 +19,7 @@ ENV P4C_DEPS bison \
 
 ENV P4C_EBPF_DEPS libpcap-dev \
              libelf-dev \
+             zlib1g-dev \
              llvm \
              clang \
              libprotobuf-dev \
@@ -38,6 +39,7 @@ RUN apt-get install -y --no-install-recommends $P4C_EBPF_DEPS
 RUN pip3 install wheel
 RUN pip3 install $P4C_PIP_PACKAGES
 
+
 # p4c download begin
 RUN git clone https://github.com/p4lang/p4c.git && \
     cd p4c && \
@@ -45,6 +47,11 @@ RUN git clone https://github.com/p4lang/p4c.git && \
     git submodule update --recursive && \
     mkdir extensions
 # p4c download end
+
+# Build libbpf for eBPF and XDP tests.
+cd /p4c
+python3 backends/ebpf/build_libbpf
+cd -
 
 # copy xdp into the extension folder
 COPY . /home/p4c/extensions/p4c-xdp
