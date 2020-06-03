@@ -56,7 +56,7 @@ if (LIBBPF_XDP)
 else()
   message(FATAL_ERROR "Missing the libbpf dependency, disabling kernel tests."
   " You can install libbpf by running './build_libbpf' in the "
-  "${P4C_SOURCE_DIR}/runtime folder.")
+  "$${P4C_SOURCE_DIR}/backends/ebpf/runtime folder.")
 endif()
 
 
