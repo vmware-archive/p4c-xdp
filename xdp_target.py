@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import sys
-import time
 # path to the tools folder of the compiler
 sys.path.insert(0, 'p4c/tools')
 # path to the framework repository of the compiler
@@ -35,31 +33,20 @@ class Target(EBPFKernelTarget):
         print("Compiler is", self.compiler)
 
     def compile_dataplane(self):
-        # Use clang to compile the generated C code to a LLVM IR
-        args = "make "
-        # target makefile
-        args += "-f kernel.mk "
-        # Source folder of the makefile
-        args += "-C " + self.runtimedir + " "
-        # Input eBPF byte code
-        args += self.template + ".o "
-        # The bpf program to attach to the interface
-        args += "BPFOBJ=" + self.template + ".o "
-        args += "INCLUDES+=-I" + os.path.dirname(self.options.p4filename)
-        errmsg = "Failed to compile the eBPF byte code:"
-        return run_timeout(self.options.verbose, args, TIMEOUT,
-                           self.outputs, errmsg)
+        # Just call into the parent with the target set to kernel
+        old_target = self.options.target
+        self.options.target = "kernel"
+        result = super(Target, self).compile_dataplane()
+        self.options.target = old_target
+        return result
 
     def _create_runtime(self):
-        args = self.get_make_args(self.runtimedir, "kernel")
-        # List of bpf programs to attach to the interface
-        args += "BPFOBJ=" + self.template + " "
-        args += "CFLAGS+=-DCONTROL_PLANE "
-        args += "INCLUDES+=-I" + os.path.dirname(self.options.p4filename)
-        args += " SOURCES= "
-        errmsg = "Failed to build the filter:"
-        return run_timeout(self.options.verbose, args, TIMEOUT,
-                           self.outputs, errmsg)
+        # Just call into the parent with the target set to kernel
+        old_target = self.options.target
+        self.options.target = "kernel"
+        result = super(Target, self)._create_runtime()
+        self.options.target = old_target
+        return result
 
     def _load_filter(self, bridge, proc, port_name):
         # Load the specified eBPF object to "port_name" ingress and egress
