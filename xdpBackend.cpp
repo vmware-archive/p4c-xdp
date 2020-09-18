@@ -32,7 +32,8 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
 
     auto main = toplevel->getMain();
     if (main == nullptr) {
-        ::warning("Could not locate top-level block; is there a %1% module?", IR::P4Program::main);
+        ::warning(ErrorType::WARN_MISSING,
+                  "Could not locate top-level block; is there a %1% module?", IR::P4Program::main);
         return;
     }
 
@@ -44,7 +45,8 @@ void run_xdp_backend(const EbpfOptions& options, const IR::ToplevelBlock* toplev
     } else if (options.target.isNullOrEmpty() || options.target == "xdp") {
         target = new XdpTarget();
     } else {
-        ::error("Unknown target %s; legal choices are 'bcc', 'xdp', and 'kernel'", options.target);
+        ::error(ErrorType::ERR_UNSUPPORTED,
+                "Unknown target %s; legal choices are 'bcc', 'xdp', and 'kernel'", options.target);
         return;
     }
 

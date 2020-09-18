@@ -30,7 +30,8 @@ bool XDPSwitch::build() {
     hitVariable = program->refMap->newName("hit");
     auto pl = controlBlock->container->type->applyParams;
     if (pl->size() != 3) {
-        ::error("Expected switch block to have exactly 3 parameters");
+        ::error(ErrorType::ERR_EXPECTED,
+                "Expected switch block to have exactly 3 parameters");
         return false;
     }
 
@@ -60,7 +61,8 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
     std::map<const IR::Parameter*, const IR::Parameter*> substitution;
 
     bool illegal(const IR::Statement* statement)
-    { ::error("%1%: not supported in deparser", statement); return false; }
+    { ::error(ErrorType::ERR_UNSUPPORTED,
+              "%1%: not supported in deparser", statement); return false; }
 
  public:
     OutHeaderSize(P4::ReferenceMap* refMap, P4::TypeMap* typeMap,
@@ -111,7 +113,7 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
         auto type = typeMap->getType(h);
         auto ht = type->to<IR::Type_Header>();
         if (ht == nullptr) {
-            ::error("Cannot emit a non-header type %1%", h);
+            ::error(ErrorType::ERR_INVALID, "Cannot emit a non-header type %1%", h);
             return false;
         }
         unsigned width = ht->width_bits();
@@ -137,7 +139,7 @@ bool XDPDeparser::build() {
     hitVariable = program->refMap->newName("hit");
     auto pl = controlBlock->container->type->applyParams;
     if (pl->size() != 2) {
-        ::error("Expected switch block to have exactly 3 parameters");
+        ::error(ErrorType::ERR_EXPECTED, "Expected switch block to have exactly 3 parameters");
         return false;
     }
 

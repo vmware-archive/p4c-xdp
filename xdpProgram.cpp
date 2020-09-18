@@ -34,7 +34,8 @@ bool XDPProgram::build() {
     } else if (paramCount == 3) {
         parserParamName = xdp_model.xdp.parser.name;
     } else {
-        ::error("%1%: Expected 2 or 3 package parameters", pack);
+        ::error(ErrorType::ERR_EXPECTED,
+                "%1%: Expected 2 or 3 package parameters", pack);
     }
 
     auto pb = pack->getParameterValue(parserParamName)
@@ -109,7 +110,8 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
     }
 
     if (builder->target->name != "XDP") {
-        ::error("This program must be compiled with --target xdp");
+        ::error(ErrorType::ERR_EXPECTED,
+                "This program must be compiled with --target xdp");
         return;
     }
 
