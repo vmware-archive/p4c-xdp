@@ -4,6 +4,7 @@ struct ovs_packet {}
 
 parser Parser(packet_in packet, out ovs_packet hdr) {
     state start {
+        hdr = {};
         transition accept;
     }
 }

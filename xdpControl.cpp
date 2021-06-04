@@ -86,8 +86,6 @@ class OutHeaderSize final : public EBPF::CodeGenInspector {
     }
     bool preorder(const IR::SwitchStatement* statement) override
     { return illegal(statement); }
-    bool preorder(const IR::IfStatement* statement) override
-    { return illegal(statement); }
     bool preorder(const IR::AssignmentStatement* statement) override
     { return illegal(statement); }
     bool preorder(const IR::ReturnStatement* statement) override
