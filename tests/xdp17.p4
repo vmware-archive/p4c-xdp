@@ -1,10 +1,16 @@
 #include "xdp_model.p4"
 
-struct ovs_packet {}
+header some {
+    bit<32> b;
+}
+
+struct ovs_packet {
+    some some;
+}
 
 parser Parser(packet_in packet, out ovs_packet hdr) {
     state start {
-        hdr = {};
+        hdr = { { 0 } };
         transition accept;
     }
 }
@@ -18,7 +24,8 @@ control Ingress(inout ovs_packet hdr, in xdp_input xin, out xdp_output xout) {
 
 control Deparser(in ovs_packet hdrs, packet_out packet) {
     apply {
-        ;
+        if (hdrs.some.isValid() && hdrs.some.b != 0)
+           packet.emit(hdrs.some);
     }
 }
 
