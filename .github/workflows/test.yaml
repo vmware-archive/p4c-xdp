@@ -40,4 +40,4 @@ jobs:
     - name: Test the xdp extension
       run: |
         cd $GITHUB_WORKSPACE/../p4c/build
-        ctest -R xdp --output-on-failure --schedule-random
+        sudo -E ctest -R xdp --output-on-failure --schedule-random
