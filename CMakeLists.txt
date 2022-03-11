@@ -66,11 +66,7 @@ EXECUTE_PROCESS(COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/xdp_target.py ${P4C_S
    )
 endif(CMAKE_HOST_UNIX)
 
-set (XFAIL_TESTS_XDP
-  # Fails because of stack size
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp7.p4
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp12.p4
-  )
+set (XFAIL_TESTS_XDP)
 
 add_dependencies(p4c_driver linkp4cxdp)
 
