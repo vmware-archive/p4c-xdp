@@ -24,7 +24,7 @@ namespace XDP {
 // Target XDP
 class XdpTarget : public EBPF::KernelSamplesTarget {
  public:
-    XdpTarget() : KernelSamplesTarget("XDP") {}
+    XdpTarget() : KernelSamplesTarget(false, "XDP") {}
     void emitIncludes(Util::SourceCodeBuilder* builder) const override;
     cstring forwardReturnCode() const override { return "XDP_PASS"; }
     cstring dropReturnCode() const override { return "XDP_DROP"; }
