@@ -1,0 +1,39 @@
+name: test
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: ${{ matrix.os }}
+        max-size: 1000M
+    - name: Install P4C dependencies
+      run: |
+        git clone https://github.com/p4lang/p4c $GITHUB_WORKSPACE/../p4c
+        cd $GITHUB_WORKSPACE/../p4c
+        git submodule update --init --recursive
+        cd $GITHUB_WORKSPACE
+        ./tools/install_dependencies.sh
+    - name: Prepare P4C
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/../p4c/extensions/
+        cp -r $GITHUB_WORKSPACE $GITHUB_WORKSPACE/../p4c/extensions/p4c-xdp
+        ln -sf $GITHUB_WORKSPACE $GITHUB_WORKSPACE/../p4c/extensions/p4c-xdp
+        mkdir $GITHUB_WORKSPACE/../p4c/build
+        cd $GITHUB_WORKSPACE/../p4c/build
+        cmake .. -DCMAKE_RUN_CLANG_TIDY=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    - name: Install P4C with the xdp extension
+      run: |
+        cd $GITHUB_WORKSPACE/../p4c/build
+        make  -j2
+    - name: Test the xdp extension
+      run: |
+        cd $GITHUB_WORKSPACE/../p4c/build
+        ctest -R xdp --output-on-failure --schedule-random
