@@ -59,8 +59,6 @@ else()
   "$${P4C_SOURCE_DIR}/backends/ebpf/runtime folder.")
 endif()
 
-
-
 # Automatically insert the xdp_target in the targets folder
 if(CMAKE_HOST_UNIX)
 EXECUTE_PROCESS(COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/xdp_target.py ${P4C_SOURCE_DIR}/backends/ebpf/targets/xdp_target.py
