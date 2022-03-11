@@ -6,7 +6,7 @@ set -e
 # fetch submodules and update apt
 echo "Initializing submodules..."
 git submodule update --init --recursive
-sudo apt-get update
+sudo apt update
 
 SRC_DIR="$(pwd)"
 
