@@ -31,6 +31,18 @@ sudo apt install -y bison \
                     libgmp-dev \
                     pkg-config
 
+# Install the eBPF dependencies
+sudo apt install -y libpcap-dev \
+                    libelf-dev \
+                    zlib1g-dev \
+                    llvm \
+                    clang \
+                    libprotobuf-dev \
+                    protobuf-compiler \
+                    iproute2 \
+                    tcpdump \
+                    iptables
+
 # This only works on Ubuntu 18+
 sudo apt install -y libprotoc-dev protobuf-compiler
 
