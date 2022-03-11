@@ -28,6 +28,8 @@ jobs:
         mkdir -p $GITHUB_WORKSPACE/../p4c/extensions/
         cp -r $GITHUB_WORKSPACE $GITHUB_WORKSPACE/../p4c/extensions/p4c-xdp
         ln -sf $GITHUB_WORKSPACE $GITHUB_WORKSPACE/../p4c/extensions/p4c-xdp
+        cd $GITHUB_WORKSPACE/../p4c
+        python3 backends/ebpf/build_libbpf
         mkdir $GITHUB_WORKSPACE/../p4c/build
         cd $GITHUB_WORKSPACE/../p4c/build
         cmake .. -DCMAKE_RUN_CLANG_TIDY=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
