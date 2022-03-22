@@ -1,5 +1,5 @@
 # p4c-xdp
-[![Build Status](https://travis-ci.org/vmware/p4c-xdp.svg?branch=master)](https://travis-ci.org/vmware/p4c-xdp)
+[![Main Build](https://github.com/vmware/p4c-xdp/actions/workflows/test.yml/badge.svg)](https://github.com/vmware/p4c-xdp/actions/workflows/test.yml)
 [![Apache licensed](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/vmware/p4c-xdp/blob/master/LICENSE)
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg)](https://github.com/vmware/p4c-xdp/blob/master/lib/COPYING)
 

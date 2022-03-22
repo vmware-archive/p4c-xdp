@@ -59,8 +59,6 @@ else()
   "$${P4C_SOURCE_DIR}/backends/ebpf/runtime folder.")
 endif()
 
-
-
 # Automatically insert the xdp_target in the targets folder
 if(CMAKE_HOST_UNIX)
 EXECUTE_PROCESS(COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/xdp_target.py ${P4C_SOURCE_DIR}/backends/ebpf/targets/xdp_target.py
@@ -68,11 +66,7 @@ EXECUTE_PROCESS(COMMAND ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/xdp_target.py ${P4C_S
    )
 endif(CMAKE_HOST_UNIX)
 
-set (XFAIL_TESTS_XDP
-  # Fails because of stack size
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp7.p4
-  ${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp12.p4
-  )
+set (XFAIL_TESTS_XDP)
 
 add_dependencies(p4c_driver linkp4cxdp)
 
