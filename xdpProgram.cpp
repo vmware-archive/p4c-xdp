@@ -224,7 +224,7 @@ void XDPProgram::emitC(EBPF::CodeBuilder* builder, cstring headerFile) {
 
     builder->newline();
     builder->emitIndent();
-    builder->target->emitCodeSection(builder, functionName);
+    builder->target->emitCodeSection(builder, "prog");
     builder->emitIndent();
     builder->target->emitMain(builder, functionName, model.CPacketName.str());
     builder->blockStart();
