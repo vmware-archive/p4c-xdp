@@ -20,19 +20,21 @@ set (P4C_XDP_SOURCES
   ../../backends/ebpf/ebpfModel.cpp
   ../../backends/ebpf/midend.cpp
   ../../backends/ebpf/lower.cpp
-  )
+)
 
-build_unified(P4C_XDP_SOURCES)
 set (P4C_XDP_HEADERS
   xdpModel.h
   xdpProgram.h
   xdpControl.h
   target.h
-  xdpBackend.h)
+  xdpBackend.h
+)
 
 set (XDP_DIST_HEADERS p4include/xdp_model.p4)
 
-add_cpplint_FILES(${CMAKE_CURRENT_SOURCE_DIR} "$(P4C_XDP_SOURCES)")
+add_cpplint_FILES(${CMAKE_CURRENT_SOURCE_DIR} "${P4C_XDP_SOURCES};${P4C_XDP_HEADERS}")
+
+build_unified(P4C_XDP_SOURCES)
 
 add_executable(p4c-xdp ${P4C_XDP_SOURCES})
 target_link_libraries(p4c-xdp ${P4C_LIBRARIES} ${P4C_LIB_DEPS})
@@ -76,4 +78,3 @@ set(XDP_DRIVER "${P4C_SOURCE_DIR}/backends/ebpf/run-ebpf-test.py -t xdp -c \"${P
 set (XDP_TEST_SUITES "${CMAKE_CURRENT_SOURCE_DIR}/tests/xdp*.p4")
 p4c_add_tests("xdp" ${XDP_DRIVER} ${XDP_TEST_SUITES} "${XFAIL_TESTS_XDP}")
 message(STATUS "Done with configuring XDP back end")
-
