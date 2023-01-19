@@ -1,4 +1,10 @@
 # p4c-xdp
+
+This project has been archived.  For a more complete ebpf XDP compiler
+please see the open-source p4c [repository](https://github.com/p4lang/p4c), in particular the p4c-ebpf 
+compiler. 
+
+
 [![Main Build](https://github.com/vmware/p4c-xdp/actions/workflows/test.yml/badge.svg)](https://github.com/vmware/p4c-xdp/actions/workflows/test.yml)
 [![Apache licensed](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/vmware/p4c-xdp/blob/master/LICENSE)
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg)](https://github.com/vmware/p4c-xdp/blob/master/lib/COPYING)
